@@ -18,8 +18,8 @@ or separate game files are required.
 - WASD movement and mouse look outside the aircraft; Space jumps and Q opens the
   parachute. Keyboard and mouse bindings are configurable in the menu.
 - Adjustable ground detail gives a clearer sense of movement.
-- Distant enemies remain active. Production follows simulation time independently
-  of frame rate, and the T-key time-advance exploit has been removed.
+- Hold T for tenfold fast-forward while flying or walking. Enemies, projectiles
+  and production keep pace, and distant enemies remain active.
 - Lingering bomb craters no longer damage the player or their aircraft. Explosions
   and debris still do.
 - Mousewheel scrolling in menus, documentation and tower briefings.

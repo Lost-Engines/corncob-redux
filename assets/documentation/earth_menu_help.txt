@@ -184,6 +184,7 @@ On foot
   V: call rescue. Caps Lock: remote control of your aircraft.
 
 Shared controls
+  T (hold): tenfold fast-forward while flying or walking.
   M: map. O: toggle radio messages. G: ground detail.
   P / Escape: pause menu. F1: boss screen.
   F2: intelligence. F3: current score. F4: control bindings.
@@ -192,8 +193,8 @@ Shared controls
 Joystick buttons 1 and 2 fire guns and missiles during flight.
 Modern joysticks do not need the DOS calibration controls.
 
-There is no accelerated-time key in Redux. Enemy production and
-movement follow the simulation clock, independently of rendering.
+Fast-forward advances the whole simulation, including enemies,
+projectiles and production. They do not sleep while you hold T.
 
 Use Left/Right to adjust FOV, draw distance, ground detail, resolution,
 mouse sensitivity and inversion. Enter opens the binding list. Settings

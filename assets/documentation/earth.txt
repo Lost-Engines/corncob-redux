@@ -134,6 +134,7 @@ On foot
   V: call rescue. Caps Lock: remote control of your aircraft.
 
 Shared controls
+  T (hold): tenfold fast-forward while flying or walking.
   M: map. O: toggle radio messages. G: ground detail.
   P / Escape: pause menu. F1: boss screen.
   F2: intelligence. F3: current score. F4: control bindings.
@@ -142,8 +143,8 @@ Shared controls
 Joystick buttons 1 and 2 fire guns and missiles during flight.
 Modern joysticks do not need the DOS calibration controls.
 
-There is no accelerated-time key in Redux. Enemy production and
-movement follow the simulation clock, independently of rendering.
+Fast-forward advances the whole simulation, including enemies,
+projectiles and production. They do not sleep while you hold T.
 
 Menus, documentation and the tower
   Arrow Up / Down: select or scroll; mousewheel also scrolls.
@@ -976,10 +977,11 @@ down the brake key until the plane comes to a complete stop.  The
 default brake binding is Period or keypad 0.
 
 
->  Why doesn't the T key accelerate time?
+>  How does the T key accelerate time?
 
-Redux removes accelerated time. KLA production and all movement run on
-a fixed simulation clock, independently of the display frame rate.
+Hold T to run the whole simulation ten times faster, on foot or in
+flight. Enemies, projectiles and production advance at the same rate;
+they no longer sleep while you travel. Release T for normal speed.
 
 
 >  Why does using the rudder in flight just make me stall?

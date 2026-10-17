@@ -12,6 +12,11 @@ pixel dimensions.
 
 The simulation advances at the original fixed five-unit step, forty PIT ticks
 per update (about 29.13 updates per second), independently of display refreshes.
+Holding T schedules ten times as many complete fixed updates; releasing it
+restores normal speed. It accelerates player travel, enemies, projectiles,
+production, expiry and the sortie clock together, without enlarging physics
+steps. The binding is configurable for both flying and walking. Map inspection,
+the mission builder and paused play do not accelerate.
 Actor movement, production and expiry run across the world. Production caps,
 mission censuses and force-field checks remain local to each installation.
 Weapon targeting ranges remain gameplay rules. Map and menu screens pause the

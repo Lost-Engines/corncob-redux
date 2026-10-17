@@ -496,8 +496,8 @@ auto main(int const argc, char const *const argv[])->int {
   corncob::render::framebuffer flight_frame;
   bool flight_frame_valid{false};
   unsigned int frame_number{0};
-  double previous_time{glfwGetTime()}, accumulated_time{0.0};
-  double constexpr simulation_period{corncob::game::timing::seconds_per_step};
+  double previous_time{glfwGetTime()};
+  corncob::game::timing::simulation_clock simulation_time;
   bool clock_was_flying{front.in_flight()};
   while(!glfwWindowShouldClose(window.get())) {
     glfwPollEvents();
@@ -551,7 +551,7 @@ auto main(int const argc, char const *const argv[])->int {
       observer = game->camera();
       flight_frame_valid = false;
       clock_was_flying = true;
-      accumulated_time = 0.0;
+      simulation_time.reset();
     }
     if(front.in_flight()) game->resume_from_tower();
     if(front.take_map()) game->press(corncob::game::action::toggle_map);
@@ -588,6 +588,7 @@ auto main(int const argc, char const *const argv[])->int {
     }
 #endif // NDEBUG
     corncob::game::input_state input;
+    bool fast_forwarding{false};
     auto configure_renderer{[&]{
       auto settings{preferences.scene};
       if(preferences.window_resolution) {
@@ -663,6 +664,7 @@ auto main(int const argc, char const *const argv[])->int {
           return (found->key >= 0 && held(found->key)) || (found->alternate >= 0 && held(found->alternate)) || (found->mouse >= 0 && glfwGetMouseButton(window.get(), found->mouse) == GLFW_PRESS);
         }};
         using enum corncob::game::control_id;
+        fast_forwarding = down(fast_forward) && !game->in_builder() && !game->in_map() && !game->is_paused();
         input.stick.roll = static_cast<int16_t>((down(roll_right) - down(roll_left)) * 512);
         input.stick.pitch = static_cast<int16_t>((down(pitch_up) - down(pitch_down)) * 512);
         input.stick.rudder = static_cast<int16_t>((down(rudder_left) - down(rudder_right)) * 512);
@@ -686,13 +688,12 @@ auto main(int const argc, char const *const argv[])->int {
         if(auto const joystick{walking ? std::nullopt : corncob::platform::poll_joystick(front.flight_controls().joystick_device)})
           corncob::game::apply_joystick(input, *joystick, input.view.modifier || game->looking_around());
       }
-      accumulated_time += elapsed;
-      while(accumulated_time >= simulation_period) {
+      simulation_time.add_time(elapsed, fast_forwarding);
+      while(simulation_time.take_step()) {
         game->advance(input);
         input.look_yaw = input.look_pitch = 0;
         state.look_x = state.look_y = 0;
         update_audio();
-        accumulated_time -= simulation_period;
       }
       observer = game->camera();
 #ifndef NDEBUG
@@ -737,7 +738,7 @@ auto main(int const argc, char const *const argv[])->int {
     if(!front.in_flight() && !inspect) {
       if(clock_was_flying) game->suspend_clock();
       clock_was_flying = false;
-      accumulated_time = 0.0;
+      simulation_time.reset();
       front.render(frame);
       presenter.present(frame);
       ++frame_number;

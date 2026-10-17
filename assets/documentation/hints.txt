@@ -193,9 +193,10 @@ KLA production and time (Redux):
 
 Production follows fixed simulation time, rather than displayed frames.
 Low frame rates or different rendering resolutions do not slow a site's
-countdown. The T-key time-advance exploit has been removed. Damaging
-sites
-still delays production, and the local population cap still applies.
+countdown. Holding T advances everything ten times faster, including
+KLA production and enemies, so it speeds travel without putting them
+to sleep. Damaging sites still delays production, and the local
+population cap still applies.
 
 
 Get KLA's to fly into enemy structures

@@ -12,7 +12,7 @@ enum class control_id {
   roll_left, roll_right, pitch_up, pitch_down, rudder_left, rudder_right, brakes,
   throttle_up, throttle_down, forward, backward, strafe_left, strafe_right, jump, drop_through,
   gun, pistol, cannon, missile, autopilot, flaps, rocket, eject, parachute, remote,
-  rear, cockpit, ground, look, map, rescue, messages, pause, bomb, charge, detonate, sound,
+  rear, cockpit, ground, look, map, rescue, messages, pause, bomb, charge, detonate, sound, fast_forward,
 };
 struct control_binding {
   control_id id;

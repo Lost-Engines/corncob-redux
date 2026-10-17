@@ -49,6 +49,8 @@ std::vector<control_binding> default_bindings() {
     binding(pause, "Pause / options", both, 'P'), binding(bomb, "Drop bomb", flight, 'B'),
     binding(charge, "Plant charge", walking, ';'), binding(detonate, "Detonate charges", walking, 'B'),
     binding(sound, "Sound effects", flight, 'S'),
+    // append new controls to preserve indices in existing saved bindings
+    binding(fast_forward, "Fast forward (hold)", both, 'T'),
   };
 }
 std::string binding_name(control_binding const &binding) {

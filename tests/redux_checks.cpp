@@ -6,6 +6,7 @@
 #include "game/front_end.h"
 #include "game/preferences.h"
 #include "game/session.h"
+#include "game/timing.h"
 #include "graphics/depth_raster.h"
 #include "resources/assets.h"
 #include "resources/documentation.h"
@@ -113,6 +114,78 @@ void walking_checks() {
   require(!forward.pilot().standing && forward.pilot().velocity.z > 0, "Space did not jump immediately");
 }
 
+void fast_forward_checks() {
+  namespace game = corncob::game;
+  namespace timing = game::timing;
+  namespace world = corncob::world;
+  corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
+  world::theatre theatre;
+  theatre.objects.push_back({
+    .position{4'000'000, 4'000'000, 0},
+    .attitude{},
+    .type{world::object_type::kla_site},
+    .flags{geometry.definition(world::object_type::kla_site).flags},
+    .timer{110},
+  });
+  auto run{[](game::session &session, bool const fast_forward, game::input_state const &input) {
+    timing::simulation_clock clock;
+    // retain a fractional step while switching speed, just as between window refreshes
+    clock.add_time(timing::seconds_per_step / 4, false);
+    unsigned int const frames{fast_forward ? 60u : 600u};
+    for(unsigned int frame{0}; frame < frames; ++frame) {
+      clock.add_time(timing::seconds_per_step / 2, fast_forward);
+      while(clock.take_step()) session.advance(input);
+    }
+  }};
+  game::session walking{geometry, theatre}, fast_walking{geometry, theatre};
+  auto const origin{walking.pilot().position};
+  game::input_state const pedestrian{
+    .walk_forward{true},
+    .weapons{.gun{true}},
+  };
+  run(walking, false, pedestrian);
+  run(fast_walking, true, pedestrian);
+  require(fast_walking.frame_number() == 300 && fast_walking.timer() == 300 * timing::pit_ticks_per_step, "fast-forward did not advance the full simulation clock tenfold");
+  require(fast_walking.pilot().position != origin && fast_walking.pilot().position == walking.pilot().position, "accelerated walking differs from normal fixed steps");
+  require(fast_walking.random_stream().seed() == walking.random_stream().seed() && fast_walking.results().encode() == walking.results().encode(), "fast-forward changed gameplay randomness or the sortie clock");
+  auto const &normal{walking.world().objects}, &fast{fast_walking.world().objects};
+  require(normal.size() == fast.size(), "fast-forward changed the object pools");
+  bool active_kla{false}, moved_projectile{false};
+  for(std::size_t i{0}; i < normal.size(); ++i) {
+    auto const &a{normal[i]}, &b{fast[i]};
+    require(a.type == b.type && a.position == b.position && a.velocity == b.velocity && a.flags == b.flags && a.timer == b.timer && a.health == b.health, "enemy or projectile updates diverged during fast-forward");
+    if(b.type == world::object_type::kla && b.has(world::object_flag::present))
+      active_kla = b.timer < 23'900;
+    if(b.type == world::object_type::bullets && b.position != origin) moved_projectile = true;
+  }
+  require(active_kla && fast.front().timer < 400, "KLA production or distant enemy activity slept during fast-forward");
+  require(moved_projectile, "projectiles did not move during fast-forward");
+
+  world::theatre training;
+  training.training = true;
+  game::session flight{geometry, training}, fast_flight{geometry, training};
+  game::input_state const aircraft{
+    .throttle_up{true},
+    .weapons{.gun{true}, .missile{true}},
+  };
+  flight.set_invincible(true); fast_flight.set_invincible(true);
+  run(flight, false, aircraft); run(fast_flight, true, aircraft);
+  require(fast_flight.craft().position == flight.craft().position && fast_flight.craft().velocity == flight.craft().velocity && fast_flight.random_stream().seed() == flight.random_stream().seed(), "accelerated flight differs from normal fixed steps");
+
+  timing::simulation_clock clock;
+  clock.add_time(timing::seconds_per_step / 2, false);
+  require(!clock.take_step(), "normal time advanced before a complete step");
+  clock.add_time(timing::seconds_per_step / 2, true);
+  unsigned int steps{0};
+  while(clock.take_step()) ++steps;
+  require(steps == 5, "holding fast-forward discarded fractional time");
+  clock.add_time(timing::seconds_per_step / 2, false);
+  require(clock.take_step() && !clock.take_step(), "releasing fast-forward did not restore normal speed");
+  clock.add_time(timing::seconds_per_step / 2, true);
+  clock.reset();
+  require(!clock.take_step(), "pausing retained pending fast-forward steps");
+}
+
 void proximity_and_crater_checks() {
   namespace world = corncob::world;
   namespace game = corncob::game;
@@ -161,6 +234,13 @@ void menu_checks(std::filesystem::path const &scratch) {
   require(front.options().bindings.front().key == 'K' && front.options().bindings.front().mouse == 3, "mouse rebind removed the keyboard binding");
   auto saved{game::preferences::load(scratch / "redux.cfg")};
   require(saved.bindings.front().key == 'K', "bindings did not persist");
+  require(saved.bindings.back().id == game::control_id::fast_forward && saved.bindings.back().key == 'T' && saved.bindings.back().context == game::control_context::both, "T fast-forward was not available while flying and walking");
+  {
+    std::ofstream legacy{scratch / "legacy.cfg"};
+    legacy << "bind 0 75 -1 -1\n";
+  }
+  auto const legacy{game::preferences::load(scratch / "legacy.cfg")};
+  require(legacy.bindings.front().key == 'K' && legacy.bindings.back().key == 'T', "adding fast-forward broke existing settings");
   front.wheel(1000);
   front.wheel(1000);
   front.command(game::interface_command::accept);
@@ -185,6 +265,7 @@ void menu_checks(std::filesystem::path const &scratch) {
   auto const hints{corncob::resources::documentation_text(true, "hints.txt")};
   require(hints.find("toasting") == std::string_view::npos && hints.find("toasted") != std::string_view::npos, "hint typo was not corrected");
   auto const manual{corncob::resources::documentation_text(false, "corncob.doc")};
+  require(manual.find("T (hold): tenfold fast-forward") != std::string_view::npos && hints.find("Holding T advances everything") != std::string_view::npos, "manuals omitted restored fast-forward or the production fix");
   require(manual.find("F9: toggle special flag") != std::string_view::npos && manual.find("Space: jump immediately") != std::string_view::npos, "manual omitted editor or walking keys");
 }
 
@@ -194,7 +275,7 @@ int main(int argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"scratch directory required"};
   std::filesystem::path const scratch{argv[1]};
   std::filesystem::remove_all(scratch);
-  depth_checks(); renderer_checks(); walking_checks(); proximity_and_crater_checks(); menu_checks(scratch);
+  depth_checks(); renderer_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
   std::filesystem::remove_all(scratch);
-  std::cout << "Redux depth, resolution, FOV, walking, bindings, scrolling and PDF checks passed\n";
+  std::cout << "Redux depth, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
 }
