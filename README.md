@@ -17,7 +17,8 @@ or separate game files are required.
   that fixes the tower door showing through walls and other overlapping objects.
 - WASD movement and mouse look outside the aircraft; Space jumps and Q opens the
   parachute. Keyboard and mouse bindings are configurable in the menu.
-- Adjustable ground detail gives a clearer sense of movement.
+- Adjustable ground detail gives a clearer sense of movement. Nearby dots and
+  lines scale with resolution, becoming fine single-pixel details in the distance.
 - Hold T for tenfold fast-forward while flying or walking. Enemies, projectiles
   and production keep pace, and distant enemies remain active.
 - Lingering bomb craters no longer damage the player or their aircraft. Explosions

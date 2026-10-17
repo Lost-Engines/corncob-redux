@@ -43,6 +43,71 @@ void depth_checks() {
   draw.line({-1e12,1e12,0}, {1e12,0,0}, 5);
 }
 
+void detail_size_checks() {
+  namespace graphics = corncob::graphics;
+  graphics::indexed_framebuffer frame;
+  frame.width = 192; frame.height = 128;
+  frame.pixels = std::vector<uint8_t>(frame.width * frame.height);
+  std::vector<float> depth(frame.pixels.size());
+  corncob::maths::random_source random;
+  graphics::perspective_view view{{8, 8, 184, 120}, 900, 600, 96, 64, false, 3};
+  auto position{[&](double const x, double const y, double const z) {
+    return graphics::view_point{z, (view.centre_x - x) * z / view.focal_x, (view.centre_y - y) * z / view.focal_y};
+  }};
+  auto clear{[&]{ std::ranges::fill(frame.pixels, 0); std::ranges::fill(depth, 0); }};
+  auto pixels{[&](uint8_t const colour){ return std::ranges::count(frame.pixels, colour); }};
+  graphics::depth_raster draw{frame, depth, view, random};
+  draw.point(position(96, 64, 1000), 7);
+  require(pixels(7) == 9, "nearby points did not scale to an original pixel at threefold resolution");
+  clear(); draw.point(position(96, 64, 22500), 7);
+  require(pixels(7) == 4, "middle-distance points did not shrink with perspective");
+  clear(); draw.point(position(96, 64, 1e8), 7);
+  require(pixels(7) == 1, "distant points did not reduce to one physical pixel");
+  clear(); draw.disc(position(96, 64, 1e8), 0.1, 7);
+  require(pixels(7) == 1, "detail scaling enlarged distant authored discs");
+  for(double const scale : {0.5, 1.0}) {
+    clear(); auto native{view}; native.pixel_scale = scale;
+    graphics::depth_raster{frame, depth, native, random}.point(position(96, 64, 1000), 7);
+    require(pixels(7) == 1, "native or reduced resolutions enlarged source points");
+  }
+  clear(); auto rear{view}; rear.rear = true; rear.pixel_scale = 2;
+  auto const forward{position(96, 64, 1000)};
+  graphics::depth_raster{frame, depth, rear, random}.point(-forward, 7);
+  require(pixels(7) == 4, "rear-view points did not use their own pixel scale or orientation");
+  clear(); draw.line(position(24, 64, 1000), position(168, 64, 1000), 7);
+  auto column{[&](int const x) {
+    unsigned int count{0};
+    for(unsigned int y{0}; y < frame.height; ++y) if(frame.pixels[y * frame.width + static_cast<unsigned int>(x)] == 7) ++count;
+    return count;
+  }};
+  require(column(96) == 3, "nearby model lines stayed one physical pixel wide");
+  clear(); draw.line(position(24, 64, 1e8), position(168, 64, 1e8), 7);
+  require(column(96) == 1, "far model lines retained enlarged thickness");
+  clear(); draw.line(position(24, 64, 15000), position(168, 64, 150000), 7);
+  require(column(32) >= 2 && column(160) == 1, "receding line thickness did not vary with perspective depth");
+  clear(); draw.line(position(96, 64, 1000), position(96, 64, 1e8), 7);
+  require(pixels(7) == 9, "end-on line failed to retain its nearest endpoint thickness");
+  clear(); draw.line(position(24, 8, 1000), position(168, 8, 1000), 7);
+  require(pixels(7) > 100, "viewport clipping dropped an overlapping wide line");
+  clear(); draw.line(position(24, 7.75, 1000), position(168, 7.75, 1000), 7);
+  require(pixels(7) > 100, "line clipping ignored width when the centre was off screen");
+  for(unsigned int y{0}; y < frame.height; ++y) for(unsigned int x{0}; x < frame.width; ++x)
+    if(x < 8 || x >= 184 || y < 8 || y >= 120) require(frame.pixels[y * frame.width + x] == 0, "wide line leaked outside its view");
+  clear();
+  std::array<graphics::view_point, 4> const wall{{position(30, 20, 100), position(160, 20, 100), position(160, 110, 100), position(30, 110, 100)}};
+  draw.polygon(wall, 4);
+  draw.point(position(96, 64, 1000), 7);
+  draw.line(position(40, 64, 1000), position(150, 64, 1000), 7);
+  require(pixels(7) == 0, "enlarged points or lines leaked through foreground geometry");
+  draw.line({-1000, 0, 0}, {1000, 0, 0}, 7);
+  require(pixels(7) == 9, "a line crossing the eye failed near-plane clipping or nearest-depth selection");
+  clear(); draw.line(position(60, 20, 1000), position(85, 100, 1000), 7);
+  auto const ascending{frame.pixels};
+  require(pixels(7) > 200, "steep nearby lines lost their thickness");
+  clear(); draw.line(position(85, 100, 1000), position(60, 20, 1000), 7);
+  require(frame.pixels == ascending, "reversing a steep line changed its coverage");
+}
+
 void renderer_checks() {
   namespace graphics = corncob::graphics;
   namespace world = corncob::world;
@@ -92,6 +157,27 @@ void renderer_checks() {
     require(different == front, "tower doorway occlusion or front visibility is incorrect");
   }
 
+}
+
+void ground_size_checks() {
+  namespace graphics = corncob::graphics;
+  namespace resources = corncob::resources;
+  resources::geometry_bank geometry{resources::engine_data_asset()};
+  auto const cockpit{resources::decode_cockpit_mask(resources::cockpit_asset())};
+  corncob::world::theatre theatre;
+  auto count{[&](int32_t const altitude, unsigned int const scale) {
+    graphics::scene_renderer renderer{geometry, cockpit};
+    renderer.configure({.resolution{640 * scale, 350 * scale}, .ground_points{80}});
+    graphics::camera observer{.position{0, 0, altitude}, .attitude{}, .cockpit{false}};
+    corncob::maths::random_source random;
+    corncob::render::framebuffer frame;
+    renderer.render(theatre, observer, 0, 0, random, frame);
+    return std::ranges::count(renderer.indexed_frame().pixels, uint8_t{0});
+  }};
+  auto const native{count(720, 1)}, doubled{count(720, 2)}, quadrupled{count(720, 4)};
+  require(native > 10 && doubled >= native * 3 && quadrupled >= native * 12, "ground dots did not preserve their nearby screen-space weight at higher resolutions");
+  auto const distant_native{count(1'000'000, 1)}, distant_quadrupled{count(1'000'000, 4)};
+  require(distant_native > 10 && distant_quadrupled < distant_native * 2, "distant ground dots did not remain single-pixel details");
 }
 
 void walking_checks() {
@@ -275,7 +361,7 @@ int main(int argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"scratch directory required"};
   std::filesystem::path const scratch{argv[1]};
   std::filesystem::remove_all(scratch);
-  depth_checks(); renderer_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
+  depth_checks(); detail_size_checks(); renderer_checks(); ground_size_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
   std::filesystem::remove_all(scratch);
-  std::cout << "Redux depth, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
+  std::cout << "Redux depth, detail sizing, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
 }

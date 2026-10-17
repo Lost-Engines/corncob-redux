@@ -6,6 +6,10 @@ namespace corncob::graphics {
 
 namespace {
 
+// World centimetres are halved in model space: this is a one-metre detail footprint.
+// At the original 300-pixel focal length it is one pixel wide at 300 metres.
+double constexpr detail_diameter{50.0};
+
 double edge(double ax, double ay, double bx, double by, double x, double y) {
   return (bx - ax) * (y - ay) - (by - ay) * (x - ax);
 }
@@ -32,6 +36,24 @@ double depth_raster::plane(view_point const &p, unsigned int const index) const 
 }
 auto depth_raster::project(view_point const &p) const->projected_point {
   return {view.centre_x - p.y * view.focal_x / p.x, view.centre_y - p.z * view.focal_y / p.x, 1.0 / p.x};
+}
+double depth_raster::detail_width(double const reciprocal_depth) const {
+  return std::clamp(detail_diameter * view.focal_x * reciprocal_depth, 1.0, std::max(1.0, view.pixel_scale));
+}
+void depth_raster::detail_point(projected_point const &point, colour_index const colour) {
+  int const size{static_cast<int>(std::lround(detail_width(point.depth)))};
+  // Square footprints preserve the original pixel artwork without filtering the palette.
+  int const left{static_cast<int>(std::floor(point.x)) - size / 2}, top{static_cast<int>(std::floor(point.y)) - size / 2};
+  for(int y{std::max(top, view.bounds.top)}; y < std::min(top + size, view.bounds.bottom); ++y)
+    for(int x{std::max(left, view.bounds.left)}; x < std::min(left + size, view.bounds.right); ++x) pixel(x, y, point.depth, colour);
+}
+void depth_raster::point(view_point const &position, colour_index const colour) {
+  auto const centre{orient(position)};
+  if(centre.x < 1.0) return;
+  auto const p{project(centre)};
+  double const margin{std::max(1.0, view.pixel_scale)};
+  if(p.x + margin < view.bounds.left || p.x - margin >= view.bounds.right || p.y + margin < view.bounds.top || p.y - margin >= view.bounds.bottom) return;
+  detail_point(p, colour);
 }
 void depth_raster::pixel(int const x, int const y, double const reciprocal_depth, colour_index colour) {
   if(x < view.bounds.left || x >= view.bounds.right || y < view.bounds.top || y >= view.bounds.bottom) return;
@@ -87,17 +109,60 @@ void depth_raster::polygon(std::span<view_point const> const vertices, colour_in
 }
 void depth_raster::line(view_point a, view_point b, colour_index const colour) {
   a = orient(a); b = orient(b);
+  double const margin{std::max(1.0, view.pixel_scale) * 0.5};
   for(unsigned int i{0}; i != 5; ++i) {
-    double const da{plane(a, i)}, db{plane(b, i)};
+    // Include the stroke's width when clipping at the viewport edges.
+    auto distance{[&](view_point const &p){ return plane(p, i) + (i == 0 ? 0.0 : margin * p.x); }};
+    double const da{distance(a)}, db{distance(b)};
     if(da < 0 && db < 0) return;
     if(da < 0) a += (b - a) * (da / (da - db));
     else if(db < 0) b = a + (b - a) * (da / (da - db));
   }
-  auto const first{project(a)}, last{project(b)};
-  int const steps{std::max(1, static_cast<int>(std::ceil(std::max(std::abs(last.x - first.x), std::abs(last.y - first.y)))))};
-  for(int i{0}; i <= steps; ++i) {
-    double const t{static_cast<double>(i) / steps};
-    pixel(static_cast<int>(std::floor(first.x + (last.x - first.x) * t)), static_cast<int>(std::floor(first.y + (last.y - first.y) * t)), first.depth + (last.depth - first.depth) * t, colour);
+  auto first{project(a)}, last{project(b)};
+  double const maximum_width{std::max(detail_width(first.depth), detail_width(last.depth))};
+  if(maximum_width <= 1.0) {
+    int const steps{std::max(1, static_cast<int>(std::ceil(std::max(std::abs(last.x - first.x), std::abs(last.y - first.y)))))};
+    for(int i{0}; i <= steps; ++i) {
+      double const t{static_cast<double>(i) / steps};
+      pixel(static_cast<int>(std::floor(first.x + (last.x - first.x) * t)), static_cast<int>(std::floor(first.y + (last.y - first.y) * t)), first.depth + (last.depth - first.depth) * t, colour);
+    }
+    return;
+  }
+  if(std::abs(last.x - first.x) + std::abs(last.y - first.y) < 1e-8) {
+    first.depth = std::max(first.depth, last.depth);
+    detail_point(first, colour);
+    return;
+  }
+  // Walk a narrow ribbon along the major axis, visiting each covered pixel once.
+  // Perspective depth determines both the local thickness and its occlusion.
+  bool const steep{std::abs(last.y - first.y) > std::abs(last.x - first.x)};
+  if(steep) { std::swap(first.x, first.y); std::swap(last.x, last.y); }
+  if(first.x > last.x) std::swap(first, last);
+  double const dx{last.x - first.x}, dy{last.y - first.y}, length_squared{dx * dx + dy * dy};
+  double const radius{maximum_width * 0.5}, ribbon{radius * std::sqrt(1.0 + dy * dy / (dx * dx))};
+  int const major_begin{steep ? view.bounds.top : view.bounds.left}, major_end{steep ? view.bounds.bottom : view.bounds.right};
+  int const minor_begin{steep ? view.bounds.left : view.bounds.top}, minor_end{steep ? view.bounds.right : view.bounds.bottom};
+  int const begin{std::max(major_begin, static_cast<int>(std::floor(first.x - radius)))};
+  int const end{std::min(major_end, static_cast<int>(std::ceil(last.x + radius)))};
+  for(int major{begin}; major < end; ++major) {
+    double const t{std::clamp((major + 0.5 - first.x) / dx, 0.0, 1.0)};
+    double const centre{first.y + dy * t}, reciprocal{first.depth + (last.depth - first.depth) * t};
+    if(detail_width(reciprocal) < 1.5) {
+      if(major + 1.0 < first.x || major > last.x) continue;
+      int const minor{static_cast<int>(std::floor(centre))};
+      pixel(steep ? minor : major, steep ? major : minor, reciprocal, colour);
+      continue;
+    }
+    int const low{std::max(minor_begin, static_cast<int>(std::floor(centre - ribbon)))};
+    int const high{std::min(minor_end, static_cast<int>(std::ceil(centre + ribbon)))};
+    for(int minor{low}; minor < high; ++minor) {
+      double const along{std::clamp(((major + 0.5 - first.x) * dx + (minor + 0.5 - first.y) * dy) / length_squared, 0.0, 1.0)};
+      double const depth{first.depth + (last.depth - first.depth) * along};
+      double const width{detail_width(depth)}, x{major + 0.5 - first.x - dx * along}, y{minor + 0.5 - first.y - dy * along};
+      double const squared_distance{x * x + y * y}, squared_radius{width * width * 0.25};
+      if(squared_distance < squared_radius || (squared_distance == squared_radius && y < 0.0))
+        pixel(steep ? minor : major, steep ? major : minor, depth, colour);
+    }
   }
 }
 void depth_raster::disc(view_point centre, double const diameter, colour_index const colour) {

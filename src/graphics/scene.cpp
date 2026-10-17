@@ -152,7 +152,8 @@ void scene_renderer::draw_ground_and_stars(world::theatre const &theatre, camera
       if(point.x < 1.0) continue;
       double const x{view.centre_x - point.y * view.focal_x / point.x}, y{view.centre_y - point.z * view.focal_y / point.x};
       if(x < view.bounds.left || x >= view.bounds.right || y < view.bounds.top || y >= view.bounds.bottom) continue;
-      raster{indexed, view.bounds, random}.point({static_cast<int>(x), static_cast<int>(y)}, star ? 15 : dark ? 14 : 0);
+      if(star) raster{indexed, view.bounds, random}.point({static_cast<int>(x), static_cast<int>(y)}, 15);
+      else depth_raster{indexed, depth, view, random}.point(transformed, dark ? 14 : 0);
       visible = true;
     }
     return visible;
@@ -185,7 +186,7 @@ void scene_renderer::draw_model(resources::model_address const address, unsigned
             ++statistics.lines;
           }
         } else if constexpr(std::is_same_v<shape_type, resources::point_cloud>) {
-          for(auto const &point : shape.points) draw.disc(vertex(point.position), 0, geometry.colour(point.colour));
+          for(auto const &point : shape.points) draw.point(vertex(point.position), geometry.colour(point.colour));
         } else if constexpr(std::is_same_v<shape_type, resources::disc_cloud>) {
           for(auto const &disc : shape.discs) {
             draw.disc(vertex(disc.position), disc.diameter, geometry.colour(disc.colour));
@@ -262,6 +263,8 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
   view_storage[0].focal_y = focal * (2.0 / 3.0);
   view_storage[0].centre_x = size.width * 0.5;
   view_storage[0].centre_y = view_storage[0].bounds.bottom * 0.5;
+  double const native_width{static_cast<double>(render::dimensions(video).width)};
+  view_storage[0].pixel_scale = size.width / native_width;
   view_storage[1] = {
     .bounds{std::max(0, scaled_x(168)), scaled_y(254), std::min(static_cast<int>(size.width), scaled_x(472)), scaled_y(345)},
     .focal_x{150 * scale},
@@ -269,6 +272,7 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
     .centre_x{panel_left + 320 * scale},
     .centre_y{panel_top + 299 * scale},
     .rear{true},
+    .pixel_scale{640.0 * scale / native_width},
   };
   if(observer.orb_distortion != 0) {
     int16_t const amount{maths::word(observer.orb_distortion)};

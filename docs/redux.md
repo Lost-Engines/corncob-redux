@@ -3,9 +3,16 @@
 Rendering uses a depth buffer, full-detail source models and wider intermediate
 coordinates; it no longer depends on the DOS projection tiers or streamed tiles.
 A zero draw-distance setting has no far clipping plane. Distant polygons naturally
-become subpixel; points and discs retain a one-pixel minimum. Palette indices and
-authored coplanar markings remain intact. The 3D view has configurable horizontal
-FOV; its horizontal/vertical focal ratio preserves the original projection style.
+become subpixel. Ground dots and model points/lines scale up to the screen size
+of one original-mode pixel nearby, tapering towards a physical pixel with
+distance. A one-metre footprint controls that taper (one native EGA pixel at
+300 metres with its original focal length); it does not enlarge authored discs
+or stars. Line width and reciprocal depth vary along each segment, including
+viewport clipping and occlusion. The rear view uses its own panel scale.
+Authored discs retain their model diameters and a physical-pixel minimum.
+Palette indices and authored coplanar markings remain intact. The 3D view has
+configurable horizontal FOV; its horizontal/vertical focal ratio preserves the
+original projection style.
 Cockpit instruments render on the original panel, which is scaled with nearest
 neighbour sampling and centred on wider screens. Menus retain their original
 pixel dimensions.
