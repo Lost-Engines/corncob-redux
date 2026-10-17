@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <stdexcept>
+
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -17,14 +18,14 @@ namespace corncob::platform {
 std::filesystem::path default_save_directory() {
   /// Keep native user saves separate from embedded installation resources
 #ifdef _WIN32
-  if(auto const *path{std::getenv("APPDATA")}) return std::filesystem::path{path} / "Corncob";
+  if(auto const *path{std::getenv("APPDATA")}) return std::filesystem::path{path} / "CorncobRedux";
 #elif defined(__APPLE__)
-  if(auto const *path{std::getenv("HOME")}) return std::filesystem::path{path} / "Library/Application Support/Corncob";
+  if(auto const *path{std::getenv("HOME")}) return std::filesystem::path{path} / "Library/Application Support/CorncobRedux";
 #else
-  if(auto const *path{std::getenv("XDG_DATA_HOME")}; path != nullptr && *path != '\0') return std::filesystem::path{path} / "corncob";
-  if(auto const *path{std::getenv("HOME")}) return std::filesystem::path{path} / ".local/share/corncob";
+  if(auto const *path{std::getenv("XDG_DATA_HOME")}; path != nullptr && *path != '\0') return std::filesystem::path{path} / "corncob-redux";
+  if(auto const *path{std::getenv("HOME")}) return std::filesystem::path{path} / ".local/share/corncob-redux";
 #endif // _WIN32
-  return "corncob-saves";
+  return "corncob-redux-saves";
 }
 std::vector<uint8_t> read_binary(std::filesystem::path const &path) {
   /// Read a complete native save with a contextual error rather than silently replacing an unreadable file

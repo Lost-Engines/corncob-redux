@@ -10,6 +10,10 @@ enum class video_mode {
   ega_low,
   hercules,
 };
+struct resolution_limits {
+  static unsigned int constexpr minimum_width{160}, minimum_height{100};
+  static unsigned int constexpr maximum_width{7680}, maximum_height{4320};
+};
 struct video_size {
   unsigned int width;
   unsigned int height;

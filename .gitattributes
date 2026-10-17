@@ -11,3 +11,6 @@ assets/*.twr binary
 
 # Native TOWERS.INF reference retains its DOS line endings
 tests/reference/*.inf binary
+
+# Linked PDF manuals contain compressed binary streams.
+*.pdf binary

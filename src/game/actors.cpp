@@ -2,10 +2,10 @@
 #include <algorithm>
 #include <bit>
 #include <cstdlib>
+#include "vectorstorm/vector/vector2.h"
 #include "maths/integer.h"
 #include "resources/actor_tables.h"
 #include "world/motion.h"
-#include "vectorstorm/vector/vector2.h"
 
 namespace corncob::game {
 
@@ -77,10 +77,17 @@ actors::actors(resources::geometry_bank const &geometry, world::theatre &theatre
   /// Keep the preceding active census separate from this pass's live actor updates
   active_updates.reserve(theatre.objects.size());
 }
+actor_census actors::census(maths::world_position const &centre) const {
+  actor_census result{};
+  for(auto const &object : theatre.objects) if(object.has(world::object_flag::present) && object.has(world::object_flag::updates)
+    && world::in_active_neighbourhood(object.position, centre)) count_actor(object, result);
+  return result;
+}
 void actors::update_launcher(world::placed_object &object, actor_context const &context, flight::time_step const step) {
   /// Site countdowns use the previous census, updating its population immediately when a constructor is attempted
   using enum world::object_type;
-  auto const population{[&](world::object_type const type){return previous_counts[std::to_underlying(type)];}};
+  auto const local{census(object.position)};
+  auto const population{[&](world::object_type const type){return local[std::to_underlying(type)];}};
   unsigned int const quality{object.quality()};
   world::object_type const launched{object.type == vehicle_site ? ground_vehicle : object.type == saucer_site ? saucer : kla};
   unsigned int const present{population(launched) + (launched == saucer ? population(objective_saucer) : 0)};
@@ -121,14 +128,12 @@ void actors::update_launcher(world::placed_object &object, actor_context const &
 }
 void actors::update_kla(world::placed_object &object, actor_context const &context, flight::time_step const step) {
   /// KLAs launch vertically, wait through their hundred-frame rest and then steer rather than teleporting their velocity
-  effects.sound.kla_distance = 64;
   if(object.timer >= 23'900) return;
   object.motion.gravity = static_cast<int16_t>(static_cast<uint16_t>(object.motion.gravity) & 0xff00u);
   object.motion.dispersion = 0;
   object.motion.drag_divisor = 0;
   auto const target{relative_target(object.position, context.target, 4)};
   if(!target) {
-    object.velocity = maths::fixed_vector{0, 0, 0};
     if(object.timer <= 11'950) object.timer = 1;
     return;
   }
@@ -392,9 +397,8 @@ void actors::update_balloon(world::placed_object &object, flight::time_step cons
 
 }
 void actors::update_orb(world::placed_object &object, actor_context const &context, flight::time_step const step) {
-  /// Orb objectives consume the preceding active census; destruction leaves the objective anchor in place
+  /// Orb objectives inspect their own installation; destruction leaves the objective anchor in place.
   object.timer = 32'000;
-  effects.orb_distortion = 0;
   if(object.type == world::object_type::destroyed_generator_orb && object.has(world::object_flag::objective_complete)) {
     unsigned int constexpr collapse_height{11'200}, resting_height{3100};
     if((static_cast<uint32_t>(object.position.z) >> 16) != 0 || static_cast<uint16_t>(object.position.z) > collapse_height) {
@@ -407,11 +411,10 @@ void actors::update_orb(world::placed_object &object, actor_context const &conte
     }
   }
   if(object.type == world::object_type::generator_orb) {
-    effects.sound.orb_distance = 63;
     auto const target{relative_target(object.position, context.observer)};
     if(target && target->distance <= 2000) {
-      effects.sound.orb_distance = static_cast<uint16_t>(std::min(63, target->distance * 70 / 2000));
-      effects.orb_distortion = static_cast<uint16_t>(std::min(35, 71 - target->distance * 70 / 2000));
+      effects.sound.orb_distance = std::min(effects.sound.orb_distance, static_cast<uint16_t>(std::min(63, target->distance * 70 / 2000)));
+      effects.orb_distortion = std::max(effects.orb_distortion, static_cast<uint16_t>(std::min(35, 71 - target->distance * 70 / 2000)));
       if(object.has(world::object_flag::special) && !context.on_foot) {
         unsigned int const divisor{std::max(10u, static_cast<unsigned int>(target->distance) * target->distance / 5000u)};
         for(unsigned int axis{0}; axis != 3; ++axis) {
@@ -424,7 +427,8 @@ void actors::update_orb(world::placed_object &object, actor_context const &conte
   }
   if(!objective_in_range(object, geometry.definition(object.type), context.observer)) return;
   if(object.quality() == 4) object.health = 65;
-  auto population{[&](world::object_type const type){return previous_counts[std::to_underlying(type)];}};
+  auto const local{census(object.position)};
+  auto population{[&](world::object_type const type){return local[std::to_underlying(type)];}};
   using enum world::object_type;
   bool complete{false};
   switch(object.quality()) {
@@ -451,7 +455,7 @@ void actors::update_mortar(world::placed_object &object, actor_context const &co
   weapons.scatter(object, 2, fragment_pattern::mortar, step);
 }
 proximity_sound const &actors::proximity() const noexcept {
-  /// Retain the original handlers' audio outputs, including overwrite order and KLA quality across frames
+  /// Retain the nearest active proximity sources, independently of actor order and distant updates.
   return effects.sound;
 }
 
@@ -468,7 +472,7 @@ void actors::refresh_census(maths::world_position const &observer) {
   census_ready = true;
 }
 actor_effects const &actors::advance(actor_context const &context, flight::time_step const step) {
-  /// Run the original nearby object handlers and rebuild the census for the following pass
+  /// Update actors throughout the world; local objectives and production use installation-centred censuses.
   effects = {};
   static_cast<vehicle_effects &>(effects) = weapons.take_vehicle_effects();
   effects.sound.kla_quality = last_kla_quality;
@@ -479,12 +483,12 @@ actor_effects const &actors::advance(actor_context const &context, flight::time_
   for(unsigned int i{0}; i != theatre.objects.size(); ++i) {
     auto const &object{theatre.objects[i]};
     if(object.has(world::object_flag::present) && object.has(world::object_flag::updates)
-      && world::in_active_neighbourhood(object.position, context.observer)) active_updates.push_back(i);
+      ) active_updates.push_back(i);
   }
   // new effects enter the original painter tables at the following EXPMOV, after their creation pass
   for(unsigned int const i : active_updates) {
     auto &object{theatre.objects[i]};
-    if(!object.has(world::object_flag::present) || !world::in_active_neighbourhood(object.position, context.observer)) continue;
+    if(!object.has(world::object_flag::present)) continue;
     auto const &definition{geometry.definition(object.type)};
     if(!object.has(world::object_flag::updates)) continue;
     if(i < weapons.stored_objects()) {
@@ -535,11 +539,10 @@ actor_effects const &actors::advance(actor_context const &context, flight::time_
     case destroyed_generator_orb: update_orb(object, context, step); break;
     case mindbender:
       ++object.timer;
-      effects.hallucination = 0;
       if(auto const target{relative_target(object.position, context.observer)}; target && target->distance <= 1000) {
         object.flags |= 4u;
         int const proximity{1000 - target->distance};
-        effects.hallucination = static_cast<uint16_t>(proximity * proximity / 31);
+        effects.hallucination = std::max(effects.hallucination, static_cast<uint16_t>(proximity * proximity / 31));
       }
       break;
     case portal:
@@ -552,6 +555,7 @@ actor_effects const &actors::advance(actor_context const &context, flight::time_
       }
       break;
     case control_tower:
+      if(!world::in_active_neighbourhood(object.position, context.observer)) { ++object.timer; break; }
       if(auto const reset{tower_parking_reset(object.position, context.observer)}; reset != parking_reset::unchanged) effects.parking = reset;
       theatre.start.x = maths::dword(static_cast<int64_t>(object.position.x) + 3001 - 2 * 65'536);
       theatre.start.y = maths::dword(static_cast<int64_t>(object.position.y) - 16'000);
@@ -565,7 +569,8 @@ actor_effects const &actors::advance(actor_context const &context, flight::time_
       break;
     }
     if(!theatre.slalom && (definition.properties & std::to_underlying(world::object_property::forcefield)) != 0) {
-      if(previous_counts[std::to_underlying(generator_orb)] == 0 && previous_counts[std::to_underlying(destroyed_generator_orb)] != 0) object.flags = 0;
+      auto const local{census(object.position)};
+      if(local[std::to_underlying(generator_orb)] == 0 && local[std::to_underlying(destroyed_generator_orb)] != 0) object.flags = 0;
       else if(object.type == forcefield_x || object.type == forcefield_y || object.type == forcefield_z || object.type == forcefield_z1) {
         // quality zero only reveals its far model for eight frames after contact; the nearby barrier always remains visible
         if(object.quality() == 0 && object.timer <= 31'992) {

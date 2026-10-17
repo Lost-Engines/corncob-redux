@@ -2,6 +2,7 @@
 
 #include <array>
 #include <span>
+#include "graphics/depth_raster.h"
 #include "graphics/instruments.h"
 #include "graphics/ground_detail.h"
 #include "graphics/raster.h"
@@ -35,20 +36,25 @@ struct render_statistics {
   unsigned int discs{0};
 };
 
-struct view_parameters {
-  clip_rectangle bounds;
-  int focal_x;
-  int focal_y;
-  int centre_x;
-  int centre_y;
-  bool rear;
+struct scene_settings {
+  static double constexpr minimum_fov{30}, maximum_fov{150};
+  static double constexpr maximum_draw_distance{100000};
+  static unsigned int constexpr original_ground_points{80}, maximum_ground_points{20000};
+  render::video_size resolution{1280, 700};
+  double horizontal_fov{94.0};
+  double draw_distance{0.0}; // Kilometres; zero has no far plane.
+  unsigned int ground_points{640};
 };
+using view_parameters = perspective_view;
 
 class scene_renderer {
 private:
   resources::geometry_bank &geometry;
   resources::cockpit_mask const &cockpit;
   render::video_mode video;
+  scene_settings settings;
+  std::vector<float> depth;
+  random_source visual_random;
   indexed_framebuffer indexed{};
   std::array<render::rgba_pixel, 16> palette{};
   render_statistics statistics;
@@ -59,10 +65,11 @@ private:
   void background(view_parameters const &view, maths::rotation const &rotation);
   void draw_ground_and_stars(world::theatre const &theatre, camera const &observer, maths::rotation const &rotation, std::span<view_parameters const> views, random_source &random);
   void draw_model(resources::model_address address, unsigned int octant, maths::rotation const &matrix,
-                  maths::fixed_vector const &origin, unsigned int reduction, std::span<view_parameters const> views, random_source &random);
+                  view_point const &origin, std::span<view_parameters const> views, random_source &random);
 
 public:
   scene_renderer(resources::geometry_bank &geometry, resources::cockpit_mask const &cockpit, render::video_mode video = render::video_mode::ega);
+  void configure(scene_settings const &value);
   void initialise(maths::world_position const &observer, random_source &random);
   indexed_framebuffer const &indexed_frame() const noexcept;
   std::array<render::rgba_pixel, 16> const &colours() const noexcept;

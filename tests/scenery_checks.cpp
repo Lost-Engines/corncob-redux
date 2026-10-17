@@ -65,7 +65,7 @@ int main(int const argc, char const *const argv[]) {
   });
   game::session flight{geometry, std::move(distant)};
   flight.advance({});
-  if(flight.world().objects[0].timer != 1234) throw std::runtime_error{"distant scenery handler ran outside the active neighbourhood"};
+  if(flight.world().objects[0].timer != 32000) throw std::runtime_error{"distant scenery failed to update"};
   std::cout << ranges << " native local distances and " << handlers << " complete scenery handlers match" << std::endl;
   return EXIT_SUCCESS;
 }

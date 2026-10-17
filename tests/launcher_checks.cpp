@@ -1,54 +1,36 @@
 #include <algorithm>
-#include <cstdlib>
-#include <fstream>
 #include <iostream>
-#include <iterator>
 #include <stdexcept>
 #include "game/actors.h"
 #include "resources/assets.h"
-#include "resources/binary_reader.h"
-#include "tests/actor_record.h"
 
-int main(int const argc, char const *const argv[]) {
-  /// Supply a preceding census through the public actor API and compare unchanged original site/constructor executions
-  if(argc != 2) throw std::invalid_argument{"launcher fixture required"};
-  std::ifstream file{argv[1], std::ios::binary};
-  std::vector<uint8_t> const bytes{std::istreambuf_iterator<char>{file}, {}};
-  corncob::resources::binary_reader const data{bytes};
-  if(bytes.size() != 182'796 || std::string{bytes.begin(), bytes.begin() + 8} != "CORNLAU1") throw std::runtime_error{"invalid launcher fixture"};
-  namespace game = corncob::game;
+int main() {
   namespace world = corncob::world;
+  namespace game = corncob::game;
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
-  unsigned int launches{0};
-  for(unsigned int i{0}, offset{12}; i != 768; ++i, offset += 238) {
-    auto const initial{corncob::tests::read_actor(data, offset)};
-    unsigned int const sites{data.word(offset + 74)}, population{data.word(offset + 76)};
-    bool const full{data.byte(offset + 84) != 0};
-    world::object_type const child{initial.type == world::object_type::kla_site ? world::object_type::kla
-      : initial.type == world::object_type::vehicle_site ? world::object_type::ground_vehicle : world::object_type::saucer};
+  for(auto const type : {world::object_type::kla_site, world::object_type::vehicle_site, world::object_type::saucer_site}) {
     world::theatre theatre;
-    game::combat weapons{geometry, theatre, data.dword(offset + 80)};
+    auto const &definition{geometry.definition(type)};
+    theatre.objects.push_back({.position{4'000'000,4'000'000,0}, .attitude{}, .type{type}, .flags{definition.flags}, .timer{0}});
+    game::combat weapons{geometry, theatre};
     game::actors actors{geometry, theatre, weapons};
-    for(unsigned int n{0}; n != 320; ++n) weapons.spawn(world::object_type::aircraft, {0, 0, 0});
-    for(auto &entry : theatre.objects) entry.flags = 0;
-    for(unsigned int n{0}; n != sites + population; ++n) {
-      theatre.objects[n].type = n < sites ? initial.type : child;
-      theatre.objects[n].flags = 0x11;
+    corncob::maths::world_position const origin{0,0,0};
+    corncob::maths::fixed_vector const velocity{0,0,0};
+    auto const child{type == world::object_type::kla_site ? world::object_type::kla : type == world::object_type::vehicle_site ? world::object_type::ground_vehicle : world::object_type::saucer};
+    auto population{[&]{return std::ranges::count_if(theatre.objects, [&](auto const &object){return object.type == child && object.has(world::object_flag::present);});}};
+    for(unsigned int step{0}; step < 10000 && population() == 0; ++step) {
+      theatre.objects[0].timer = 0;
+      actors.advance({origin, origin, velocity, false, step * 40}, {5,5});
     }
-    corncob::maths::world_position const origin{0, 0, 0};
-    actors.refresh_census(origin);
-    for(auto &entry : theatre.objects) entry.flags = full ? 1 : 0;
-    // the native constructor runs now; the new actor enters the painter tables on the following pass
-    theatre.objects[0] = initial;
-    corncob::maths::fixed_vector const velocity{0, 0, 0};
-    actors.advance({origin, origin, velocity, false, 0}, {data.signed_word(offset + 78), 5});
-    corncob::tests::compare_actor(theatre.objects[0], corncob::tests::read_actor(data, offset + 85), i, "site");
-    bool const expected_spawn{data.byte(offset + 163) != 0};
-    bool const spawned{!full && theatre.objects[1].flags != 0};
-    if(spawned != expected_spawn) throw std::runtime_error{"native launcher allocation case " + std::to_string(i)};
-    if(weapons.random_stream().seed() != data.dword(offset + 159)) throw std::runtime_error{"native launcher random continuation " + std::to_string(i)};
-    if(spawned) { corncob::tests::compare_actor(theatre.objects[1], corncob::tests::read_actor(data, offset + 164), i, "child"); ++launches; }
+    if(population() != 1) throw std::runtime_error{"remote site never produced an actor"};
+    if(type == world::object_type::kla_site) {
+      for(unsigned int n{0}; n < 20; ++n) { theatre.objects[0].timer = 0; actors.advance({origin,origin,velocity,false,n*40}, {5,5}); }
+      if(population() != 1) throw std::runtime_error{"local production cap was bypassed"};
+      auto const child_index{std::ranges::find_if(theatre.objects, [&](auto const &object){return object.type == child && object.has(world::object_flag::present);}) - theatre.objects.begin()};
+      auto const timer{theatre.objects[static_cast<std::size_t>(child_index)].timer};
+      weapons.move(origin, {5,5});
+      if(theatre.objects[static_cast<std::size_t>(child_index)].timer != timer - 1) throw std::runtime_error{"distant KLA entered suspended animation"};
+    }
   }
-  std::cout << "768 original site updates and " << launches << " complete actor constructors match" << std::endl;
-  return EXIT_SUCCESS;
+  std::cout << "Distant production, local caps and remote actor lifetimes passed\n";
 }

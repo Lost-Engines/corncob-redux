@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.30)
 project(corncob VERSION 0.1.0 LANGUAGES C CXX)
+if(APPLE)
+  enable_language(OBJC)
+endif()
 
 option(BUILD_TESTING "Build automated tests" OFF)
 include(CTest)
@@ -27,6 +30,16 @@ FetchContent_Declare(glfw
   URL_HASH SHA256=7e85e39ade1efdda00734d323a0230b5c938074e9fb2ddbe453bdbb281064d2c
 )
 FetchContent_MakeAvailable(glfw)
+if(APPLE)
+  # GLFW's C files also include Cocoa headers requiring Apple's blocks extension.
+  get_target_property(glfw_sources glfw SOURCES)
+  foreach(source IN LISTS glfw_sources)
+    if(source MATCHES "\\.c$")
+      get_filename_component(source_path "${source}" ABSOLUTE BASE_DIR "${glfw_SOURCE_DIR}/src")
+      set_source_files_properties("${source_path}" DIRECTORY "${glfw_SOURCE_DIR}/src" PROPERTIES LANGUAGE OBJC)
+    endif()
+  endforeach()
+endif()
 
 FetchContent_Declare(miniaudio
   URL https://codeload.github.com/mackron/miniaudio/tar.gz/f40cf03f80cdb7e741d43e53b7e706e8c1394bcf
@@ -42,6 +55,10 @@ FetchContent_MakeAvailable(miniaudio nuked_opl3)
 add_library(nuked_opl3 STATIC "${nuked_opl3_SOURCE_DIR}/opl3.c")
 target_include_directories(nuked_opl3 SYSTEM PUBLIC "${nuked_opl3_SOURCE_DIR}")
 target_compile_options(nuked_opl3 PRIVATE $<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-O2>)
+if(APPLE)
+  # CoreAudio headers use Apple's blocks extension; compile this implementation with Clang.
+  set_source_files_properties(src/platform/miniaudio_implementation.c PROPERTIES LANGUAGE OBJC)
+endif()
 add_library(corncob_pcm STATIC src/platform/miniaudio_implementation.c)
 target_include_directories(corncob_pcm SYSTEM PUBLIC "${miniaudio_SOURCE_DIR}")
 target_compile_definitions(corncob_pcm PRIVATE MA_NO_DECODING MA_NO_ENCODING MA_NO_RESOURCE_MANAGER MA_NO_NODE_GRAPH MA_NO_ENGINE)
@@ -63,6 +80,13 @@ function(configure_first_party target)
     $<$<AND:$<CONFIG:RelWithDebInfo>,$<CXX_COMPILER_ID:GNU,Clang,AppleClang>>:-UNDEBUG>
     $<$<AND:$<CONFIG:RelWithDebInfo>,$<CXX_COMPILER_ID:MSVC>>:/UNDEBUG>
   )
+  if(MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+      AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16
+      AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)
+    # GCC PR125151: C++26 Debug emits strong stdexcept copy constructors on MinGW.
+    # Use the runtime exception definitions until that compiler bug is fixed.
+    target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:__cpp_lib_constexpr_exceptions=0>)
+  endif()
 endfunction()
 
 # Embed original resources with CMake alone; the application performs no asset file I/O
@@ -77,6 +101,9 @@ function(embed_resource resource_name asset_file)
 endfunction()
 
 add_library(corncob_core STATIC
+  src/graphics/depth_raster.cpp
+  src/resources/documentation.cpp
+  src/game/preferences.cpp
   src/game/actors.cpp
   src/game/actors.h
   src/game/vehicle.cpp
@@ -187,6 +214,7 @@ add_library(corncob_core STATIC
 configure_first_party(corncob_core)
 target_include_directories(corncob_core SYSTEM PUBLIC "${PROJECT_SOURCE_DIR}")
 target_compile_definitions(corncob_core PUBLIC VECTORSTORM_NO_BOOST)
+embed_resource(documentation "documentation.dat")
 embed_resource(front_end front_end.dat)
 embed_resource(other_worlds other_worlds.dat)
 embed_resource(cockpit cockpit.img)
@@ -254,7 +282,8 @@ if(BUILD_TESTING)
   corncob_check(resource_checks embedded_resources "${PROJECT_SOURCE_DIR}/tests/reference/legacy_world.bin")
   corncob_check(fixed_math_checks native_fixed_math "${PROJECT_SOURCE_DIR}/tests/reference/fixed_math.bin")
   corncob_check(raster_checks native_raster "${PROJECT_SOURCE_DIR}/tests/reference/lines.bin" "${PROJECT_SOURCE_DIR}/tests/reference/line_clipping.bin")
-  corncob_check(scene_checks original_theatres "${PROJECT_SOURCE_DIR}/tests/reference/scene_order.bin")
+  corncob_check(redux_checks redux_features "${PROJECT_BINARY_DIR}/redux-checks")
+  corncob_check(scene_checks redux_theatre_rendering "${PROJECT_SOURCE_DIR}/tests/reference/scene_order.bin")
   corncob_check(frame_checks simulation_frame_order "${PROJECT_SOURCE_DIR}/tests/reference/frame_clock.bin")
   corncob_check(ground_checks native_ground_detail "${PROJECT_SOURCE_DIR}/tests/reference/ground.bin")
   corncob_check(flight_checks native_flight "${PROJECT_SOURCE_DIR}/tests/reference/flight.bin")
@@ -303,15 +332,15 @@ if(BUILD_TESTING)
   corncob_check(rocket_checks native_rocket "${PROJECT_SOURCE_DIR}/tests/reference/rocket.bin")
   corncob_check(button_checks native_cockpit_buttons "${PROJECT_SOURCE_DIR}/tests/reference/buttons.bin" "${PROJECT_SOURCE_DIR}/tests/reference/gunsight.bin")
   corncob_check(mortar_checks native_mortars "${PROJECT_SOURCE_DIR}/tests/reference/mortars.bin")
-  corncob_check(orb_checks native_orbs "${PROJECT_SOURCE_DIR}/tests/reference/orbs.bin")
-  corncob_check(launcher_checks native_launchers "${PROJECT_SOURCE_DIR}/tests/reference/launchers.bin")
+  corncob_check(orb_checks local_orb_objectives "${PROJECT_SOURCE_DIR}/tests/reference/orbs.bin")
+  corncob_check(launcher_checks continuous_launchers "${PROJECT_SOURCE_DIR}/tests/reference/launchers.bin")
   corncob_check(title_checks native_title "${PROJECT_SOURCE_DIR}/tests/reference/title.bin")
   corncob_check(vision_checks native_visual_feedback "${PROJECT_SOURCE_DIR}/tests/reference/vision.bin")
   corncob_check(parking_checks native_parked_aircraft "${PROJECT_SOURCE_DIR}/tests/reference/parking.bin")
   corncob_check(shard_checks native_shards "${PROJECT_SOURCE_DIR}/tests/reference/shards.bin")
   corncob_check(impact_checks native_impacts "${PROJECT_SOURCE_DIR}/tests/reference/impacts.bin")
   corncob_check(scenery_checks native_scenery "${PROJECT_SOURCE_DIR}/tests/reference/scenery.bin")
-  corncob_check(proximity_checks native_proximity "${PROJECT_SOURCE_DIR}/tests/reference/proximity.bin")
+  corncob_check(proximity_checks nearest_actor_proximity "${PROJECT_SOURCE_DIR}/tests/reference/proximity.bin")
   corncob_check(soundscape_checks native_soundscape "${PROJECT_SOURCE_DIR}/tests/reference/soundscape.bin")
   target_link_libraries(audio_checks PRIVATE corncob_audio)
   target_link_libraries(soundscape_checks PRIVATE corncob_audio)

@@ -4,10 +4,11 @@
 #include <cmath>
 #include <cstdlib>
 #include <utility>
-#include "maths/integer.h"
-#include "resources/actor_tables.h"
 #include "game/frame_clock.h"
 #include "game/scenery.h"
+#include "game/timing.h"
+#include "maths/integer.h"
+#include "resources/actor_tables.h"
 #include "world/airfields.h"
 
 namespace corncob::game {
@@ -53,7 +54,7 @@ session::session(resources::geometry_bank const &geometry, world::theatre theatr
     object.collision_group = definition.collision_group;
     object.motion = definition.motion;
   }
-  notice = "On foot - keypad 5/0 walks; arrows turn; walk into an aircraft to board";
+  notice = "On foot - WASD and mouse; Space jumps; F4 shows controls";
   if(this->theatre.training || reserve_aircraft) {
     parking.new_arrival = false;
     if(auto const index{weapons.spawn(world::object_type::aircraft, this->theatre.start)}) {
@@ -207,7 +208,7 @@ void session::find_surfaces() {
       landing.surface_height = object.position.z;
       landing.runway = true;
     }
-    if(mode != player_mode::on_foot || !within_xy(person.position)) continue;
+    if(mode != player_mode::on_foot || object.type == world::object_type::crater || !within_xy(person.position)) continue;
     if(std::abs(static_cast<int64_t>(person.position.z) - object.position.z) >= object.collision_extents.z) continue;
     if(has(definition, world::object_property::kills_person) && !invincible) {
       fatal_contact = object.type;
@@ -255,7 +256,7 @@ void session::check_aircraft_collisions(flight::time_step const step) {
     for(unsigned int axis{0}; axis != 3; ++axis) {
       if(std::abs(static_cast<int64_t>(aircraft.position[axis]) - object.position[axis]) >= static_cast<uint16_t>(object.collision_extents[axis])) inside = false;
     }
-    if(!inside || has(definition, world::object_property::runway)) continue;
+    if(!inside || object.type == world::object_type::crater || has(definition, world::object_property::runway)) continue;
     if(has(definition, world::object_property::portal)) {
       enter_portal(object, step);
       continue;
@@ -391,7 +392,7 @@ void session::leave_aircraft() {
   } else person.tumble = vec2<int16_t>{0, 0};
   look_mode = looking = false;
   head_angles = {};
-  notice = person.standing ? "On foot - walk over 40m away, then return to board" : "Ejected - Space opens parachute";
+  notice = person.standing ? "On foot - walk over 40m away, then return to board" : "Ejected - open your parachute; F4 shows controls";
 }
 
 void session::update_aircraft(input_state const &input, flight::time_step const step) {
@@ -453,8 +454,8 @@ void session::update_scenery() {
   for(unsigned int i{0}; i != theatre.objects.size(); ++i) {
     auto &object{theatre.objects[i]};
     auto const observer{camera().position};
-    if(!object.has(world::object_flag::present) || !object.has(world::object_flag::updates)
-      || !world::in_active_neighbourhood(object.position, observer)) continue;
+    if(!object.has(world::object_flag::present) || !object.has(world::object_flag::updates)) continue;
+    if(object.type == world::object_type::aircraft && !world::in_active_neighbourhood(object.position, observer)) continue;
     if(object.type == world::object_type::aircraft && controlled_aircraft != i) {
       if(advance_parked_aircraft(object, theatre.start, observer, parking, mode == player_mode::on_foot)) enter_aircraft(i);
     }
@@ -487,29 +488,28 @@ void session::update_person(input_state const &input, flight::time_step const st
     person.attitude.roll += static_cast<maths::angle>(timed_word(static_cast<int16_t>(maths::negate(roll) >> 6), step));
     swing_parachute(person, input.stick);
   }
-  if((input.walk_forward || input.walk_backward) && std::abs(static_cast<int>(maths::word(static_cast<uint16_t>(fast_ticks) - person.last_step_tick))) > 40) {
-    person.last_step_tick = static_cast<uint16_t>(fast_ticks);
-    person.attitude.heading += static_cast<maths::angle>(person.step_wobble);
-    person.step_wobble = maths::negate(person.step_wobble);
-    maths::angles const heading{
-      .heading{person.attitude.heading},
-    };
-    maths::fixed_vector const forward{timed_word(static_cast<int16_t>(input.walk_forward ? 800 : -800), step), 0, 0};
-    auto const motion{maths::transform(maths::make_inverse_rotation(heading), forward)};
-    person.position.x += maths::rounded_divide(maths::scale(motion.x >> 4, step.elapsed), step.normal);
-    person.position.y += maths::rounded_divide(maths::scale(motion.y >> 4, step.elapsed), step.normal);
+  if(!remote) {
+    person.attitude.heading += static_cast<maths::angle>(input.look_yaw);
+    int const pitch{std::clamp(static_cast<int>(maths::word(person.attitude.pitch)) + input.look_pitch, -16000, 16000)};
+    person.attitude.pitch = static_cast<maths::angle>(pitch);
   }
-  if(input.jump && person.standing) {
+  int const forward{static_cast<int>(input.walk_forward) - static_cast<int>(input.walk_backward)};
+  int const sideways{input.strafe};
+  if(forward != 0 || sideways != 0) {
+    double const normalise{forward != 0 && sideways != 0 ? 0.7071067811865475 : 1.0};
+    maths::angles const heading{.heading{person.attitude.heading}};
+    auto const motion{maths::transform(maths::make_inverse_rotation(heading), {static_cast<int16_t>(forward * 25 * normalise), static_cast<int16_t>(sideways * 25 * normalise), 0})};
+    person.position.x += maths::rounded_divide(static_cast<int32_t>(motion.x) * step.elapsed, step.normal);
+    person.position.y += maths::rounded_divide(static_cast<int32_t>(motion.y) * step.elapsed, step.normal);
+  }
+  if(input.jump && person.standing && !person.charging_jump) {
     person.charging_jump = true;
-    person.jump_charge = static_cast<uint16_t>(std::min<unsigned int>(1024, person.jump_charge + 40));
-  } else if(person.charging_jump) {
-    person.charging_jump = false;
-    person.velocity.z = maths::word(person.jump_charge * 4);
-    person.jump_charge = 0;
+    person.velocity.z = 4000;
     person.standing = false;
     person.parachute = false;
-    person.horizontal_damping = 31'000;
+    person.horizontal_damping = 31000;
   }
+  if(!input.jump) person.charging_jump = false;
   if(input.drop_through) person.surface_height = 0;
   int32_t const floor{person.surface_height + flight::landing_state::aircraft_height};
   if(person.position.z <= floor && person.velocity.z <= 0) {
@@ -572,24 +572,24 @@ void session::advance(input_state const &requested, std::optional<std::function_
     if(draw_frame) (*draw_frame)();
     return;
   }
-  /// One original five-unit frame is forty fast PIT ticks; T advances physical time without replacing frame timers
+  /// Fixed simulation steps advance forty fast PIT ticks, independently of rendered frames.
   if(map) {
-    fast_ticks += 40;
-    clock.advance(40);
+    fast_ticks += timing::pit_ticks_per_step;
+    clock.advance(timing::pit_ticks_per_step);
     map->advance(input.stick, input.map);
     if(draw_frame) (*draw_frame)();
     return;
   }
   if(paused || visiting_tower || finished()) return;
-  walking = input.walk_forward || input.walk_backward;
+  walking = input.walk_forward || input.walk_backward || input.strafe != 0;
   if(input.throttle_up) press(action::throttle_up);
   if(input.throttle_down) press(action::throttle_down);
-  fast_ticks += 40;
-  clock.advance(40);
+  fast_ticks += timing::pit_ticks_per_step;
+  clock.advance(timing::pit_ticks_per_step);
   frame = advance_frame(frame);
   vision.advance(aircraft.body_force.z, mode != player_mode::in_aircraft, frame, {
-    .elapsed{static_cast<int16_t>(input.advance_time ? 50 : 5)},
-    .normal{5},
+    .elapsed{timing::physics_units_per_step},
+    .normal{timing::physics_units_per_step},
   });
   for(auto &object : theatre.objects) switch(object.type) {
   case world::object_type::wire_forcefield_x:
@@ -601,8 +601,8 @@ void session::advance(input_state const &requested, std::optional<std::function_
   default: break;
   }
   flight::time_step const step{
-    .elapsed{static_cast<int16_t>(input.advance_time ? 50 : 5)},
-    .normal{5},
+    .elapsed{timing::physics_units_per_step},
+    .normal{timing::physics_units_per_step},
   };
   auto const observer{camera().position};
   auto const previous_objectives{weapons.stats().objectives_completed};

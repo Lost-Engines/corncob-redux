@@ -1,0 +1,471 @@
+Corncob Redux menu help
+ Main Menu Info
+
+  To choose a selection from the main menu, use the arrow keys (\\)
+to highlight the selection you want, and press \<\C\R\>.  A quicker way is
+to press the highlighted letter corresponding to the desired selection.
+
+To change pilots, activate or deactivate a pilot, create or delete a
+pilot, or view pilot records, choose the "\Duty Roster" selection.
+
+The "\Combat Missions" selection allows the user to choose between
+various battle scenarios, or Theaters-of-Operation.  This leads to a
+great deal of variety in the type and quality of opponents.  A pilot
+must prove his proficiency in multiple theaters to advance far in rank.
+
+If you want to brush-up on some specific aspect of your flying and
+fighting skills, then you can choose the "\Training Missions" selection.  This allows you to choose the number and quality of a limited
+array of opponents.  By default, a pilot flies an invulnerable plane
+during the training missions, and thus they are not counted.  Note
+that if a standard plane is chosen, then these missions DO count
+toward a pilot's career, and a pilot can still be killed or captured
+in these missions.
+
+You can see who the hottest pilots are by choosing "display \High score
+list".
+
+CORNCOB 3D is volume one of the Corncob saga.  If you enjoy this program,
+you will LOVE the sequel, Corncob Other Worlds Campaign.  Check out
+"\Read This!!!" from the main menu.
+
+The "keyboard/\Joystick setup" selection allows the user to choose how
+the plane will be controlled.  The current choices are shown at the
+bottom of the main-menu screen.
+
+The "\Music toggle" selection allows the user to turn the music on and
+off.  The music only plays during the title credits and menus.  If you
+want to switch to the next song, just turn the sound off and then on again.
+See the documentation to learn how to add your own music selections to
+Corncob.
+
+When you have finished playing CORNCOB 3D, you may exit the program
+by choosing "e\Xit to dos".  You may also type \<\E\S\C\>.  Note that
+this selection does NOT ask for user confirmation, because that would
+be silly.
+
+  Duty Roster Menu Info
+
+When CORNCOB 3D is first run, the pilot flying is considered to be
+a trainee.  The trainee does not have a record, and his exploits and
+current selections are erased each time the program is run.  The "\Duty
+roster menu allows users to create pilots which can be used in repeated missions.  Also the current choices (such as theater of operation)
+for each pilot is saved when the program exits.  Building a career without
+being killed is a very challenging and satisfying endeavor.
+
+On the left is a list of selections which you can choose from by using
+the arrow keys (\\) to highlight the selection you want, and press
+\<\C\R\>. On the right is a list of the currently known pilots.  Many of
+the selections require the user to choose a pilot from the list on the
+right.  Choose the desired pilot with the arrow keys and select with
+\<\C\R\>.  While choosing a pilot, the menu on the left will be replaced
+by a box summarizing that pilots career.
+
+You create a pilot with the "\Create Pilot" selection.  When you choose
+this, a box will pop up prompting you for a pilot's name.  After you type
+in the name, the program will ask you if you want to activate the pilot.
+The active pilot is the pilot which is used when a mission is flown,
+which is probably what you want so just press \<\C\R\> for yes.
+
+You can change the active pilot with the "\Activate Pilot" selection.
+This allows you to set the currently active pilot who will fly on the next
+Corncob mission.
+
+You may deactivate the active pilot with the "\Deactivate Pilot" se-
+lection.  When you do this, no pilot in the list is considered active,
+and the active pilot will be "trainee" as discussed above.
+
+You may delete a pilot with the "de\Lete Pilot" selection.  When you
+delete a pilot, his record is permanently removed.
+
+If your pilot is killed or captured during a combat mission, he will be
+deactivated, and cannot be activated.  You can override this, and bring
+a pilot back to life with the "r\Esurrect Pilot" selection.  Beware
+though, the program keeps track of the number of resurrections, and dis-
+plays this information prominently in the pilot's record.  It is hard to
+brag about what a great career your pilot has when he has been resurrec-
+ted several times!
+
+If you don't like the name you chose for your pilot, you can change it
+with the "re\Name Pilot" selection.  This changes the pilots name with-
+out affecting his career.
+
+If you want a detailed view of your pilot's record, choose the "\View
+Pilot Records" selection.  Move the highlight to the to the desired
+pilot, and press \<\C\R\>.  This will bring up a full screen display of
+that pilot's record.  You can then move through the list of pilots with
+the arrow keys, or return to the menu with \<\C\R\>.
+
+  Combat Missions Info
+
+CORNCOB 3D allows a pilot to choose between several different battle
+scenarios, or "Theaters-of-Operation".  The theaters vary in difficulty and in the type of opponent.
+
+You can fly a combat mission in one of the theaters-of-operation by
+choosing the "\Fly mission" selection.
+
+Most Theaters-of-Operation consists of 9 airfields.  Surrounding these
+airfields are enemy targets, which you must kill.  If you fly from one
+airfield to another, then the next time you fly that theater you will
+begin at the new airfield.  As you fly in a Theater-of-Operation, the
+state of the universe is preserved.  Thus enemy sites and targets that
+you kill in one mission will still be dead when you continue in a later
+mission.
+
+In the upper-right is a list of the various Theaters-of-Operation.  You
+select one of these with the "\Open a new theater of operations" selection from the Theaters menu.  This highlights one of the theaters, and
+you can change the highlighted name with the arrow keys.  Pressing <CR>
+chooses the highlighted name.  Pressing <ESC> or <BS> aborts the choice
+and returns you to the Theaters menu.  You may open as many different
+theaters as you wish.
+
+In the lower-right is a list of the Theaters you have opened.  This
+list changes according to the current selected pilot.  Each pilot has
+a current Theater-of-Operations. When you fly a mission from the main
+menu, you fly in your current Theater-of-Operations.  The current
+theater is indicated by a  in the list at the lower-right as well
+as being shown at the upper-left of the theaters menu, underneath the
+current pilot.
+
+You can change the active theater with the \Activate an open theater menu
+item.  Pressing this item will allow the user to select the desired current
+theater from the list of open theaters in the lower-right.
+
+You may choose to play with an invulnerable plane with the "toggle
+invulnerable \Plane" selection.  When flying with an invulnerable plane,
+you will not be damaged by any alien forces, or by any collision.  Flights
+taken with an invulnerable plane are never counted toward a pilots record.
+
+While you are inflight, Corncob can put text messages up to guide the
+new user until he/she becomes familiar with the game.  After the user
+learns that you must fly back to the airstrip to get points and so on,
+these messages become an annoyance.  Use Inflight \Comments  menu
+selection to turn off these inflight messages.
+
+New pilots who just start playing Corncob tend to fly into the ground
+frequently, and have much trouble learning to turn.  Therefore, the
+game contains two aerodynamic flight models.   The beginner  flight
+model gently pushes the nose to the correct attitude for level flight.
+This helps prevent crashes, and also causes the plane to turn without
+the player having coordinate the use of the elevators.
+
+The advanced flight model is much preferred for real combat.  Loops,
+flying upside down, and dives are much easier with this flight model.
+Choose between these two flight models with the Flight \Model menu
+item.
+
+ OLD SHAREWARE VERSION Registration Menu Info
+Options and Controls
+
+Redux Controls
+
+These are the default bindings. F4 opens the current bindings during
+flight; Enter selects a binding to change it. Escape or P opens the
+pause menu, including display and control options. Delete clears a
+binding during capture; Escape cancels capture.
+
+Flying
+  Arrow keys or keypad 4/6 and 8/2: roll and pitch.
+  Z / X or keypad 7 / 9: left / right rudder.
+  + / - or keypad + / -: throttle up / down.
+  Period or keypad 0: hold wheel brakes.
+  Space or left mouse button: machine guns.
+  Left Shift: heavy cannon. C or right mouse button: missiles.
+  A: autopilot. F: flaps. I: rocket booster. B: drop bomb.
+  E: leave the aircraft or eject.
+  R: rear view. L: cockpit. Num Lock: look mode.
+  Hold Ctrl with arrow keys to look around.
+
+On foot
+  W / A / S / D: forward / left / backward / right.
+  Mouse: look around. Space: jump immediately.
+  Left Ctrl: drop through a supporting platform.
+  Left mouse button: pistol. Q: open parachute.
+  Semicolon: plant assassin charge. B: arm/detonate charges.
+  V: call rescue. Caps Lock: remote control of your aircraft.
+
+Shared controls
+  M: map. O: toggle radio messages. G: ground detail.
+  P / Escape: pause menu. F1: boss screen.
+  F2: intelligence. F3: current score. F4: control bindings.
+  Mousewheel: scroll menus, documentation and tower briefings.
+
+Joystick buttons 1 and 2 fire guns and missiles during flight.
+Modern joysticks do not need the DOS calibration controls.
+
+There is no accelerated-time key in Redux. Enemy production and
+movement follow the simulation clock, independently of rendering.
+
+Use Left/Right to adjust FOV, draw distance, ground detail, resolution,
+mouse sensitivity and inversion. Enter opens the binding list. Settings
+are saved automatically in redux.cfg in the Redux save directory.
+ Training Missions Menu.
+
+If you want to brush-up on some specific aspect of your flying and
+fighting skills, you can design your own mission by choosing the
+"\Training Missions" selection.  This allows you to choose the
+number and quality of a limited array of opponents.  Note that these
+missions still count toward a pilot's career, and a pilot can still
+be killed or captured in these missions.
+
+In the "\Training Missions" scenario, you have a single simple
+objective:  destroy a field of 15 alien fuel dumps.  A force-field
+protected orb is also present.
+
+The design-your-own aspect enters in the number and quality of alien
+defenses.  The tick field is protected by KLA's and AAA batteries, as
+well as a swarm of enemy ground vehicles and a flying saucer.
+You may choose the number and quality of each of these defenses.  The
+more and higher quality you choose, the higher the potential score.
+
+You can fly a training mission by choosing the "\Fly mission"
+selection.
+
+To choose the quality of the enemy defenses, select "modify \Wicked-
+ness of enemies".  This will bring up a menu allowing you to change
+the "wickedness" of the three defenses.  Wickedness values range from
+1-8 inclusive, with 1 representing really stupid opponents, and 8 being
+deadly.  A special wickedness value of 0 is reserved to select a random
+spread of wickedness.
+
+To choose the number of enemy defenses, select "choose \Number of
+enemies".  You may choose between 0 and 25 inclusive of each.
+(Note that choosing a large number (>~5-10 will put a strain on your
+CPU.  If you experience too slow of a frame rate, cut down on the
+numbers.)
+
+The default values are as follows:
+           5 KLA sites        Random spread of Wickedness
+           6 AAA batteries    Random spread of Wickedness
+           2 vehicle sites    Wickedness 4
+
+The beginner should especially beware of the danger of plowing his plane
+into the turf when strafing the fuel dumps.  You can restore these default
+settings at any time with the "choose \Default values" selection.
+
+You may choose to play with an invulnerable plane with the "toggle
+invulnerable \Plane" selection.  When flying with an invulnerable plane,
+your plane cannot be damaged.   Flights taken with an invulnerable plane
+are never counted toward a pilots record.
+
+ Hiscore Menu
+
+Obviously, no combat game is complete without a high-score list, and
+CORNCOB 3D maintains three separate lists:  the High-Score list,
+the Top-Career list, and the Fast-Career list.
+
+The High-Score list, shown by choosing the "see list of high \Scores"
+selection, is a list of the top 10 best missions, sorted by points,
+along with the pilot, theater-of-operation, and number of kills.  Pilots
+with a strong showing in this list are the true hot-shots of the game.
+
+The Top-Career list, shown by choosing the "see list of top \Careers"
+selection, is a list to the top 10 best careers, sorted by points,
+along with the pilot, number of missions, number of resurrections, and
+number of kills.
+
+The Fast-Career list, shown by choosing the "see list of \Fastest
+careers" selection, is a list of the "rising star" pilots.  This is
+a career list sorted by average points per mission.  Thus, you can
+usually see which pilots got off to the best start with this list.
+There is a requirement of three missions to appear on the Fast-Career
+list.
+
+The first two of the lists show number of kills.  This is a three
+number field, showing, from left to right, number of missions objectives accomplished, number of primary kills, and number of other kills.
+Primary kills are defined as TETS, Fuel Dumps, AAA batteries, Missile
+or Vehicle Sites, and Orbs.  Other kills are KLA and vehicles.
+
+When pilots are deleted from the roster, their careers are frozen,
+and their names are marked in all the lists with an \*.  Thus, the
+same name could appear repeatedly in the career lists, if a pilot is
+deleted, and recreated.
+
+Each of the lists can be independently deleted by choosing the "\Delete
+one of the above lists" selection.
+
+ Delete a high score list menu
+
+Each of the High-Score lists can be deleted independently from the others.
+
+To delete the top score list, choose the "delete the list of top
+\Scores" selection.
+
+To delete the top score list, choose the "delete the list of top
+\Careers" selection.
+
+To delete the top score list, choose the "delete the list of \Fastest
+careers" selection.
+
+Each of these choices will require confirmation by pressing <CR>.
+
+
+ NEW SHAREWARE VERSION Registration Menu Info
+     Important Information about the Corncob Other Worlds Campaign
+     ────────────────────────────────────────────────────────────-
+
+     Ever try to fly a Corsair on a world with 3 times Earth's gravity?
+     How about mixing it up with the KLA's on a tiny iceworld, where
+     your second biggest worry is ending up in orbit by mistake?
+
+
+     If you like Corncob 3D, then you will love part II, the Other
+     Worlds Campaign.  In this sequel there are more than 130 unique
+     and bizarre alien strongholds located on six different planets.
+
+
+     But this gold mine of creative missions isn't the only reason
+     to order the Campaign!
+
+
+     Press the PGDN key to see more important information.
+
+
+    Exciting Features of the Corncob Other Worlds Campaign
+    ──────────────────────────────────────────────────────
+
+    * 130 NEW Missions: Receive the Stellar Cluster, the highest honor.
+    * See Strange New Worlds with bizarre special effects.
+    * Mission Builder: Create your own missions using the same software
+      the developer used to design all the theaters in the game.
+    * Expanded documentation (2x the amount in this program, filled with
+      hints, advice and inside information from the author for real success
+      at Corncob.  This comes both on disk and in a printed manual!
+    * Sound Editor: Customize the ADLIB inflight sounds.
+      Allows almost any combo of ADLIB parameters.
+    * Inflight score reporting shows your current mission stats and score
+      during flight.  Very helpful in deciding when to return to base.
+    * FREE Access to the exclusive Corncob support BBS.
+    * A FREE Bonus Game.
+
+      Press the PGDN key to see more important information.
+
+
+     To Order
+     ────────
+
+     In the US, simply call (800)-968-9684 toll-free 24 hours, or
+     (616) 245-8376 and charge the $20 + $3 S&H to your MC/VISA account.
+
+
+     Or print the file ORDER.FRM and fill it out, and send it with a
+     check for $23.00 to: MVP Software
+                          1035 Dallas SE
+                          Grand Rapids, MI 49507-1407
+
+
+             Order today to receive the Otherworlds Campaign
+                     before you finish saving Earth!
+
+
+     Press the PGDN key for more important information.
+
+
+      ──────────────────────────────────────────────────
+      Canadian customers please order from:
+
+      Distant Markets
+      Box #1149, 194 - 3803 Calgary Trail South
+      Edmonton, Alberta T6J 5M8
+
+      or call 800-661-7383
+      order price: $29 Canadian
+      ──────────────────────────────────────────────────
+
+
+      Press the PGDN key for more important information.
+
+
+      Australian customers please order from:
+
+      Budgetware
+      9 Albermarle St.
+      Newtown NSW 2942
+
+      or call (02) 519-4233           Fax: (02) 516-4236
+      order price: $A30
+      ─────────────────────────────────────────────────-
+      UK customers please order from:
+
+      Testware Ltd.
+      46 The Avenue
+      Harrogate, N Yorks HG1 4QD
+
+      or call (0423) 886 415          Fax: (0423) 889 728
+      order price: 17 pounds
+      ───────────────────────────────────────────────────
+
+      Press the PGDN key for more important information.
+
+      ────────────────────────────────────────────────────
+      German, Swiss and Austrian customers please order from:
+
+      Pfohl & Partner GMBH
+      Brueckenstr. 16
+      8500 Nuernberg 90  Germany
+
+      or call 911-39903-99            Fax: 911-39903-50
+      order price: 40,- DM
+      ────────────────────────────────────────────────────
+      Danish and all Scandinavian customers please order from:
+
+      Prof. Shareware, Benloese Skell 4 G, DK-4100 Ringsted, Denmark
+
+      or call 53 61 90 42             Fax: 53 61 93 91
+      order price: kr. 145,00 + 25% moms
+      ────────────────────────────────────────────────────
+
+
+      ────────────────────────────────────────────────────
+      Swedish customers please order from:
+
+      Svenska PC-Klubben
+      Box 83
+      511 21 Kinna
+      Sweden
+
+      or call 0320-16500              Fax: 0320-16053
+      order price: 199:-inkl.moms
+      ────────────────────────────────────────────────────
+
+
+      Press the PGDN key for more important information.
+
+
+      ────────────────────────────────────────────────────
+      Japanese customers please order from:
+
+      P. & A. Company, Ltd.
+      302 Bellwins, 1367-23
+      Nakagami, Akishima
+      Tokyo 196
+
+      or call 81-425-46-9141          Fax: 81-425-46-9142
+      BBS: 81-425-46-9143
+      order price: Yen 3,000
+      ────────────────────────────────────────────────────
+
+
+      Press the PGDN key for more important information.
+
+
+  Software Creations is now the home BBS for all MVP Software shareware
+  products.  Check out the FREE MVP file section for new releases and
+  updates.  Call (508) 365-2359  2400 baud; (508) 368-4137  2400-16.8 USR;
+  (508) 368-7036  2400-14.4 V.32.
+
+  Software Creations, a major multi-line BBS -- The home of the Authors
+
+
+  Look for these other great shareware products from MVP Software.
+  ────────────────────────────────────────────────────────────────
+
+  Sand Storm                                Rapid Response
+  Robomaze II: The Lobby                    Battle Ground
+  Robomaze III: The Dome                    Gamebuilder Lite
+  Hoosier City: Assault of the Orcs         MVP Paint
+
+
+  Press ESC to return to the main menu.
+
+
+Sound Editor Help

@@ -3,8 +3,8 @@
 #include <cstdlib>
 #include <utility>
 #include "maths/integer.h"
-#include "world/motion.h"
 #include "resources/actor_tables.h"
+#include "world/motion.h"
 
 namespace corncob::game {
 
@@ -38,6 +38,7 @@ uint16_t lifetime(unsigned int const frames, flight::time_step const step) noexc
 
 bool objects_overlap(world::placed_object const &a, world::placed_object const &b) noexcept {
   /// Retain box contacts and the original asymmetric spherical and fast-projectile predicates
+  if((a.type == world::object_type::crater && b.type == world::object_type::aircraft) || (b.type == world::object_type::crater && a.type == world::object_type::aircraft)) return false;
   if(a.collision_group == b.collision_group || !a.has(world::object_flag::present) || !b.has(world::object_flag::present)) return false;
   if(((a.flags | b.flags) & flag(world::object_flag::box_collision)) != 0)
     return world::boxes_overlap(a.position, a.collision_extents, b.position, b.collision_extents);
@@ -618,10 +619,6 @@ void combat::move(maths::world_position const &observer, flight::time_step const
       object.flags = 0;
       continue;
     }
-    if(!world::in_active_neighbourhood(object.position, observer)) {
-      if((geometry.definition(object.type).properties & std::to_underlying(world::object_property::discard_when_far)) != 0) object.flags = 0;
-      continue;
-    }
     --object.timer;
     if(object.type != world::object_type::bomb || (object.flags & 4u) == 0)
       world::advance_motion(object, geometry.definition(object.type).rotate_below_tier != 0, random, step);
@@ -652,7 +649,7 @@ void combat::move(maths::world_position const &observer, flight::time_step const
 void combat::collisions(maths::world_position const &observer) {
   /// Process contacts after timed actor handlers, using stable pool indices
   for(unsigned int a{0}; a != theatre.objects.size(); ++a) {
-    if(!world::in_active_neighbourhood(theatre.objects[a].position, observer)) continue;
+    (void)observer;
     if(!theatre.objects[a].has(world::object_flag::present)) continue;
     for(unsigned int b{a + 1}; b != theatre.objects.size(); ++b) {
       if(!theatre.objects[b].has(world::object_flag::present)) continue;

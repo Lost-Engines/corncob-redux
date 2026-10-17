@@ -1,0 +1,1239 @@
+Corncob Redux edition
+
+The story, objects and flight advice below come from the original
+manuals.
+Spelling has been corrected and controls and changed rules updated.
+Historical hardware, ordering and contact details are retained as
+archival
+material; they are not current requirements, offers or support contacts.
+Both campaigns are included. No DOS installation is required.
+Use Options and controls for display settings and bindings. Save
+documentation as PDF exports the manuals into your Redux save directory.
+
+Welcome to Corncob 3D.  Copyright 1991,1992 Pie in the Sky Software
+
+Table of Contents
+-----------------
+ 1)  Getting Started
+ 2)  The Story so Far
+ 3)  Hardware Requirements
+ 4)  What to try if Corncob Crashes Your Computer
+ 5)  Inflight Keys
+ 6)  Keyboard Play and How to Handle the Rudder
+ 7)  Combat Missions: Theaters-of-Operation
+ 8)  Training Missions: Design-your-own
+ 9)  Friendly Structures
+10)  Enemy Structures
+11)  How to Take Off, Fly Level, and Land
+12)  How to Turn Your Plane
+13)  Running Around - Welcome the Assassin
+14)  Scoring and Promotion
+15)  Commonly Asked Questions
+16)  The Corncob Other Worlds Campaign Order Form
+17)  Technical Information and Disclaimer
+
+
+Getting Started
+---------------
+
+                Welcome to Corncob-3d!
+
+  Corncob-3d is an easy game to use.
+
+  If you just want to get in the cockpit and fly, then type <CR> at the
+main menu.  Doing so will bring up the Training Missions menu.  Just
+type <CR> again, and you will receive the pre-flight report, which gives
+information about the mission.   Hit <CR> again to begin the mission.
+
+  Once in the plane, the blinking message reminds you that the F4 key
+gives inflight help.
+
+The Story so Far
+----------------
+  The date is August, 1949.  This is not the 1949 that we remember,
+though.
+In this 1949 WWII never happened (this is because among other factors,
+Adolf Hitler was killed at the age of 19 when hit in the head by a
+thrown
+beer bottle), but all was not peace in this alternate age.
+
+  In 1938 aliens swept down out of the skies and began to set up
+structures.  Although many attempts were made to communicate, the aliens
+did not
+respond.  It soon became obvious that these creatures simply were not
+interested in us, or in any other life on the planet.  When human
+dwellings
+or sites were in their way, the aliens destroyed them and continued
+their
+seemingly random construction plans.
+
+  So in 1941 the world governments agreed to band together in an
+alliance
+for humanity.  No attacks were launched until November 1941.  The plan
+was
+a simultaneous all out blitz against the extraterrestrials in every part
+of
+the globe.
+
+  Your mission is critical in this plan.  You must destroy several alien
+structures, and in the process, many aliens themselves.  If you do not
+succeed the entire human effort will fail.
+[Historical DOS documentation - retained for reference]
+
+Hardware Requirements
+---------------------
+
+  Corncob requires an IBM PC/AT-type, 12Mhz or faster, with a color VGA
+display, and 560k free RAM.  A hard drive is recommended.
+
+NOTE:  If you are running Corncob from a high-density floppy disk: you
+must
+copy COMMAND.COM from your DOS disk onto the root directory of this
+floppy
+disk.
+[Historical DOS documentation - retained for reference]
+
+What to do if Corncob crashes your computer.
+-------------------------------------------
+
+  Corncob has been tested on a variety of systems and has run reliably
+with no crashes for weeks of game play.  However, Corncob 3D does do
+some
+rather unorthodox things which may cause problems with certain TSR
+programs.
+
+  If you encounter problems reboot with no TSR or menu programs loaded.
+Redux Controls
+
+These are the default bindings. F4 opens the current bindings during
+flight; Enter selects a binding to change it. Escape or P opens the
+pause menu, including display and control options. Delete clears a
+binding during capture; Escape cancels capture. Keyboard and mouse
+bindings can coexist: capturing a key changes the keyboard binding;
+capturing a mouse button changes the mouse binding. Delete clears both.
+
+Flying
+  Arrow keys or keypad 4/6 and 8/2: roll and pitch.
+  Z / X or keypad 7 / 9: left / right rudder.
+  + / - or keypad + / -: throttle up / down.
+  Period or keypad 0: hold wheel brakes.
+  Space or left mouse button: machine guns.
+  Left Shift: heavy cannon. C or right mouse button: missiles.
+  S: toggle sound effects. A: autopilot. F: flaps. I: rocket booster. B:
+drop bomb.
+  E: leave the aircraft or eject.
+  R: rear view. L: cockpit. Num Lock: look mode.
+  Hold Ctrl with arrow keys to look around.
+
+On foot
+  W / A / S / D: forward / left / backward / right.
+  Mouse: look around. Space: jump immediately.
+  Left Ctrl: drop through a supporting platform.
+  Left mouse button: pistol. Q: open parachute.
+  Semicolon: plant assassin charge. B: arm/detonate charges.
+  V: call rescue. Caps Lock: remote control of your aircraft.
+
+Shared controls
+  M: map. O: toggle radio messages. G: ground detail.
+  P / Escape: pause menu. F1: boss screen.
+  F2: intelligence. F3: current score. F4: control bindings.
+  Mousewheel: scroll menus, documentation and tower briefings.
+
+Joystick buttons 1 and 2 fire guns and missiles during flight.
+Modern joysticks do not need the DOS calibration controls.
+
+There is no accelerated-time key in Redux. Enemy production and
+movement follow the simulation clock, independently of rendering.
+
+Menus, documentation and the tower
+  Arrow Up / Down: select or scroll; mousewheel also scrolls.
+  Enter: accept. Escape: back/cancel. Backspace: erase text or go back.
+  Home / End: first / last entry or beginning / end of a document.
+  Page Up / Page Down: scroll documents by a page.
+  Left / Right: adjust options; switch world groups in the world list.
+  Insert: toggle detailed pilot records. Highlighted letters: shortcuts.
+  Type a chapter number in the documentation contents, then Enter.
+  In the tower, Enter selects a highlighted mission and closes the
+  briefing; if airborne, this relocates your aircraft to that mission.
+  Tower aliases: J/K or 2/8 scroll down/up; D/U move half a page;
+  Space pages down; G goes to the start, Shift+G to the end; Q exits.
+  Ctrl+F/N and Ctrl+B/P scroll; Ctrl+Y pages down, Ctrl+O pages up;
+  Ctrl+T goes to the start, Ctrl+R to the end; Ctrl+H exits.
+
+Map mode
+  Arrows or keypad 4/6 and 8/2: move the map viewpoint.
+  Page Up / keypad 9: descend (zoom in).
+  Page Down / keypad 3: climb (zoom out). Hold S for slower zoom.
+  Home / keypad 7: reset the map to your position.
+  Hold Left Shift with arrows: rotate the map viewpoint.
+  Escape, Enter, Space, or the configured Map key: return to flight.
+  Map mode pauses the sortie; looking at a map does not advance enemies.
+
+Mission builder (fixed editor keys, separate from flight bindings)
+  In the world list, B opens the selected world in the builder.
+  Arrows: turn the view; keypad 5/0: move forward/backward.
+  Page Up / Down: lower/raise the viewpoint. 1..8: movement speed.
+  Left Shift: show cursor or commit object; Left Ctrl: hide cursor.
+  C: create an object. Space: select a nearby object. D: delete it.
+  + / -: next/previous object type. ] / [: next/previous quality.
+  Hold Left Alt with arrows and Page Up/Down: move cursor/object.
+  Hold A with arrows: rotate selected object.
+  F9: toggle special flag. F10: toggle objective-complete flag.
+  Caps Lock: level the view. Alt+H: remember cursor height.
+  H: move cursor to the remembered height.
+  B, M or Escape: switch overhead/3D view. F5: save and return.
+  Edits are exported under custom_worlds in the Redux save directory.
+
+Other retained shortcuts
+  Ctrl+C during flight: abort the sortie without awarding a score.
+  Alt+I: enable invulnerability; in Other Worlds this toggles it.
+  Escape stops a recorded demonstration without saving it.
+  While a radio message is visible, O disables future messages;
+  any other non-modifier key dismisses the message.
+  F1's boss screen dismisses on any non-modifier key.
+
+Mouse sensitivity and inverted look are adjustable in Options and
+controls. Losing focus releases the mouse and pauses the game.
+FOV, draw distance and ground detail do not affect simulation speed.
+
+
+Keyboard Play
+-------------
+
+  A great deal of effort was put into Corncob in order to make keyboard
+play work well.  The keyboard is interrupt driven, and your key presses
+are timed to within 1/1000 th of a second.  Also, Corncob has no problem
+detecting keystrokes even when 3 keys are held down at once.
+
+  Remember that to apply gentle tweaks to the control, you must press
+keys on and off rapidly, with the average time spent down being the
+desired roll/pitch rate.  You have three displays on the front panel
+which show you what you are presently sending to the control stick.
+These meters are just to the right of the ALT light.
+
+NOTE: if the keypad arrow keys suddenly appear to be not functioning
+properly, perhaps you have bumped the numlock key.  See the 'inflight
+keys' section for the function of the numlock key.
+
+Combat Missions: Theaters-of-Operation
+---------------------------------------
+  To fly a mission a pilot first chooses in which theater of operations
+he
+wishes to fly.  A theater of operations is a terrain filled with
+airports
+and areas of enemy concentrations.  After opening a theater, select 'F'
+from the combat missions menu in order to fly a mission in that theater.
+
+  A pilot selects his mission by either flying there from the airstrip,
+or
+simply pressing F2 to bring up a list of the local missions.  The pilot
+selects the mission by using the arrow keys to move the text until the
+start coords for the desired mission light up.  Then by pressing the
+<enter> key, he/she will be teleported right to the action.
+
+  After you have completed your mission, you must fly back to your
+airstrip to get credit for your victory.  If you can land the plane,
+your
+points will be much higher than if you quit during a 'flyby'.
+
+  Still, even if you cannot land the plane safely, quitting the flight
+via
+the pause menu must be done close to airstrip in order to avoid losing
+a plane.  The definition of 'close' to your airstrip is when your
+airstrip's radar dish is blinking.
+
+  Most theaters of operation have 9 airbases from which the pilot
+can take off and land in.  (However, the Earth campaign contains
+single-airstrip
+theaters.)  Each airbase has intelligence information about the enemy
+forces in the vicinity.  Intelligence info can be gotten from entering
+the control tower on foot, or by using your radio (F2 key) when in the
+air.
+The information you receive will be from the last airport you were in.
+
+  One of the most important things about theaters is that they have a
+history capability.  This means that anything a pilot has destroyed will
+stay destroyed forever.  For example, say that yesterday a mission was
+flown in which the Devil's Aquarium was demolished.   If that same
+theater
+is flown in today,  the wreckage will still remain.  This applies to
+friendly objects as well as enemy objects.  Which brings us to the topic
+of plane conservation.
+
+  Planes are a precious resource which should not be wasted.  Each time
+you crash a plane beyond repair, there is one less in your theater.
+
+  Even a heavily damaged plane can be repaired by landing and strolling
+over to the control tower on foot.  If the pilot cannot land, then
+ending
+the mission with a low flyby will assume a safe landing with plane
+intact,
+and the next time the game is played the plane will be repaired.
+
+  If desired, some older model planes can be brought out of storage, but
+this should be used only when desperate.  These planes have reduced
+performance specs, and are a brown color.  Planes are brought out of
+storage when you select 'F' to fly at an airstrip where there are no
+regular blue planes available.
+
+  Of course, if a pilot runs out of planes in a theater, or would like a
+fresh start, there is always the option of reopening a fresh theater.  A
+pilot can have up to 15 theaters open at one time, so he may fly one
+mission
+in DUSK theater, then fly a mission in WASTELND, and so on.  Closing an
+undesirable theater does not affect the pilot's record.  In fact even if
+a
+pilot is killed in action, he can be resurrected.  The only cost of
+resurrection is the fact that the computer keeps track of how many
+resurrections you did, and places this number by your name in all
+records.
+
+  Each pilot has records kept both for his total career, and his
+performance
+in each theater in which he has flown.
+
+
+Training Missions
+---------------
+  If you don't want to fight in an actual theater -- you just want to
+hop
+in a plane and shoot at aliens -- then the Training Missions are for
+you.
+Use the menu to specify the number of enemy KLA sites, AAA batteries,
+and
+ground vehicle sites, and you are ready to engage in combat.
+
+  You will be placed in a universe which is empty except for your
+airstrip
+and the enemy field of operations.  The basic setup of the enemy
+territory
+will always be the same. The fuel storage canisters (or Ticks, as pilots
+call them) are always the primary mission objective.
+
+  The default is that you are issued an invulnerable plane for training
+missions.  If you wish the mission to add to your pilot's score, you may
+toggle off the invulnerable plane option.
+
+  Please note that the default training mission is much harder than the
+combat missions.
+
+Friendly Objects
+----------------
+
+Airplanes
+---------
+  Every airstrip has one or more airplanes that you may fly.  To get
+into a
+plane, simply walk up to it.  To get out of a plane use the 'e' key.
+There
+are three different plane types in the game.
+
+  The blue-winged planes are the standard front-line ground attack
+planes.
+The brown-winged planes are older planes which have been brought out of
+storage in the case of an emergency.  These planes have less engine
+power.
+
+Control Tower
+-------------
+  Every airstrip has a control tower.  This tower contains the radio
+equipment and intelligence officers.  If a pilot enters the door of the
+control tower on foot, his plane will be repaired if close enough.
+
+  If a control tower is destroyed, it may be impossible to get
+intelligence
+info on future missions.
+
+Radar Unit
+----------
+  The radar tower watches for your safe return to home base.  If you
+want
+to have your plane on the next mission, you must make sure the radar
+tower
+is flashing before ending the mission with the pause menu's End current
+sortie option.  The radar tower
+begins flashing when you get to within a certain distance of the control
+tower.
+
+  Ending the mission with the radar tower flashing makes a big
+difference
+in the computed pilot score.
+
+Runways
+-------
+  Runways are the ideal location for taking off and landing.  Your plane
+can do both on the grass also, but the risk of crashlanding is much
+higher
+when not landing on the runway.  Taxiing on the grass bounces the plane
+about, and can cause a crashlanding even at low speeds.
+
+Rescue Van
+----------
+  When a pilot is downed behind enemy lines, he can be rescued by the
+rescue
+van.  He must first eject from the plane, and then use his handheld
+portable
+radio to call for assistance.  (Press the 'v' key.)  A rescue van will
+be
+dispatched and will appear shortly.  The van will approach you and stop
+when
+within a few steps of the pilot.  When the pilot enters the van the
+mission
+is over, and the pilot is considered home safe.
+
+  The rescue van is not indestructible.  The van will be destroyed if it
+collides with another object on its way to pick you up.  It is up to the
+pilot to maneuver himself so that there are no obstructions between the
+approaching van and himself.
+
+Enemy Defenses
+--------------
+
+Force Fields
+------------
+  Force Fields are a passive defense system used to protect resources by
+shielding them from firepower, and preventing our aircraft from flying
+through.  Some forcefields shimmer, some are solid colors.  Some fields
+appear as a rectangular frame which may or may not vary in size with the
+passage of time.
+
+  The solid and shimmering force fields require the most power, and
+therefore only click on when needed.  When a bullet or missile, or
+a plane itself comes near a solid forcefield, it will pop into
+existence.
+Almost all bullets and missiles are stopped by the forcefields, as well
+as bombs.  Do not use missiles when your plane is too close to field,
+as they will explode in your face when launched.  A forcefield will
+cause damage to a plane at a certain rate during the time in which
+the airplane is flying too close.  If a forcefield must be flown
+through,
+then to minimize damage, fly through perpendicular to the surface, and
+the higher the airspeed, the better.
+
+  In almost all cases, forcefields are powered by a local generator orb.
+Therefore when you take out the orb, all the local ff's will drop.
+
+  Note that the enemy's fire can be stopped by forcefields also.
+
+Barrage Balloons
+----------------
+  Barrage balloons are huge membranes filled with a lighter-than-air
+gas.
+They float up and down randomly.  Their purpose is simply to be in the
+way.
+They are organic and self-regenerating, so although they stop all our
+firepower, they themselves are indestructible.
+
+Bee Swarms
+----------
+  Bee swarms are very similar to the barrage balloons discussed above.
+They
+float up and down, but they are much harder to see, and are more
+difficult to
+determine their exact position due to their indistinct appearance.
+
+AAA Batteries
+-------------
+  These are one of the most threatening of the enemy's active defenses.
+AAA
+sites track your plane and send up volleys of explosive shells which
+burst in
+the air around you.  You do not have to be hit directly to take damage
+from
+an AA shell.  The shells are designed to explode into fragments that
+tear
+through your plane, even if you are hundreds of feet from the explosion.
+
+  The AAA batteries vary wildly from site to site.  We have found that
+there
+is a correlation between muzzle color and deadliness.  Usually brown
+AAAs
+are the least threatening, while white AAAs are devastating.
+
+  Note that enemy AAA shells can destroy enemy KLA's.
+
+KLA's Deathballs
+----------------
+  These are enemy missiles that lock on to your plane, and attempt to
+explode when close enough.  They are launched either from missile sites
+or from saucers.  These missiles have varying abilities which you can
+determine from their color.
+
+  When a KLA becomes active, it will show up as a green dot on your
+radar screen.  When you see one visually you will notice that when
+it is pointed at you it begins to flash.  At this point the KLA has a
+lock on you.  Most KLAs will accelerate forward when they get a lock.
+
+  Note that deathballs always head directly towards you, and do not
+lead your plane, like AAA batteries do.
+
+Generator Orbs
+--------------
+  Generator orbs produce power for force fields and act as a central
+structure to each concentration of enemy activity.  The process used by
+the aliens to generate power has a strange disorienting effect on humans
+when close to the orb.  Usually this effect decreases with distance, but
+under certain circumstances can become independent of position.
+
+  When attempting to destroy it, aim for the center of the flashing
+ball.
+It takes maybe ten missiles or two bombs and a few missiles to destroy
+one.
+
+  When an orb is destroyed all the force fields in the immediate
+vicinity
+drop.  This makes them of extreme strategic importance on some missions.
+In some situations it is wise NOT to destroy the orbs, since sometimes
+the alien's force fields can be used to our advantage.
+
+  There is a special kind of orb which has an attractive tractor beam
+that
+exerts a pulling force on your plane.
+
+  Some orbs have been designed to be invincible to normal weapons, and
+the
+only effective way to take them out is via suiciding the plane into
+them.
+Make sure you bail out before contact, or else you will be killed in the
+ensuing explosion.  If you must bail a good way away from the target,
+hit
+caps lock to control your plane remotely.
+
+TRFRU
+-----
+  Tetrahedral Radio Frequency receiving units, or TRFRU, are antenna
+systems used for spying on all human military communications.  They look
+like small black tetrahedrons spinning in the air.
+
+Mortars
+-------
+  Mortars are simple ground devices that spew incendiaries when any
+human
+is near.  They are used to deny low altitude flying.
+
+Mind Benders
+------------
+  Mind benders are small tofu-like structures that have a hallucinatory
+effect on the human nervous system.  These devices blaze with flashing
+colors, and spin slowly about the ball in their centers.   They are
+extremely tough, and can only be taken out with a bomb.  In many
+missions
+they are unreachable from the air.  In this case a volunteer must land
+his
+plane in enemy territory and proceed on foot to plant an assassin bomb
+on
+the device, then blow it up remotely from a distance.
+
+Aliens
+------
+  Aliens are very light and like to be in constant motion.  They rarely
+are
+seen on open ground and must be approached on foot most of the time.
+The
+handgun is the weapon of choice for assassinating aliens.  Upon death
+chemical reactions occur that may cause the body to float up into the
+sky.
+
+  If an alien touches you while you are not in your plane, you are
+captured.
+
+Ground Transports
+-----------------
+  These ground vehicles look like three wheeled radio controlled cars.
+They are no threat to the airborne pilot; however it is a different
+story
+for the pilot on foot.  These shopping carts (unofficial name) can
+capture
+an ambulatory pilot.
+
+  There are two ways to avoid capture while on the ground.  One is to
+use
+your handgun to destroy approaching carts.  The other method is to lead
+them into some wreckage or other structure which will cause the cart to
+turn onto its side and die.  Ground vehicles are notoriously stupid.
+
+  When a shopping cart comes near, a human on foot feels a force
+inexorably
+pulling him towards the cart.
+
+Flying Saucers
+--------------
+  Saucers are the primary vehicle for alien airborne transportation.
+They
+vary widely in self-defense capability.  Some possess AAA; some have
+missile
+launchers (KLA) aboard.  All but the dumbest have the ability to execute
+evasive maneuvers.  All saucers have the ability to make bombing runs
+against
+airfields.  The color of the top ball on the saucer indicates its
+intent.
+
+  Saucers emanate from saucer sites.  These sites look like large square
+cookie tins with an 'x' in the bottom.
+
+Portals
+-------
+  The aliens have developed a means of instantaneous travel.  Portals
+are
+small force fields which look like rectangles with the corners clipped.
+There are a number of different types of portals.  Some are used by
+saucers
+to appear directly over the home airstrip.  These can be used by the
+clever
+pilot as a means of getting home when his plane is not serviceable
+enough
+to fly back.
+
+  Other kinds take you to a random place in the theater, depending on
+whatever the aliens used it for last.  Others are placed as traps that
+result in a destroyed plane, or worse, instant death.
+
+How to Take Off, Land, and Fly Level
+------------------------------------
+  The key to success in Corncob is to become a good flyer.  Only when a
+pilot
+learns the abilities and limitations of his plane can he make the
+complex
+maneuvers required to make it to the rank of General.
+
+Takeoffs
+--------
+  Pulling your plane up into the air is the easiest part of flying.
+Merely
+put the throttle to the maximum, and pull up on the stick when you reach
+over 150 mph.
+
+  However, there are some details to be aware of.  If your plane is not
+lined
+up on the runway, you will have to maneuver on the ground.  The joystick
+controls the tilt of the plane, it cannot turn the plane.  Therefore,
+use
+the rudder controls to steer while on the ground.
+
+  To bring the plane to a stop you must use the brakes.  These are the
+Period key, the '.' key, or the '0' key on the keypad.  The brakes must
+be used to bring the plane to a complete stop.  (The plane must be
+brought
+to a complete stop to qualify as a landing.)
+
+  Once you are lined up, bring the throttle up to max.  When you reach
+100
+mph the tail of your plane will rise off the ground.  Keep the plane on
+the
+runway by tapping the rudder keys if needed.  When you surpass 150 mph,
+pull
+back gently on the stick.  If you pull back too hard the tail will swing
+down so quickly that it will slam back down onto the runway, thus
+kicking
+down your nose due to the bounce.  This can cause a crash, so be
+careful.
+
+Level Flight
+------------
+  When in the air the most important thing is to avoid crashing into the
+ground.  To achieve level flight you must keep your gunsight above the
+horizon.  How high you must keep your nose depends on your airspeed.
+Near
+the stall speed of 100 mph, the nose must be kept much higher above the
+horizon than when you are flying at 350 mph.
+
+  There is an altimeter and a climb rate meter to help you fly level.
+A warning light will flash if your altitude drops below 150 feet.
+
+  When climbing, keep an eye on your airspeed.  If this drops below 100
+mph,
+then you may not have enough airspeed to fly.  This makes a stall
+possible.
+
+Stalls and Advanced Aerodynamics
+--------------------------------
+  A stall occurs when the air traveling over the wings becomes
+turbulent.
+This results in a dramatic loss of lift, and unless corrected, the plane
+will invariably fall to the ground.  Stalling can be brought about by
+letting your airspeed drop below stall speed, or it can also occur as a
+result of an imprudent aerobatic maneuver.
+
+  In a computer sim, the joystick tension does not reflect the flight
+situation.  Therefore, Corncob has in it an automatic stall preventer
+that
+limits the stick travel to the maximum attainable without causing a
+stall.
+This does not mean that it is impossible to stall.  The stall preventer
+simply limits the control stick from causing a stall which would be the
+result of pulling back too hard.
+
+  The most common cause of a stall is simply that the airspeed has
+dropped
+too low to sustain flight.  Another common cause is excessive
+sideslipping.
+
+  Also, a damaged plane is much more likely to stall.  Wing damage will
+lower
+the lift of the wings, and control damage can make the stick jitter
+beyond
+what the automatic stall preventer can handle.  Of course engine damage
+will
+lower airspeed, and rudder damage will increase level flight sideslip.
+
+How to get out of a stall
+-------------------------
+  To get out of stall means getting your forward airspeed up.  Since
+your
+direction of motion is invariably down when stalled, it is best to get
+the
+nose pointed down.  Of course your throttle should be place to maximum
+also.
+
+  Note that when the stall is so bad that your airspeed is nil, then you
+have
+lost the ability to control the plane with the control surfaces.  In
+fact, it
+is even possible for your plane to fly backwards with the controls
+operating
+in a reversed fashion.  Even backwards airspeed is better than zero.  If
+you
+are falling backwards, pull the stick back to push the nose down.  Once
+the
+nose is down, hold her there until you get some forward airspeed.
+
+  The emergency rocket booster can also be useful in getting out of a
+stall.
+
+Landing
+-------
+  This is one of the hardest parts of learning to fly.
+
+  The biggest problem for beginners is to get lined up properly.  One
+point
+to remember is that you must not fly toward the middle of the runway.
+Fly
+towards the close end of the runway, or a point on an imaginary line
+running
+the length of the runway and beyond.  Once you are over that imaginary
+line,
+then turn your nose to point towards the end of the runway.  Getting
+lined
+up is especially difficult in Corncob, due to fact that the plane may be
+slipping sideways.
+
+  When you get close enough to the runway so that it no longer looks
+like a
+line, but instead looks like a black rectangle, engage the flaps, and
+drop
+your throttle to zero.  (But don't let your airspeed drop below 100
+mph.)  At
+this point you should be no higher than 1000 ft.
+
+  Your plane has automatic landing gear that pops down as required.
+
+  Now let the plane drop, shedding that altitude before you reach the
+end
+of the runway.  When you get to 100 or 200 feet, level the plane out for
+the
+final drop to the runway.
+
+  If you are not perfectly lined up, but are low and over the runway,
+then
+drop and steer with the rudder once your wheels touch.  The gear of your
+plane is quite tough, and on the runway surface you can have your rate
+of
+climb meter almost pegged negative and still survive.  Landing on the
+grass can be done, but requires a much more sensitive touch down.
+
+  It is a good idea to be holding down the brake key throughout the
+whole
+landing process.  The Period key is situated conveniently for the
+left hand to operate the brakes and rudder controls.  For those that use
+the left hand on the joystick, use the keypad rudder and brake controls.
+
+  Once you have solidly touched down you may taxi about using your
+rudder.
+Be careful to keep your speed down while taxiing (especially if your
+flaps
+are down.) because it may cause you to lift into the air inadvertently,
+and
+then cause a crashlanding.  Please remember than on the ground, the
+stick
+is useless, and you must steer with the rudder keys.  Pulling the stick
+over
+on the ground may cause your plane to flip.
+
+Crashes
+-------
+  There are two different types of crashes.  One is a fatal wreck, and
+the
+other type is a crashlanding.  A crashlanding is where your plane is
+brought
+down too hard, and the landing gear fails.  The plane then spins to a
+stop
+on the ground.  When it stops, your plane is dead and will not fly again
+until repaired.  If you were close to your airstrip, the repair crew can
+fix
+it.  (Do this by entering the control tower through the door on foot.)
+
+  The other type of crash is the fatal crash.  This happens if you slam
+into
+the ground too hard, or if your plane is so tilted during landing that
+your
+wing tip hits.
+
+Midair collisions
+------------------
+  There are many types of objects which will destroy your plane if you
+collide
+with them.  When this happens your plane bounces, and the damage
+indicators
+immediately max out.  The screen border turns dark red, and the eject
+light
+begins to flash.  At this point you should bail out, since it is likely
+that
+you will die if you try to land the plane.  Don't bother trying to make
+it
+back to base.  (Although landing such a plane has been done on occasion,
+it most often proves to be a fatal mistake.)
+
+  Some of the objects which will destroy your plane in a collision are:
+Saucers, fuel dumps, TRFRU, generator orbs.
+
+How to Turn Your Plane
+----------------------
+  Please note that Corncob's advanced flight model makes turning
+different
+than on many commercial flight games which have simpler models.  With a
+little practice however, you will find the plane is just as
+maneuverable.
+
+  To turn your plane, simply move the stick left or right.  The plane
+will
+begin to bank.  Don't be too shy, give the plane a nice 45 degree bank.
+Now that wing's lift is no longer pulling straight up, you will lose
+some
+lift, and your nose may drop.  Pull back on the stick to keep the nose
+above the horizon.  You will notice that as you pull back on the stick,
+your nose will be pulled into the turn.
+
+  To make a typical combat turn, place the plane on its side, so that
+the
+horizon forms a vertical line.  Then pull all the way back on the stick,
+and
+hold it there until you have the compass reading you desire.  Then
+simply
+flatten your plane back to the level.  Be careful not to let the nose
+drop during the turn.  You can always bring it up by unbanking the plane
+a
+little, and the nose will lift since you are holding the control stick
+back.  This method of turning is actually easier than a slow coordinated
+turn.  The price for the fast turn is airspeed.
+
+  The fastest turns are done with the flaps engaged, since this greatly
+increases the lift from the wings.  Be careful not to let your airspeed
+drop too much.  Flaps increase drag also.
+
+  Note that the amount of time required for the turn depends very much
+upon your airspeed.  (Just like in an automobile, when moving fast you
+cannot make tight turns.)
+Running Around - Welcome the Assassin
+
+Part of your job as a pilot involves special forces missions. You may
+have to land in enemy territory and continue on foot. You carry a pistol
+with twenty rounds and one assassin charge; boarding a plane resupplies
+you, including a crashed plane.
+
+Move with WASD and look with the mouse. Space jumps immediately; you can
+steer in the air. Q opens the parachute, even during a jump, and Left
+Ctrl
+lets you drop through a platform. Horizontal force fields, fuel dumps,
+platforms and control towers may support your weight. Watch your
+landing:
+a long fall can still kill you.
+
+Plant a charge with Semicolon and move to safety. B arms the charge and
+lets it fall; contact then detonates it. A charge can be planted in
+midair.
+Mindbenders are vulnerable only to bombs, so some missions require you
+to
+plant a charge inside one and retreat before arming it.
+
+Shopping carts and aliens can capture you. Use your pistol, jump to
+safety, or lure a cart into wreckage. V calls a rescue van. Caps Lock
+switches remote aircraft control; it does not move you back into the
+cockpit. Walk near a parked plane to board it automatically.
+
+Scoring and Medals/promotion
+----------------------------
+
+Scoring
+-------
+  Your score for a mission is determined by a formula outlined below.
+Your
+raw score which depends on how much stuff you killed is multiplied by 3
+factors.  These three factors depend on what happened during your
+mission.
+For example say your raw score for a mission was 1000.  Further suppose
+that
+you returned from your mission, and landed your plane safely at an
+airstrip.
+Then your final mission score would be:
+
+5 * 5 * 1 * 1000 = 25000
+
+   But say you ejected in combat, and had to be rescued by the rescue
+van.
+
+4 * 1 * 1/2 * 1000 = 2000
+
+  Here you can see that bringing your plane home increased your score by
+10 times.
+
+  Now let's say you brought your plane back, but didn't have the guts to
+try and land it.
+
+5 * 1 * 1 * 1000 = 5000
+
+  So you can see it is worth it to learn how to land the plane.  It may
+be
+impossible to get a Stellar Cluster without landing your plane.
+
+  If you make multiple flights during your mission, the multiplier
+reflects
+the worst thing you did.  For example, if you crashland a plane, but
+then
+take another into the air, (without quitting the mission) and do a great
+job, and even land beautifully, your multiplier will reflect the fact
+that
+you crashlanded.  The fact that you also landed will not affect your
+score.
+
+  Therefore you can see that flying against multiply mission objectives
+may
+raise up your score, but you are jeopardizing the points you have
+already
+earned by flying more without ending the mission.  Of course you'll
+never top
+the high score list without taking some chances.
+
+Commonly Asked Questions
+------------------------
+
+>  Sometimes when I eject or crashland, there is a continuous tone that
+>  never fades.  How do I turn it off?
+
+  Under certain conditions, the stall indicator sound can get stuck on.
+This DOS sound-driver problem does not apply to Redux.
+
+
+>  When first lifting off the ground, why does the nose lift for a
+second,
+>  and then seem to knock back down?
+
+  If you pull back too hard on the stick while lifting off, your tail
+wheel will be slammed back down onto the pavement, and when it bounces
+upward,  your nose appears to bounce downward.  It is possible to crash
+and burn as a result of this, so pull back on the stick gently.
+
+
+>  Why does the stall light go on sometimes when I'm taxiing on the
+runway?
+
+  The stall detector is looking at the airflow over the wings.  It is
+calibrated to detect stalls when the plane is flying.  When on the
+ground,
+the weight of the plane is held by the landing gear, thus making the
+stall
+detector give incorrect readings.  Just ignore it.
+
+
+>  Why doesn't the plane steer worth a bean when I'm on the runway?
+
+  Don't try to use the joystick to steer a grounded plane.  The control
+stick left/right controls mostly only the roll (left/right tilt) of the
+plane.  You must use the rudder controls to steer on the ground.  These
+are the 'x' and 'z' keys, or the '7' and '9' keys on the keypad.
+
+
+>  Sometimes I can't get back into my plane.  I just go right through
+it.
+
+  There are two possible reasons for this.  One is that you must walk
+at least about a couple plane lengths away before attempting to reenter.
+This hysteresis is to avoid popping back into your plane before you had
+a chance to walk away.
+
+  The DOS version could also lock planes after walking far away; that
+renderer-dependent restriction does not apply to Redux. Historically,
+If
+you stray so far from your plane that it has shrunk to a point, then
+the plane will engage the automatic security system, and lock itself up
+tight.  In none of the missions is it imperative to walk anywhere near
+this far from your plane.
+
+
+>  Why don't the brakes appear to work?
+
+  In Corncob, the brakes do NOT toggle on/off.  To stop you must hold
+down the brake key until the plane comes to a complete stop.  The
+default brake binding is Period or keypad 0.
+
+
+>  Why doesn't the T key accelerate time?
+
+Redux removes accelerated time. KLA production and all movement run on
+a fixed simulation clock, independently of the display frame rate.
+
+
+>  Why does using the rudder in flight just make me stall?
+
+  Unlike other flight sims, Corncob's flight model includes the
+capability
+of your plane sliding sideways through the air.  The rudder causes your
+nose
+to flip to the side, without necessarily changing the direction of
+motion of
+the plane.  Using too much rudder (by holding the key down too long),
+will
+cause the plane to turn to the point where it is hurling sideways
+through the
+air.  Note that as soon as you release the rudder, the sidewind makes
+the
+nose tend to flip back into the sidewind, thus restoring the original
+orientation of the plane.  The rudder is useful for flipping the nose a
+little to the side for a quick shot at a side target without the need of
+negotiating the slow process of turning the plane.
+
+
+>  How do I know when to end the mission?
+
+  A large part of Corncob is bringing your plane back to the base.
+Therefore
+you must bring your plane to a friendly airstrip, or else when you go to
+fly
+again, you will have one less plane in that theater.
+
+  To exit without losing a plane, choose End current sortie from the
+pause menu when you are
+flying low over your airfield (with the radar tower flashing white), or
+else
+land on the air strip.  Landing on the airstrip will give you a much
+higher
+score multiplier, so it is worth an attempt if you think you can do it
+without crashing.
+
+  To find an airfield, follow the homing indicator that runs along the
+bottom
+of the windscreen.
+
+
+>  How do I zoom down closer when in map mode?
+
+  When in map mode, the KEYPAD 9 key will zoom down, and the KEYPAD 3
+key
+will zoom up.  Use the joystick or keypad arrow keys to move around.  To
+make
+the map jump back to your present position, hit the KEYPAD 7 key.
+
+
+>  Why do I die every time I eject, regardless of altitude?
+
+  Ejecting successfully from a flying plane requires two keys.  E to
+eject,
+and Q to pull your ripcord.  If you don't pull your ripcord, you
+will die when you strike the ground.
+
+  If you bail out at 20000 feet, wait until you get closer to the ground
+before pulling your ripcord, otherwise you will be stuck in the air for
+a
+long time.
+
+
+>  Why are some generator orbs seemingly indestructible?
+
+  Some orbs have been designed to be invincible to normal weapons, and
+the
+only effective way to take them out is via suiciding the plane into
+them.
+Make sure you bail out before contact, or else you will be killed in the
+ensuing explosion.  If you must bail a good way away from the target,
+hit
+caps lock to control your plane remotely.
+
+  The indestructible orbs have bases which are a light shade of
+blue/green.
+
+
+>  Why does the complete light refuse to go on, even though I know
+>  the mission is completed?
+
+  The mission objectives have to be given some geometric scope via the
+mission builder when the mission is created.  Almost all mission
+complete
+sensing is done via the generator orbs.  IE, if you have completed a
+mission,
+but the complete light doesn't go on, make a flyby of the mission's
+generator
+orb, (or its remains) and many times the complete light will belatedly
+light
+up.  Note that if your complete light never lights, you will not get
+credit
+for accomplishing an objective.
+
+
+>  Sometimes my plane goes into a weird mode where my keypad arrow
+>  keys stop working, and something weird happens.
+
+  Numlock toggles the keypad arrow keys between views, and control of
+the
+plane.  Note that the numlock light on the keyboard will not change.  If
+you
+would like to use the views without changing the mode of the arrow keys,
+hold
+down the left control key to temporarily change the function of the
+arrow
+keys to view, the normal function of the keys returns when you release
+the
+left control key.
+
+
+>  I can't find any way to put down the landing gear!
+
+  The plane has landing gear that comes down automatically.  From a game
+standpoint, it seemed unnecessary to have something which doesn't add to
+the
+fun of the game, and can cause pilots to be killed.  We all get punished
+in
+life enough for being absent-minded, why be punished when playing a
+computer
+game?
+
+
+>  Why can this Corsair do a loop directly after take off?
+
+  Because the number one priority in this game was to have fun.  That
+meant
+increasing the thrust of the engine by a factor of four.  For those sim
+buffs
+who will criticize that, how many flight games keep the realistic figure
+of
+10-15 minutes just to climb to 17,000 feet?  Who wants to spend 1/4 hour
+of
+their life just sitting there watching your computer plane climb?
+[Historical DOS documentation - retained for reference]
+
+CORNCOB OTHER WORLDS CAMPAIGN ORDER FORM
+
+Name ________________________________________________________________
+
+Address _____________________________________________________________
+
+City _______________________________ State ______ ZIP _______________
+
+Country (if outside USA) ____________________________________________
+
+CIRCLE HD DISK SIZE:    5-1/4"   -or-   3-1/2"         IMPORTANT!!!!!!
+
+Price of Corncob Other Worlds Campaign                          $20.00
+Shipping and Handling                                             3.00
+                                                                ------
+                                               Total enclosed:  $23.00
+
+           Make check or money order payable to "MVP Software"
+
+Master Card/Visa information (credit card orders only)
+
+Card number __________________________________________
+
+Expiration number ____________________________________
+---------------------------------------------------------------------------
+VOLUNTARY QUESTIONS:  Please help us determine what features you would
+like
+====================  in future products.
+
+Circle what type of equipment you have:    8088    286    386    486
+
+Circle the speed of your computer(Mhz): 10  12  16  20  25  33  40  50
+___
+
+Circle any that apply: Joystick Mouse Modem_____ Super-VGA
+card____________
+                                          (speed)                 (type)
+
+Sound Capability:  Adlib  Sound Blaster  SB Pro  Thundercard
+    PC Speaker only  Other ____________________________________
+
+Where did you get Corncob 3D:
+    Friend   CompuServe   GEnie   AOL   BBS (name):
+_______________________
+    Shareware Distributor (name):
+_________________________________________
+
+Approx # of commercial games owned :____  #Registered shareware games
+:____
+
+Circle preference:        Beautiful Graphics   Game Complexity
+
+Circle preference:  Solo against computer  -OR-  Modem 2-Player
+
+Circle preference:  Strategy    Action    Simulation    Other_________
+
+Long term game playability:   Few Levels w/ hard difficulty   Lotsa
+Levels
+---------------------------------------------------------------------------
+Send this order form and your check for $23.00 to:
+
+MVP Software, 1035 Dallas S.E., Grand Rapids, MI  49507-1407
+
+From the US or Canada call 800-968-9684 toll-free 24-hour order line.
+Call (616) 245-8376 tech support, information, or overseas orders.
+
+
+The Corncob program itself
+--------------------------
+  Corncob 3D was written by Kevin Stokes, with a lot of additional
+programming by George Welch.  The program documentation was written by
+Kevin
+Stokes.  Original music was written by Jim Collymore, A.S.C.A.P.  All
+music
+in the game is copyright 1986-1991 James L. Collymore, and the use of
+the
+three music files for any purposes except for Corncob 3D is strictly
+illegal.
+The music is contained in the following files: DESTINY3.ROL,
+RIDINGT.ROL, and
+DREAMS0.ROL.  These files cannot be legally copied or distributed
+without the
+author's permission.
+
+  The VGA directory (created the first time Corncob 3D is run) contains
+all
+the digitized artwork in the game.  These photos were extensively
+retouched
+using the excellent program MVP Paint, by David Johndrow.  You can order
+your
+own copy of this extremely useful program from MVP Software.
+
+  Corncob 3D was written in assembler and C.  The excellent library of
+routines Spontaneous Assembly was used in developing the program.
+
+  This software is based in part on the work of the Independent JPEG
+Group.
+
+THIS SOFTWARE IS DISTRIBUTED ON AN AS IS BASIS.  MVP SOFTWARE AND PIE IN
+THE
+SKY SOFTWARE MAKE NO WARRANTIES, EITHER EXPRESS OR IMPLIED, WITH RESPECT
+TO
+THIS SOFTWARE, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
+FITNESS
+FOR A PARTICULAR PURPOSE AND MERCHANTABILITY.  ACCORDINGLY, THE ENTIRE
+RISK
+AS TO THE USE, RESULTS AND PERFORMANCE OF THE SOFTWARE IS ASSUMED BY THE
+USER.  IN NO EVENT WILL MVP SOFTWARE OR PIE IN THE SKY SOFTWARE BE
+LIABLE
+FOR ANY DAMAGES, INCLUDING CONSEQUENTIAL DAMAGES, EVEN IF MVP SOFTWARE
+OR
+PIE IN THE SKY SOFTWARE HAVE BEEN ADVISED OF SUCH DAMAGES.
+
+IF ANY OF THE PROVISIONS, OR PORTIONS THEREOF, OF THIS DISCLAIMER ARE
+INVALID UNDER ANY APPLICABLE STATUTE OR RULE OF LAW, THEY ARE TO THAT
+EXTENT
+DEEMED TO BE OMITTED.  ALL OTHER PROVISIONS, HOWEVER, REMAIN IN EFFECT.
+

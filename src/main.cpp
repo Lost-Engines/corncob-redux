@@ -15,20 +15,26 @@
 #include "audio/music.h"
 #include "game/front_end.h"
 #include "game/session.h"
+#include "game/timing.h"
 #include "graphics/scene.h"
 #include "platform/audio_output.h"
 #include "platform/framebuffer_presenter.h"
 #include "platform/joystick.h"
+#include "platform/key_codes.h"
 #include "platform/storage.h"
 #include "render/framebuffer.h"
 #include "resources/assets.h"
-#include "world/theatre_catalog.h"
-#include "world/airfields.h"
 #include "resources/cockpit_mask.h"
 #include "resources/geometry_bank.h"
+#include "world/airfields.h"
+#include "world/theatre_catalog.h"
 #include "world/world.h"
 
 namespace {
+
+static_assert(GLFW_KEY_LEFT == corncob::platform::key::left && GLFW_KEY_LAST == corncob::platform::key::last);
+using resolution_limits = corncob::render::resolution_limits;
+using scene_settings = corncob::graphics::scene_settings;
 
 struct window_state {
   std::unique_ptr<corncob::game::session> &game;
@@ -36,7 +42,40 @@ struct window_state {
   bool &sound_enabled;
   corncob::render::framebuffer &frame;
   std::bitset<GLFW_KEY_LAST + 1> consumed_key_releases{};
+  double look_x{0}, look_y{0}, last_x{0}, last_y{0};
+  bool mouse_captured{false}, mouse_primed{false};
+  double wheel_remainder{0};
 };
+
+void activate_control(window_state &state, corncob::game::control_id const id) {
+  using corncob::game::action;
+  using corncob::game::control_id;
+  auto &game{*state.game};
+  switch(id) {
+  case control_id::sound: state.sound_enabled = !state.sound_enabled; break;
+  case control_id::autopilot: game.press(action::toggle_autopilot); break;
+  case control_id::flaps: game.press(action::toggle_flaps); break;
+  case control_id::rocket: game.press(action::rocket); break;
+  case control_id::eject: game.press(action::eject); break;
+  case control_id::parachute: game.press(action::parachute); break;
+  case control_id::remote: game.press(action::toggle_remote); break;
+  case control_id::rear: game.press(action::toggle_rear); break;
+  case control_id::cockpit: game.press(action::toggle_cockpit); break;
+  case control_id::ground: game.press(action::toggle_ground); break;
+  case control_id::look: game.press(action::toggle_look); break;
+  case control_id::map: game.press(action::toggle_map); break;
+  case control_id::rescue: game.press(action::call_rescue); break;
+  case control_id::messages: game.press(action::toggle_messages); break;
+  case control_id::pause: state.front.show_menu(); break;
+  case control_id::bomb: game.press(action::drop_bomb); break;
+  case control_id::charge: game.press(action::plant_charge); break;
+  case control_id::detonate: game.press(action::arm_charges); break;
+  default: break;
+  }
+}
+bool applies(corncob::game::control_binding const &binding, bool const walking) {
+  return binding.context == corncob::game::control_context::both || binding.context == (walking ? corncob::game::control_context::walking : corncob::game::control_context::flight);
+}
 
 int startup_failure(std::string const &message) {
   /// Report actionable startup errors while leaving unexpected engine failures uncaught
@@ -48,7 +87,7 @@ int startup_failure(std::string const &message) {
 
 auto main(int const argc, char const *const argv[])->int {
   /// Render the embedded original theatre while bringing up the native flight engine
-  boost::program_options::options_description options{"Corncob 3D: reconstruction in progress"};
+  boost::program_options::options_description options{"Corncob Redux"};
   options.add_options()
     ("help,h", "show command-line options")
     ("version", "show the native reconstruction version")
@@ -56,8 +95,13 @@ auto main(int const argc, char const *const argv[])->int {
     ("joystick", boost::program_options::value<std::string>()->default_value("auto"), "flight joystick: auto, none, or a device index 0..15; button 1 guns, button 2 missiles")
     ("list-joysticks", "list connected joystick device indices and names, then exit")
     ("no-music", "start with title and menu music disabled")
-    ("no-sound", "start with sound effects disabled; S toggles effects during flight")
+    ("no-sound", "start with sound effects disabled")
     ("graphics-mode", boost::program_options::value<std::string>()->default_value("ega"), "flight graphics: ega (640x350), ega-low (320x200), hercules (720x348 monochrome); alternate cockpits are adapted")
+    ("resolution", boost::program_options::value<std::string>(), "3D resolution: window (default), or WIDTHxHEIGHT; menus retain their original pixels")
+    ("fov", boost::program_options::value<double>(), "horizontal field of view in degrees, 30..150 (default 94)")
+    ("draw-distance", boost::program_options::value<double>(), "maximum visible distance in kilometres; 0 = unlimited (default)")
+    ("ground-detail", boost::program_options::value<double>(), "ground point density relative to DOS: 0..250 (default 8)")
+    ("mouse-sensitivity", boost::program_options::value<double>(), "walking mouse sensitivity, 1..200 (default 24)")
     ("slalom", "launch the recovered source-only slalom course with player weapons disabled")
     ("skip-intro", "open the main menu without the title and story")
     ("theatre", boost::program_options::value<std::string>()->default_value("white_sands"), "world identifier; --list-theatres lists Earth, Other Worlds and practice scenarios")
@@ -92,7 +136,7 @@ auto main(int const argc, char const *const argv[])->int {
     return EXIT_SUCCESS;
   }
   if(arguments.contains("version")) {
-    std::cout << "Corncob C++ 0.1.0 (reconstruction in progress)" << std::endl;
+    std::cout << "Corncob Redux 0.1.0" << std::endl;
     return EXIT_SUCCESS;
   }
   auto const graphics_argument{arguments["graphics-mode"].as<std::string>()};
@@ -116,7 +160,7 @@ auto main(int const argc, char const *const argv[])->int {
   auto const aspect{aspect_argument == "crt" ? corncob::render::display_aspect::crt : corncob::render::display_aspect::square_pixels};
   bool const automatic_scale{!arguments.contains("scale")};
   int const scale{automatic_scale ? 1 : arguments["scale"].as<int>()};
-  if(scale < 1 || scale > std::numeric_limits<int>::max() / 720) {
+  if(scale < 1 || scale > std::numeric_limits<int>::max() / static_cast<int>(resolution_limits::maximum_width)) {
     return startup_failure("--scale must be a positive integer whose window dimensions fit in an int");
   }
 #ifndef NDEBUG
@@ -157,6 +201,38 @@ auto main(int const argc, char const *const argv[])->int {
     .joystick_device{arguments["joystick"].defaulted() ? (campaign->keyboard_control() ? -2 : -1) : joystick_device},
     .beginner_flight{arguments["flight-model"].defaulted() ? (!campaign->active_pilot() || campaign->active_pilot()->beginner_flight()) : flight_model == "beginner"},
   }, arguments.contains("no-music") ? std::optional{false} : std::nullopt};
+  auto &preferences{front.options()};
+  if(arguments.contains("resolution")) {
+    auto const value{arguments["resolution"].as<std::string>()};
+    preferences.window_resolution = value == "window";
+    if(!preferences.window_resolution) {
+      auto const separator{value.find('x')};
+      if(separator == std::string::npos) return startup_failure("--resolution must be window or WIDTHxHEIGHT");
+      unsigned int width{}, height{};
+      auto const w{std::from_chars(value.data(), value.data() + separator, width)};
+      auto const h{std::from_chars(value.data() + separator + 1, value.data() + value.size(), height)};
+      if(w.ec != std::errc{} || h.ec != std::errc{} || w.ptr != value.data() + separator || h.ptr != value.data() + value.size()
+        || width < resolution_limits::minimum_width || height < resolution_limits::minimum_height || width > resolution_limits::maximum_width || height > resolution_limits::maximum_height) return startup_failure("--resolution must be between 160x100 and 7680x4320");
+      preferences.scene.resolution = {width, height};
+    }
+  } else if(!arguments["graphics-mode"].defaulted()) {
+    preferences.scene.resolution = corncob::render::dimensions(video);
+    preferences.window_resolution = false;
+  }
+  auto number{[&](char const *name, double &value, double const low, double const high){
+    if(!arguments.contains(name)) return true;
+    double const requested{arguments[name].as<double>()};
+    if(!std::isfinite(requested) || requested < low || requested > high) return false;
+    value = requested;
+    return true;
+  }};
+  if(!number("fov", preferences.scene.horizontal_fov, scene_settings::minimum_fov, scene_settings::maximum_fov)) return startup_failure("--fov must be between 30 and 150 degrees");
+  if(!number("draw-distance", preferences.scene.draw_distance, 0, scene_settings::maximum_draw_distance)) return startup_failure("--draw-distance must be a finite non-negative number of kilometres");
+  if(!number("mouse-sensitivity", preferences.mouse_sensitivity, 1, 200)) return startup_failure("--mouse-sensitivity must be between 1 and 200");
+  double density{preferences.scene.ground_points / 80.0};
+  if(!number("ground-detail", density, 0, 250)) return startup_failure("--ground-detail must be between 0 and 250");
+  preferences.scene.ground_points = static_cast<unsigned int>(std::lround(density * 80));
+  renderer->configure(preferences.scene);
   game->set_experimental_clearance(game->world().expansion || (campaign->active_pilot() && campaign->active_pilot()->awards(corncob::game::medal::combat_master) != 0));
   game->set_beginner_flight(front.flight_controls().beginner_flight);
   if(slalom_mode) { game->set_invincible(true); front.begin_flight(); }
@@ -220,7 +296,7 @@ auto main(int const argc, char const *const argv[])->int {
   glfwWindowHint(GLFW_MAXIMIZED, compositor_sizing ? GLFW_TRUE : GLFW_FALSE);
   std::unique_ptr<GLFWwindow, decltype(&glfwDestroyWindow)> const window{
     glfwCreateWindow(display_width * scale, display_height * scale,
-                     "Corncob 3D", nullptr, nullptr),
+                     "Corncob Redux", nullptr, nullptr),
     glfwDestroyWindow,
   };
   if(!window) return startup_failure("cannot create the Corncob window");
@@ -256,6 +332,10 @@ auto main(int const argc, char const *const argv[])->int {
     auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
     auto &game{state.game};
     auto &front{state.front};
+    if(front.capturing_binding()) {
+      if(action == GLFW_PRESS) { front.bind_input(key); if(key >= 0) state.consumed_key_releases.set(static_cast<unsigned int>(key)); }
+      return;
+    }
     if(key >= 0 && action == GLFW_RELEASE && state.consumed_key_releases.test(static_cast<unsigned int>(key))) {
       state.consumed_key_releases.reset(static_cast<unsigned int>(key));
       return;
@@ -350,44 +430,47 @@ auto main(int const argc, char const *const argv[])->int {
       return;
     }
     if(game->in_map()) {
+      for(auto const &binding : front.options().bindings) if(binding.id == corncob::game::control_id::map && (binding.key == key || binding.alternate == key)) { game->press(corncob::game::action::toggle_map); return; }
       if(key == GLFW_KEY_ESCAPE || key == GLFW_KEY_M || key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER || key == GLFW_KEY_SPACE) game->press(corncob::game::action::toggle_map);
       return;
     }
-    switch(key) {
-    case GLFW_KEY_M:
-      if(game->messages_enabled()) front.show_radio(game->world().training ? corncob::resources::radio_notice::no_training_map : corncob::resources::radio_notice::map_instructions, state.frame, !game->world().training);
-      else game->press(corncob::game::action::toggle_map);
-      break;
-    case GLFW_KEY_O: game->press(corncob::game::action::toggle_messages); break;
-    case GLFW_KEY_C: if((modifiers & GLFW_MOD_CONTROL) != 0) front.abort_sortie(); break;
-    case GLFW_KEY_V: game->press(corncob::game::action::call_rescue); break;
-    case GLFW_KEY_ESCAPE:
-      if(game->is_paused()) game->press(corncob::game::action::pause);
-      else if(game->request_exit()) front.leave_sortie();
-      break;
-    case GLFW_KEY_F1: front.show_boss(); break;
-    case GLFW_KEY_F2: front.show_intelligence(game->world(), corncob::world::nearest_airfield(game->world(), game->camera().position)); break;
-    case GLFW_KEY_F3: front.show_current_score(game->results(), game->world().training); break;
-    case GLFW_KEY_F4: front.show_flight_help(); break;
-    case GLFW_KEY_S: state.sound_enabled = !state.sound_enabled; break;
-    case GLFW_KEY_A: game->press(corncob::game::action::toggle_autopilot); break;
-    case GLFW_KEY_R: game->press(corncob::game::action::toggle_rear); break;
-    case GLFW_KEY_L: game->press(corncob::game::action::toggle_cockpit); break;
-    case GLFW_KEY_NUM_LOCK: game->press(corncob::game::action::toggle_look); break;
-    case GLFW_KEY_G: game->press(corncob::game::action::toggle_ground); break;
-    case GLFW_KEY_F: game->press(corncob::game::action::toggle_flaps); break;
-    case GLFW_KEY_I: game->press((modifiers & GLFW_MOD_ALT) != 0 ? corncob::game::action::toggle_invulnerability : corncob::game::action::rocket); break;
-    case GLFW_KEY_E: game->press(corncob::game::action::eject); break;
-    case GLFW_KEY_SPACE:
-      if(game->is_paused()) front.show_flight_help();
-      else game->press(corncob::game::action::parachute);
-      break;
-    case GLFW_KEY_CAPS_LOCK: game->press(corncob::game::action::toggle_remote); break;
-    case GLFW_KEY_B: game->press(corncob::game::action::drop_bomb); break;
-    case GLFW_KEY_SEMICOLON: game->press(corncob::game::action::plant_charge); break;
-    case GLFW_KEY_D: game->press(corncob::game::action::arm_charges); break;
-    case GLFW_KEY_P: game->press(corncob::game::action::pause); break;
-    default: break;
+    if(key == GLFW_KEY_C && (modifiers & GLFW_MOD_CONTROL) != 0) { front.abort_sortie(); return; }
+    if(key == GLFW_KEY_I && (modifiers & GLFW_MOD_ALT) != 0) { game->press(corncob::game::action::toggle_invulnerability); return; }
+    if(key == GLFW_KEY_ESCAPE) { front.show_menu(); return; }
+    if(key == GLFW_KEY_F1) { front.show_boss(); return; }
+    if(key == GLFW_KEY_F2) { front.show_intelligence(game->world(), corncob::world::nearest_airfield(game->world(), game->camera().position)); return; }
+    if(key == GLFW_KEY_F3) { front.show_current_score(game->results(), game->world().training); return; }
+    if(key == GLFW_KEY_F4) { front.show_flight_help(); return; }
+    bool const walking{game->player() == corncob::game::player_mode::on_foot && !game->remote_control()};
+    for(auto const &binding : front.options().bindings) if(applies(binding, walking) && (binding.key == key || binding.alternate == key)) activate_control(state, binding.id);
+  });
+  glfwSetMouseButtonCallback(window.get(), [](GLFWwindow *window, int button, int action, int){
+    auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
+    if(state.front.capturing_binding()) { if(action == GLFW_PRESS) state.front.bind_input(-1, button); return; }
+    if(!state.front.in_flight() || action != GLFW_RELEASE || !glfwGetWindowAttrib(window, GLFW_FOCUSED)) return;
+    bool const walking{state.game->player() == corncob::game::player_mode::on_foot && !state.game->remote_control()};
+    for(auto const &binding : state.front.options().bindings) if(applies(binding, walking) && binding.mouse == button) activate_control(state, binding.id);
+  });
+  glfwSetScrollCallback(window.get(), [](GLFWwindow *window, double, double y){
+    auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
+    state.wheel_remainder -= y;
+    int const steps{static_cast<int>(state.wheel_remainder)};
+    state.wheel_remainder -= steps;
+    state.front.wheel(steps);
+  });
+  glfwSetCursorPosCallback(window.get(), [](GLFWwindow *window, double x, double y){
+    auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
+    if(!state.mouse_captured || !glfwGetWindowAttrib(window, GLFW_FOCUSED)) { state.mouse_primed = false; return; }
+    if(state.mouse_primed) { state.look_x += x - state.last_x; state.look_y += y - state.last_y; }
+    state.last_x = x; state.last_y = y; state.mouse_primed = true;
+  });
+  glfwSetWindowFocusCallback(window.get(), [](GLFWwindow *window, int focused){
+    auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
+    if(!focused) {
+      state.look_x = state.look_y = 0;
+      state.mouse_primed = state.mouse_captured = false;
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      if(state.front.in_flight()) state.front.show_menu();
     }
   });
   glfwSetCharCallback(window.get(), [](GLFWwindow *const window, unsigned int const codepoint){
@@ -414,7 +497,7 @@ auto main(int const argc, char const *const argv[])->int {
   bool flight_frame_valid{false};
   unsigned int frame_number{0};
   double previous_time{glfwGetTime()}, accumulated_time{0.0};
-  double constexpr simulation_period{40.0 * 1024.0 / 1'193'182.0};
+  double constexpr simulation_period{corncob::game::timing::seconds_per_step};
   bool clock_was_flying{front.in_flight()};
   while(!glfwWindowShouldClose(window.get())) {
     glfwPollEvents();
@@ -453,6 +536,7 @@ auto main(int const argc, char const *const argv[])->int {
       game = std::make_unique<corncob::game::session>(geometry, std::move(world), reserve_aircraft);
       game->set_experimental_clearance(game->world().expansion || (campaign->active_pilot() && campaign->active_pilot()->awards(corncob::game::medal::combat_master) != 0));
       renderer = std::make_unique<corncob::graphics::scene_renderer>(geometry, cockpit, video);
+      renderer->configure(preferences.scene);
       renderer->initialise(game->camera().position, game->random_stream());
       game->set_invincible(launch->invincible);
       if(launch->editing) game->begin_builder();
@@ -504,6 +588,23 @@ auto main(int const argc, char const *const argv[])->int {
     }
 #endif // NDEBUG
     corncob::game::input_state input;
+    auto configure_renderer{[&]{
+      auto settings{preferences.scene};
+      if(preferences.window_resolution) {
+        int width{}, height{}; glfwGetFramebufferSize(window.get(), &width, &height);
+        settings.resolution = {static_cast<unsigned int>(std::clamp(width, static_cast<int>(resolution_limits::minimum_width), static_cast<int>(resolution_limits::maximum_width))), static_cast<unsigned int>(std::clamp(height, static_cast<int>(resolution_limits::minimum_height), static_cast<int>(resolution_limits::maximum_height)))};
+      }
+      renderer->configure(settings);
+    }};
+    configure_renderer();
+    bool const capture{!inspect && front.in_flight() && !game->in_builder() && !game->in_map() && game->player() == corncob::game::player_mode::on_foot && !game->remote_control() && glfwGetWindowAttrib(window.get(), GLFW_FOCUSED)};
+    if(capture != state.mouse_captured) {
+      state.mouse_captured = capture; state.mouse_primed = false;
+      state.look_x = state.look_y = 0;
+      glfwSetInputMode(window.get(), GLFW_CURSOR, capture ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+      if(glfwRawMouseMotionSupported()) glfwSetInputMode(window.get(), GLFW_RAW_MOUSE_MOTION, capture ? GLFW_TRUE : GLFW_FALSE);
+    }
+    game->set_beginner_flight(front.flight_controls().beginner_flight);
     auto draw_flight{[&](bool const preview){
       observer = game->camera();
 #ifndef NDEBUG
@@ -527,12 +628,19 @@ auto main(int const argc, char const *const argv[])->int {
       if(preview) renderer->preview(game->world(), observer, game->frame_number(), static_cast<uint16_t>(game->timer()), game->random_stream(), flight_frame, panel);
       else renderer->render(game->world(), observer, game->frame_number(), static_cast<uint16_t>(game->timer()), game->random_stream(), flight_frame, panel);
       if(game->in_builder()) {
-        corncob::graphics::interface_canvas overlay{flight_frame, interface_assets.file("font8.bin"), 8};
+        corncob::render::framebuffer builder_overlay;
+        corncob::graphics::interface_canvas overlay{builder_overlay, interface_assets.file("font8.bin"), 8};
         overlay.rectangle(0, 0, 640, 34, {0, 0, 0});
         overlay.text(4, 2, "MISSION BUILDER  Shift: cursor/commit  Ctrl: hide  C: create  Space: select", {255, 255, 85});
         overlay.text(4, 10, "Alt+arrows/PgUp/PgDn: move  A+arrows: rotate  +/-: type  []: quality  D: delete", {255, 255, 85});
         overlay.text(4, 18, "F9: special  F10: complete  H/Alt+H: height  B: map  F5: save and return", {255, 255, 85});
         overlay.text(4, 26, game->message(), {255, 255, 255});
+        double const ui_scale{flight_frame.height / 350.0};
+        for(unsigned int y{0}; y < std::min(flight_frame.height, static_cast<unsigned int>(34 * ui_scale)); ++y)
+          for(unsigned int x{0}; x < flight_frame.width; ++x) {
+            unsigned int const source_x{static_cast<unsigned int>(x / ui_scale)}, source_y{static_cast<unsigned int>(y / ui_scale)};
+            flight_frame.pixels[y * flight_frame.width + x] = source_x < 640 ? builder_overlay.pixels[source_y * 640 + source_x] : corncob::render::rgba_pixel{0, 0, 0};
+          }
       }
       flight_frame_valid = true;
       frame = flight_frame;
@@ -548,50 +656,41 @@ auto main(int const argc, char const *const argv[])->int {
     if(!inspect && front.in_flight()) {
       if(glfwGetWindowAttrib(window.get(), GLFW_FOCUSED)) {
         auto held{[&window](int const key){ return glfwGetKey(window.get(), key) == GLFW_PRESS; }};
-        input = {
-          .stick{
-            .roll{static_cast<int16_t>(((held(GLFW_KEY_RIGHT) || held(GLFW_KEY_KP_6)) - (held(GLFW_KEY_LEFT) || held(GLFW_KEY_KP_4))) * 512)},
-            .pitch{static_cast<int16_t>(((held(GLFW_KEY_DOWN) || held(GLFW_KEY_KP_2)) - (held(GLFW_KEY_UP) || held(GLFW_KEY_KP_8))) * 512)},
-            .rudder{static_cast<int16_t>(((held(GLFW_KEY_Z) || held(GLFW_KEY_KP_7)) - (held(GLFW_KEY_X) || held(GLFW_KEY_KP_9))) * 512)},
-            .brakes{held(GLFW_KEY_PERIOD) || held(GLFW_KEY_KP_0)},
-          },
-          .throttle_up{held(GLFW_KEY_EQUAL) || held(GLFW_KEY_KP_ADD)},
-          .throttle_down{held(GLFW_KEY_MINUS) || held(GLFW_KEY_KP_SUBTRACT)},
-          .walk_forward{held(GLFW_KEY_KP_5)},
-          .walk_backward{held(GLFW_KEY_KP_0) || held(GLFW_KEY_INSERT)},
-          .jump{held(GLFW_KEY_J)},
-          .drop_through{held(GLFW_KEY_E)},
-          .advance_time{held(GLFW_KEY_T)},
-          .weapons{
-            .gun{held(GLFW_KEY_SPACE)},
-            .cannon{held(GLFW_KEY_LEFT_SHIFT)},
-            .missile{held(GLFW_KEY_C) && !held(GLFW_KEY_LEFT_CONTROL) && !held(GLFW_KEY_RIGHT_CONTROL)},
-          },
-          .view{
-            .left{held(GLFW_KEY_LEFT) || held(GLFW_KEY_KP_4)},
-            .right{held(GLFW_KEY_RIGHT) || held(GLFW_KEY_KP_6)},
-            .up{held(GLFW_KEY_UP) || held(GLFW_KEY_KP_8)},
-            .down{held(GLFW_KEY_DOWN) || held(GLFW_KEY_KP_2)},
-            .below{held(GLFW_KEY_KP_5)},
-            .modifier{held(GLFW_KEY_LEFT_CONTROL) || held(GLFW_KEY_RIGHT_CONTROL)},
-          },
-          .map{
-            .higher{held(GLFW_KEY_PAGE_DOWN) || held(GLFW_KEY_KP_3)},
-            .lower{held(GLFW_KEY_PAGE_UP) || held(GLFW_KEY_KP_9)},
-            .home{held(GLFW_KEY_HOME) || held(GLFW_KEY_KP_7)},
-            .rotate{held(GLFW_KEY_LEFT_SHIFT)},
-            .slow{held(GLFW_KEY_S)},
-            .move_object{held(GLFW_KEY_LEFT_ALT)},
-            .rotate_object{held(GLFW_KEY_A)},
-          },
-        };
-        if(auto const joystick{corncob::platform::poll_joystick(front.flight_controls().joystick_device)})
+        bool const walking{game->player() == corncob::game::player_mode::on_foot && !game->remote_control()};
+        auto down{[&](corncob::game::control_id const id){
+          auto const found{std::ranges::find(preferences.bindings, id, &corncob::game::control_binding::id)};
+          if(found == preferences.bindings.end() || !applies(*found, walking)) return false;
+          return (found->key >= 0 && held(found->key)) || (found->alternate >= 0 && held(found->alternate)) || (found->mouse >= 0 && glfwGetMouseButton(window.get(), found->mouse) == GLFW_PRESS);
+        }};
+        using enum corncob::game::control_id;
+        input.stick.roll = static_cast<int16_t>((down(roll_right) - down(roll_left)) * 512);
+        input.stick.pitch = static_cast<int16_t>((down(pitch_up) - down(pitch_down)) * 512);
+        input.stick.rudder = static_cast<int16_t>((down(rudder_left) - down(rudder_right)) * 512);
+        input.stick.brakes = down(brakes);
+        input.throttle_up = down(throttle_up); input.throttle_down = down(throttle_down);
+        input.walk_forward = down(forward); input.walk_backward = down(backward);
+        input.strafe = static_cast<int16_t>(down(strafe_left) - down(strafe_right));
+        input.jump = down(jump); input.drop_through = down(drop_through);
+        input.weapons.gun = down(gun) || down(pistol); input.weapons.cannon = down(cannon); input.weapons.missile = down(missile);
+        input.view = {.left{held(GLFW_KEY_LEFT)}, .right{held(GLFW_KEY_RIGHT)}, .up{held(GLFW_KEY_UP)}, .down{held(GLFW_KEY_DOWN)}, .below{held(GLFW_KEY_KP_5)}, .modifier{held(GLFW_KEY_LEFT_CONTROL) || held(GLFW_KEY_RIGHT_CONTROL)}};
+        input.map = {.higher{held(GLFW_KEY_PAGE_DOWN) || held(GLFW_KEY_KP_3)}, .lower{held(GLFW_KEY_PAGE_UP) || held(GLFW_KEY_KP_9)}, .home{held(GLFW_KEY_HOME)}, .rotate{held(GLFW_KEY_LEFT_SHIFT)}, .slow{held(GLFW_KEY_S)}, .move_object{held(GLFW_KEY_LEFT_ALT)}, .rotate_object{held(GLFW_KEY_A)}};
+        if(walking) {
+          input.look_yaw = static_cast<int16_t>(std::clamp(-state.look_x * preferences.mouse_sensitivity, -16000.0, 16000.0));
+          input.look_pitch = static_cast<int16_t>(std::clamp(state.look_y * preferences.mouse_sensitivity * (preferences.invert_mouse ? -1 : 1), -16000.0, 16000.0));
+        }
+        if(game->in_builder() || game->in_map()) {
+          input.stick.roll = static_cast<int16_t>((held(GLFW_KEY_RIGHT) - held(GLFW_KEY_LEFT)) * 512);
+          input.stick.pitch = static_cast<int16_t>((held(GLFW_KEY_DOWN) - held(GLFW_KEY_UP)) * 512);
+          input.walk_forward = held(GLFW_KEY_KP_5); input.walk_backward = held(GLFW_KEY_KP_0);
+        }
+        if(auto const joystick{walking ? std::nullopt : corncob::platform::poll_joystick(front.flight_controls().joystick_device)})
           corncob::game::apply_joystick(input, *joystick, input.view.modifier || game->looking_around());
       }
       accumulated_time += elapsed;
-      auto draw_one{[&]{ draw_flight(false); }};
       while(accumulated_time >= simulation_period) {
-        game->advance(input, std::function_ref<void()>{draw_one});
+        game->advance(input);
+        input.look_yaw = input.look_pitch = 0;
+        state.look_x = state.look_y = 0;
         update_audio();
         accumulated_time -= simulation_period;
       }
@@ -600,7 +699,7 @@ auto main(int const argc, char const *const argv[])->int {
       if(no_cockpit) observer.cockpit = false;
 #endif // NDEBUG
       if(frame_number % 15 == 0) {
-        std::string const title{"Corncob 3D - " + game->message()};
+        std::string const title{"Corncob Redux - " + game->message()};
         glfwSetWindowTitle(window.get(), title.c_str());
       }
     }
@@ -652,7 +751,7 @@ auto main(int const argc, char const *const argv[])->int {
     } else
 #endif // NDEBUG
     {
-      if(!flight_frame_valid || game->is_paused()) draw_flight(true);
+      draw_flight(game->is_paused());
       frame = flight_frame;
     }
     ++frame_number;

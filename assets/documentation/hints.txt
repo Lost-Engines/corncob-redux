@@ -1,0 +1,500 @@
+General strategy and flying hints
+---------------------------------
+
+
+Attack Priorities:
+
+  When attacking an installation protected by both KLA's and AAA,
+first attack the high-quality AAA.  These defenses will chew you up
+the most quickly while undergoing evasive maneuvers.  Then go for
+the top-notch KLA sites.  Once these threats have been dealt with,
+proceed with the rest of the defenses at your leisure.
+
+
+Enemy activity at a distance (Redux):
+
+Enemies, projectiles and production sites continue to update when you
+leave their area. Travelling away no longer freezes their timers or
+repairs their damage. Weapon ranges and local production caps still
+apply; draw distance does not change these rules.
+
+
+Use the half barrel roll to ease blackouts quickly:
+
+  When a high-g turn blacks you out, the quickest way to get that blood
+back into your brain is to do a quick high-negative-g turn.  Simply easy
+up on the stick, and flip your plane around upside down, and push
+forward
+on the stick.  If you managed to flip the plane correctly, you should
+still be turning in the desired direction, and your vision should return
+very quickly.
+
+
+Use dumpy planes to do high-risk platform missions:
+
+  When you have to land on a suspended airstrip and proceed on foot to
+a difficult assignment, it is not unusual to fall off a platform, and
+to leave your plane abandoned up on the airstrip.  You may want to
+ferry your late model planes away from one of the airstrips in the
+theater.
+Then when you fly again from the planeless airstrip, the program will
+ask
+you if you want to pull a dumpy plane from storage.  Take the dumpy
+plane
+to the suspended mission, so you won't lose a good plane if you fall.
+
+
+Avoid bounce-back on suicide missions:
+
+  Some missions involve suiciding your plane into a generator orb.  Be
+aware that your plane will bounce backward upon impact.  It is not
+uncommon
+for the plane to bounce back toward you so that you find yourself back
+in the cockpit after collision, hurtling toward the ground in a ball
+of flaming wreckage.
+  Be ready to eject again in case this occurs.  Take care to time your
+ejection correctly so this doesn't happen.
+  Note also, the hint given above about using dumpy planes for dangerous
+mission applies to suicide missions also.
+
+
+Flying low over craters (Redux):
+
+Bomb explosions and their debris remain dangerous. The lingering crater
+cannot hurt you or your aircraft, so it no longer creates an invisible
+obstacle above the ground. Its blast damage against enemy structures is
+retained.
+
+
+Use rudder to reduce airspeed on runway:
+
+  Sometimes when landing on suspended runways it is imperative to come
+to
+a quick stop.  Hold down the brake key, and simultaneously work the
+rudder
+back and forth.  The swishing of the tail will help you slow down, as
+well as making your path longer to the end of the runway.  Take care not
+to direct the plane off the edge.
+
+
+Use barrel roll to reduce airspeed on approach:
+
+  When making a high-speed landing approach, you sometimes want to drop
+your excess speed.  Dropping the flaps, and cutting back on the throttle
+many times isn't a big enough effect, especially if your angle of
+descent
+is too steep.  In this case, try pulling the stick all the way back, and
+fully to the side.  The plane will travel in a barrel roll and end up in
+approximately in the same flight path, but with the airspeed down
+significantly.
+
+
+Techniques for escaping with your plane intact
+----------------------------------------------
+
+
+Use teleportation to get out of trouble:
+
+  This is a bit of a cheat, since it is an unrealistic way out of
+impending
+doom.  The purists will want to not do this, since it twists a
+convenience
+feature of the game into an irrational combat advantage.
+  If you are in deep doo-doo and are worried that you will not get out
+of this situation alive, simply hit F2, and select a new mission.  If
+you
+are somewhat damaged, you may want to choose a mission which is close
+to your airstrip.  Also, you might want to choose a mission which you
+have
+already completed.
+  Note that to keep this feature from being abused, there is a rule that
+you cannot teleport if your plane has sustained serious damage.
+
+
+Use autopilot when heavily damaged:
+
+  When your plane is a flying scrap, and you are having difficulty
+keeping your plane in the air due to excessive  control damage, try
+turning
+on the autopilot.  This should help you keep the plane reasonably level.
+The autopilot will react faster than you, and can make the difference
+needed
+to make it home safely.
+  Beware that the autopilot will interfere with attempts at evasive
+maneuvers.
+If you are going to try to dodge a KLA, make sure you disengage the
+autopilot
+first.
+
+
+Use the emergency rocket booster to full advantage:
+
+  When you are surrounded by KLA's, and you have taken too many hits to
+risk continuing, hit 'i' to ignite the rocket booster.  If you are at
+low
+altitude, pull the nose up to vertical to get the maximum altitude gain
+from the rocket.  However, be sure to push the nose back to the
+horizontal
+BEFORE the booster runs out.  This is because you will really need the
+airspeed in addition to the altitude.
+  If you already have good altitude ( for instance if you are in a high
+altitude mission ), then use the rocket booster for pure speed.
+Disengage
+the flaps to maximize airspeed, put yourself in level flight, and let
+her rip.  You can outrun almost any of the KLA's with the booster.
+  Note that it is generally a good idea to get the plane headed towards
+your airstrip before engaging the rocket.  Tight turns with the booster
+running will hurt your gained airspeed by quite a large amount.
+
+
+Hints for defeating KLA and AAA
+-------------------------------
+
+Blast distant airborne KLA's:
+
+  When approaching a mission from afar, many times there will be KLA's
+already airborne and approaching from the front.  Frequently, these
+pre-launched KLA's will be of higher quality than any of the nearby
+KLA sites.  Therefore, it is usually a good idea to blow these
+approachers
+out of the sky with missiles and guns.  Since they are advancing upon
+you head-on, it is an easy zero-deflection shot.
+
+
+When NOT to shoot KLA's:
+
+  Keep in mind that KLA sites will only produce KLA's when the number of
+active KLA's presently flying is less than the number of sites.
+Therefore
+if you shoot them, the sites will make more.  The key here is to only
+shoot
+the high-quality deathballs.  There is a good chance that the next site
+to create a replacement will be a lower quality site.  Thus by shooting
+the
+high quality KLA, you have traded it for a low quality model.
+  Of course, for the same reason, you should NEVER shoot a poor quality
+KLA if there is a variety of sites around.  A high quality site may make
+its replacement.
+  Remember that the lower quality models pose almost no threat to the
+seasoned pilot.
+
+
+Shoot at KLA sites at every chance:
+
+  When a KLA site takes some damage, it is prevented from production for
+a period of time.  Therefore, even if you haven't enough time to get in
+enough hits to destroy the site, even one hit with a bullet is enough to
+keep it out of commission for tens of seconds.
+  When you see a clump of KLA sites, always spray a hail of bullets and
+missiles over them just to stunt their output for a while.
+
+
+KLA production and time (Redux):
+
+Production follows fixed simulation time, rather than displayed frames.
+Low frame rates or different rendering resolutions do not slow a site's
+countdown. The T-key time-advance exploit has been removed. Damaging
+sites
+still delays production, and the local population cap still applies.
+
+
+Get KLA's to fly into enemy structures
+
+  Corncob was designed so that enemy objects can collide with each
+other.
+A useful technique for dealing with a long string of tailing KLA's is to
+simply trick them into flying into their own structures.
+  For example, it is possible even to blow up a generator orb by leading
+deathballs into it.
+  For best results you will need to keep your airspeed up, and make your
+180 degree turns be gentle to avoid dispersing the stream.
+
+
+Destroying strings of KLA's with your runway:
+
+  If you have used all your bombs, and there is a long string of KLA's
+about to hit you on your landing approach, there is no need to worry.
+The materials used in the runway will cause the KLA's to detonate
+prematurely if they get close.
+  Even if you have no intention of landing, a low flyby over the runway
+will cause the trail to explode as they follow your lead over the
+runway.
+
+Get rid of a KLA stream by dropping a low bomb:
+
+  Certainly you can take out a single KLA which is very close to your
+tail
+simply by dropping a bomb.  You aren't required to do any maneuver, just
+drop the bomb.  However, you will frequently find that you have a long
+string of them behind you, and only three bombs.  By flying low, and
+dropping a bomb, the debris flying up from the explosion can take out
+almost the whole string as they attempt to fly through the explosion.
+
+
+Keep your airspeed up around AAA:
+
+  The higher quality AAA will attempt to lead your plane so that the
+slow moving shells will arrive on target despite the forward motion of
+your plane.  Thus, the higher your airspeed, the more dispersed the
+enemy shells will be.
+  Letting your airspeed drop due to maneuvers is the fastest way to get
+blown out of the sky by AAA.  When you drop your flaps to mix it up with
+the KLA's is when they will get a bead on you.  Eliminate all the top
+notch AAA before getting into knife-fights with the deathballs.
+
+
+Stay low to avoid AAA fire:
+
+  Ground-based AAA batteries cannot fire very low to the ground, for
+fear of taking out their own structures.  It is possible to stay under
+their firing angle by flying extremely close to the ground.  The closer
+you are to the AAA site, the lower you must be to avoid fire.
+
+
+Stay level with suspended AAA:
+
+  AAA shells are programmed at firing time to explode at a certain
+altitude.  Since the enemy is attempting to kill you, they program each
+shell to explode when it reaches the altitude of your plane.  The exact
+altitude of detonation is randomly distributed around the target
+altitude.
+  The result is that if you manage to fly level with the AAA, the shells
+are already at their detonation altitude before they even leave the
+AAA muzzle!  Therefore the shells will almost always detonate before
+hitting your plane.
+
+
+Always use bullets and missiles when attacking AAA:
+
+  The bad news is that AAA shells will explode your missiles as you fire
+on an AAA site.  Since the AAA site will be sending a continuous stream
+of
+shells at you, then it is unlikely for your missiles to make it to the
+target.
+  The good news is that bullets will explode approaching AAA shells.
+Therefore the best technique is to let loose a volley of bullets to take
+out the slow-moving approaching AAA shells.  Then send a group of
+missiles
+together with more bullets.  That way the faster-moving bullets will
+take
+out the AAA shells, clearing the way for the powerful missiles.
+
+
+Never fly with your tail to the AAA:
+
+  AAA works best on zero-deflection targets.  If you cannot use your
+weapons to clear the air of approaching shells, then your best bet is
+to be flying fast and perpendicular to the AAA.   You are most
+vulnerable when flying directly away from the AAA site.  Then the AAA
+can shoot directly at you with no target-leading or anticipation, and
+the rate of closure is the slowest to ensure an accurate blast.
+
+
+Avoid bombing AAA unless desperate:
+
+  Many a pilot has been toasted by his own bomb whilst attempting this.
+The AAA shells will detonate your bomb in the air.  For lower quality
+AAA, the pilot can sometimes get lucky when the firing rate of the site
+is fairly low.
+
+
+Tips for downing flying saucers
+-------------------------------
+
+Keep up the airspeed:
+
+  When dealing with saucers with AAA, you must be aware of the fact that
+you will not be able to down the saucer with one pass.  Therefore after
+passing the saucer, it will chew you up as you attempt to fly away in
+order
+to make another pass.  Your only defense is fly as fast as possible, so
+that the time in which your tail is turned toward the saucer is
+minimized.
+  In addition, the faster your airspeed, the faster your missiles will
+reach the target.  The launch speed of your missiles affects the
+acceleration to max velocity in a positive way.  With a moving target
+like
+a saucer, the faster your ordnance travels the better.
+
+
+Keep level with the saucer:
+
+  For the same reason that you should stay level with suspended AAA, you
+should stay level with AAA fitted saucers.   This is especially true
+when
+you are pulling away from the saucer.
+
+
+Try to time the oscillations of the saucers movement:
+
+  You will notice that the saucer's evasive maneuvers are very periodic.
+Therefore if you notice that your missiles are always missing because of
+the saucer's motion, try shooting where you think the saucer will be
+when the missiles arrive.   If that isn't working, just spread your
+missiles
+around the whole area through which the saucer is swinging.
+
+
+Try to get 'behind' the saucer:
+
+  At any moment, all the saucers are traveling in a horizontal
+direction.
+You want to approach in the same direction as the saucer is moving.
+This
+gives you a slower rate of closure, so that you can get more shots in
+before you have to peel off to avoid collision.  It is possible to down
+a
+saucer in one pass using this technique.
+
+
+Do not fight saucers in close:
+
+  Fighting a saucer up close usually ends in disaster.  The evasive
+maneuvers
+which it is constantly executing make it too unpredictable a target at
+close range.  In addition, there is a great risk of collision.  Upon
+collision
+with a saucer, your plane becomes a ball of twisted wreckage.
+  Although collision will take out the saucer, the brass doesn't look at
+it
+as an even trade.  Perhaps for the desperate, it may be worth suiciding
+a
+dumpy plane for a top-ace saucer, though.
+
+
+Hints for vanquishing ground vehicles:
+--------------------------------------
+
+Keep your distance:
+
+  Ground vehicles do much random zipping around.  If you are up close,
+those movements will cause you to go through wild aerodynamic gyrations
+in order to keep those critters in your sights.  This is very likely to
+end in a fatal stall, since when attacking ground targets you are
+probably
+flying too low to recover.
+  From a prudent distance, however, the cart's erratic movements can be
+tracked with minimal difficulty and danger.   Use the plane's rudder to
+spray bullets and missiles into a cloud about the vehicle.  Shopping
+carts are not very tough, and in just a few lucky hits they will fall
+over dead.
+
+
+Lead the top-notch carts into traps:
+
+  The top-notch shopping carts will follow your plane with uncanny
+ability.  It is almost impossible to get a clean shot at them because
+they are always directly underneath your plane.
+  If they are the variety which do NOT have the flashing antenna, then
+your best bet is to fly directly over a fence, tick, or other structure
+in order
+to lead them to their own destruction.
+
+
+Climb and shoot:
+
+  The high-quality flashing antenna carts can be defeated by climbing
+high,
+dropping the flaps, and then come straight down at them with guns
+blazing.
+Make sure to break off before you pile into the ground.
+
+
+Vertical bombing:
+
+  Ordinarily, bombs are not effective against the agile carts.  However,
+in
+the case of the high-quality models, you can use their tenacity against
+them.
+Fly exactly straight up.  Your pitch gauge should show your plane as
+being
+straight up.  Then drop three bombs, and remain vertical until the bombs
+explode.  If you are lucky, the shopping cart will have stayed directly
+below you doing a little dance while the bombs rained down.
+  Note that if you stall and fall out of your straight up climb before
+the
+bombs reach the ground, then the shopping carts will have followed you
+and moved out of the target area by the time the bombs fall.
+
+
+Attack shopping cart sites first:
+
+  As with KLA's, it is a losing battle to try take out all the carts
+first, and then the sites.  Instead, ignore the carts until all the
+sites
+are history.  Then have fun tearing up the panicked vehicles.
+
+
+Tips for survival outside the plane
+-----------------------------------
+
+Get away from the plane after leaving it:
+
+  When you are outside your plane, you are very vulnerable to enemy
+weapons.  Contact with a KLA, or AAA shell results in instant death.
+Since both weapons will attack your plane, not yourself, it is a good
+idea to get far away from your plane very quickly after ejecting.
+
+
+Keep moving at all times if there are shopping carts around:
+
+  The shopping carts are like the KLA's in that they always head
+directly
+toward (despite their erratic motions) you.  IE unlike the AAA, they do
+not lead.  Therefore if you run in a straight direction, they will
+always
+end up chasing behind you.  If you stay put, they will wander in from
+all
+directions until you have no direction which is safe.
+
+
+Look down at your feet when jumping platforms:
+
+  When hopping from platform to platform, tilt your head down 30 to 40
+degrees from the horizontal.  Otherwise when you jump, you will not be
+able to see the platform you are attempting to jump onto.  Jump high
+into
+the air, and hold and release the W key to move forward just the
+right amount to land you on target.
+  Watch the far edge of the platform you are jumping to.  As long as you
+don't pass over that edge, you will make the jump.  Keep that far edge
+within your view, and you should have no troubles.
+
+
+Use proper vertical angle with the handgun:
+
+  Don't always assume that you should aim for the center of an object
+when shooting with the handgun.  Some targets take more hits with the
+game aimed high.  If you see grey spheres appear where the bullets hit,
+then the bullets are striking the ground before damaging the target.
+
+
+Experiment with position if assassin bomb fails:
+
+  The object-object collision algorithms used in Corncob were designed
+for fast-moving objects colliding with stationary targets.  Assassin
+bombs will not always detonate their targets correctly because of the
+design of the game engine.  For instance, if a mind bender is sitting
+on a force field, then a tricky situation can result.  Both the force
+field and the mind bender can detonate a bomb.  Therefore, when the
+detonate command is given, either the force field or the mindbender
+can be the cause of the bomb's detonation.  If by chance the force
+field detonates the bomb first, then the mindbender will remain intact
+through the bomb's detonation.
+  Which object causes detonation is determined by the exact positioning
+of the bomb relative to the target and the person.  Before collision
+processing, all objects are sorted by distance from the observer, then
+objects which are close together in the sorted list are compared for
+collision.
+  So if your bomb fails, try the next bomb in a position closer or
+farther away from the target.  Make sure the center of the force field
+platform is not approximately the same distance as from you to the
+target, etc.
+
+
+Use parachute to get extra hopping distance:
+
+  Your parachute can be used even when jumping into the air.  If you
+are particularly nervous about a jump, you may pull the chute string at
+the apogee of your jump, and then float down slowly.  The disadvantage
+is that you will swing for a bit, which can be disorienting.

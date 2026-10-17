@@ -67,7 +67,6 @@ int main(int const argc, char const *const argv[]) {
         },
         .walk_forward{tick % 3 == 0},
         .jump{tick % 64 == 0},
-        .advance_time{tick % 257 == 0},
         .weapons{
           .gun{true},
           .cannon{tick % 2 == 0},

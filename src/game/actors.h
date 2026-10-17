@@ -47,6 +47,7 @@ private:
   bool census_ready{false};
   uint8_t last_kla_quality{0};
 
+  actor_census census(maths::world_position const &centre) const;
   void update_launcher(world::placed_object &object, actor_context const &context, flight::time_step step);
   void update_kla(world::placed_object &object, actor_context const &context, flight::time_step step);
   void update_saucer(world::placed_object &object, actor_context const &context, flight::time_step step);

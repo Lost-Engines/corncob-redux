@@ -28,10 +28,6 @@ void reset_vehicle(world::placed_object &object, maths::world_position const &ob
     object.attitude.pitch = object.attitude.roll = 0;
     object.attitude.heading = random.next();
   }
-  if(tier == 3) {
-    object.flags = 0;
-    return;
-  }
   auto const &parameters{resources::vehicle_qualities[object.quality()]};
   unsigned int const pursuit{tier == 1 ? parameters.near_pursuit_threshold : parameters.far_pursuit_threshold};
   if(tier == 0 || random.next() <= pursuit) {

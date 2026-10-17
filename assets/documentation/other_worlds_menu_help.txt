@@ -1,0 +1,528 @@
+Corncob Redux menu help
+ Main Menu Info
+
+The main menu allows the user to select what he or she wants to do next
+in the game.  To choose a selection from the main menu, use the arrow
+keys (\\) to highlight the selection you want, and press \<\C\R\>.  A
+quicker way is to press the highlighted letter corresponding to the
+desired selection.
+
+To change pilots, activate or deactivate a pilot, create or delete a
+pilot, or view pilot records, choose the "\Duty Roster" selection.
+
+The "\Combat Missions" selection allows the user to choose between
+various battle scenarios, or Theaters-of-Operation.  This leads to a
+great deal of variety in the type and quality of opponents.  A pilot
+must prove his proficiency in multiple theaters to advance far in rank.
+
+If you want to brush-up on some specific aspect of your flying and
+fighting skills, then you can choose the "\Training Missions" selection.  This allows you to choose the number and quality of a limited
+array of opponents.  By default, a pilot flies an invulnerable plane
+during the training missions, and thus they are not counted.  Note
+that if a standard plane is chosen, then these missions DO count
+toward a pilot's career, and a pilot can still be killed or captured
+in these missions.
+
+You can see who the hottest pilots are by choosing "display \High score
+list".
+
+The "keyboard/\Joystick setup" selection allows the user to choose how
+the plane will be controlled.  The current choices are shown at the
+bottom of the main-menu screen.
+
+The sounds \Editor menu item activates the sound editor, which lets
+you modify all the ADLIB(tm) inflight sounds to your personal preference.
+More information is available from the sound editor main menu.
+
+\Watch a demo flight should be self explanatory.
+
+The "\Music toggle" selection allows the user to turn the music on and
+off.  The music only plays during the title credits and menus.  If you
+want to switch to the next song, just turn the sound off and then on again.
+See the documentation to learn how to add your own music selections to
+Corncob.
+
+When you have finished playing CORNCOB, you may exit the program
+by choosing "e\Xit to dos".  You may also type \<\E\S\C\>.  Note that
+this selection does NOT ask for user confirmation, because that would
+be silly.
+
+  Duty Roster Menu Info
+
+When CORNCOB is first run, the pilot flying is considered to be
+a trainee.  The trainee does not have a record, and his exploits and
+current selections are erased each time the program is run.  The "\Duty
+roster menu allows users to create pilots which can be used in repeated missions.  Also the current choices (such as theater of operation)
+for each pilot is saved when the program exits.  Building a career without
+being killed is a very challenging and satisfying endeavor.
+
+On the left is a list of selections which you can choose from by using
+the arrow keys (\\) to highlight the selection you want, and press
+\<\C\R\>. On the right is a list of the currently known pilots.  Many of
+the selections require the user to choose a pilot from the list on the
+right.  Choose the desired pilot with the arrow keys and select with
+\<\C\R\>.  While choosing a pilot, the menu on the left will be replaced
+by a box summarizing that pilots career.
+
+You create a pilot with the "\Create Pilot" selection.  When you choose
+this, a box will pop up prompting you for a pilot's name.  After you type
+in the name, the program will ask you if you want to activate the pilot.
+The active pilot is the pilot which is used when a mission is flown,
+which is probably what you want so just press \<\C\R\> for yes.
+
+You can change the active pilot with the "\Activate Pilot" selection.
+This allows you to set the currently active pilot who will fly on the next
+Corncob mission.
+
+You may deactivate the active pilot with the "\Deactivate Pilot" se-
+lection.  When you do this, no pilot in the list is considered active,
+and the active pilot will be "trainee" as discussed above.
+
+You may delete a pilot with the "de\Lete Pilot" selection.  When you
+delete a pilot, his record is permanently removed.
+
+If your pilot is killed or captured during a combat mission, he will be
+deactivated, and cannot be activated.  You can override this, and bring
+a pilot back to life with the "r\Esurrect Pilot" selection.  Beware
+though, the program keeps track of the number of resurrections, and dis-
+plays this information prominently in the pilot's record.  It is hard to
+brag about what a great career your pilot has when he has been resurrec-
+ted several times!
+
+If you don't like the name you chose for your pilot, you can change it
+with the "re\Name Pilot" selection.  This changes the pilots name with-
+out affecting his career.
+
+If you want a detailed view of your pilot's record, choose the "\View
+Pilot Records" selection.  Move the highlight to the to the desired
+pilot, and press \<\C\R\>.  This will bring up a full screen display of
+that pilot's record.  You can then move through the list of pilots with
+the arrow keys, or return to the menu with \<\C\R\>.
+
+  Combat Missions Info
+
+CORNCOB allows a pilot to choose between several different battle
+scenarios, or "Theaters-of-Operation".  The theaters vary in difficulty and in the type of opponent.
+
+You can fly a combat mission in one of the theaters-of-operation by
+choosing the "\Fly mission" selection.
+
+Most Theaters-of-Operation consists of 9 airfields.  Surrounding these
+airfields are enemy targets, which you must kill.  If you fly from one
+airfield to another, then the next time you fly that theater you will
+begin at the new airfield.  As you fly in a Theater-of-Operation, the
+state of the universe is preserved.  Thus enemy sites and targets that
+you kill in one mission will still be dead when you continue in a later
+mission.
+
+In the upper-right is a list of the various Theaters-of-Operation.  You
+select one of these with the "\Open a new theater of operations" selection from the Theaters menu.  This highlights one of the theaters, and
+you can change the highlighted name with the arrow keys.  Pressing <CR>
+chooses the highlighted name.  Pressing <ESC> or <BS> aborts the choice
+and returns you to the Theaters menu.  You may open as many different
+theaters as you wish.
+
+In the lower-right is a list of the Theaters you have opened.  This
+list changes according to the current selected pilot.  Each pilot has
+a current Theater-of-Operations. When you fly a mission from the main
+menu, you fly in your current Theater-of-Operations.  The current
+theater is indicated by a  in the list at the lower-right as well
+as being shown at the upper-left of the theaters menu, underneath the
+current pilot.
+
+You can change the active theater with the \Activate an open theater menu
+item.  Pressing this item will allow the user to select the desired current
+theater from the list of open theaters in the lower-right.
+
+You may choose to play with an invulnerable plane with the "toggle
+invulnerable \Plane" selection.  When flying with an invulnerable plane,
+you will not be damaged by any alien forces, or by any collision.  Flights
+taken with an invulnerable plane are never counted toward a pilots record.
+
+While you are inflight, Corncob can put text messages up to guide the
+new user until he/she becomes familiar with the game.  After the user
+learns that you must fly back to the airstrip to get points and so on,
+these messages become an annoyance.  Use Inflight \Comments  menu
+selection to turn off these inflight messages.
+
+New pilots who just start playing Corncob tend to fly into the ground
+frequently, and have much trouble learning to turn.  Therefore, the
+game contains two aerodynamic flight models.   The beginner  flight
+model gently pushes the nose to the correct attitude for level flight.
+This helps prevent crashes, and also causes the plane to turn without
+the player having coordinate the use of the elevators.
+  The advanced flight model is much preferred for real combat.  Loops,
+flying upside down, and dives are much easier with this flight model.
+Choose between these two flight models with the Flight \Model menu
+item.
+
+
+ OLD SHAREWARE VERSION Registration Menu Info
+
+Options and Controls
+
+Redux Controls
+
+These are the default bindings. F4 opens the current bindings during
+flight; Enter selects a binding to change it. Escape or P opens the
+pause menu, including display and control options. Delete clears a
+binding during capture; Escape cancels capture.
+
+Flying
+  Arrow keys or keypad 4/6 and 8/2: roll and pitch.
+  Z / X or keypad 7 / 9: left / right rudder.
+  + / - or keypad + / -: throttle up / down.
+  Period or keypad 0: hold wheel brakes.
+  Space or left mouse button: machine guns.
+  Left Shift: heavy cannon. C or right mouse button: missiles.
+  A: autopilot. F: flaps. I: rocket booster. B: drop bomb.
+  E: leave the aircraft or eject.
+  R: rear view. L: cockpit. Num Lock: look mode.
+  Hold Ctrl with arrow keys to look around.
+
+On foot
+  W / A / S / D: forward / left / backward / right.
+  Mouse: look around. Space: jump immediately.
+  Left Ctrl: drop through a supporting platform.
+  Left mouse button: pistol. Q: open parachute.
+  Semicolon: plant assassin charge. B: arm/detonate charges.
+  V: call rescue. Caps Lock: remote control of your aircraft.
+
+Shared controls
+  M: map. O: toggle radio messages. G: ground detail.
+  P / Escape: pause menu. F1: boss screen.
+  F2: intelligence. F3: current score. F4: control bindings.
+  Mousewheel: scroll menus, documentation and tower briefings.
+
+Joystick buttons 1 and 2 fire guns and missiles during flight.
+Modern joysticks do not need the DOS calibration controls.
+
+There is no accelerated-time key in Redux. Enemy production and
+movement follow the simulation clock, independently of rendering.
+
+Use Left/Right to adjust FOV, draw distance, ground detail, resolution,
+mouse sensitivity and inversion. Enter opens the binding list. Settings
+are saved automatically in redux.cfg in the Redux save directory.
+ Training Missions Menu.
+
+If you want to brush-up on some specific aspect of your flying and
+fighting skills, you can design your own mission by choosing the
+"\Training Missions" selection.  This allows you to choose the
+number and quality of a limited array of opponents.  Note that these
+missions still count toward a pilot's career, and a pilot can still
+be killed or captured in these missions.
+
+In the "\Training Missions" scenario, you have a single simple
+objective:  destroy a field of 15 alien fuel dumps.  A force-field
+protected orb is also present.
+
+The design-your-own aspect enters in the number and quality of alien
+defenses.  The tick field is protected by KLA's and AAA batteries, as
+well as a swarm of enemy ground vehicles and a flying saucer.
+You may choose the number and quality of each of these defenses.  The
+more and higher quality you choose, the higher the potential score.
+
+You can fly a training mission by choosing the "\Fly mission"
+selection.
+
+To choose the quality of the enemy defenses, select "modify \Wicked-
+ness of enemies".  This will bring up a menu allowing you to change
+the "wickedness" of the three defenses.  Wickedness values range from
+1-8 inclusive, with 1 representing really stupid opponents, and 8 being
+deadly.  A special wickedness value of 0 is reserved to select a random
+spread of wickedness.
+
+To choose the number of enemy defenses, select "choose \Number of
+enemies".  You may choose between 0 and 25 inclusive of each.
+(Note that choosing a large number (>~5-10 will put a strain on your
+CPU.  If you experience too slow of a frame rate, cut down on the
+numbers.)
+
+There is always one enemy saucer directly above the mission's center.
+The wickedness of this saucer is always the same as the KLA quality.
+
+The default values are as follows:
+           5 KLA sites        Random spread of Wickedness
+           6 AAA batteries    Random spread of Wickedness
+           2 vehicle sites    Wickedness 4
+
+The beginner should especially beware of the danger of plowing his plane
+into the turf when strafing the fuel dumps.  You can restore these default
+settings at any time with the "choose \Default values" selection.
+
+You may choose to play with an invulnerable plane with the "toggle
+invulnerable \Plane" selection.  When flying with an invulnerable plane,
+your plane cannot be damaged.   Flights taken with an invulnerable plane
+are never counted toward a pilots record.
+
+ Hiscore Menu
+
+Obviously, no combat game is complete without a high-score list, and
+CORNCOB maintains three separate lists:  the High-Score list,
+the Top-Career list, and the Fast-Career list.
+
+The High-Score list, shown by choosing the "see list of high \Scores"
+selection, is a list of the top 10 best missions, sorted by points,
+along with the pilot, theater-of-operation, and number of kills.  Pilots
+with a strong showing in this list are the true hot-shots of the game.
+
+The Top-Career list, shown by choosing the "see list of top \Careers"
+selection, is a list to the top 10 best careers, sorted by points,
+along with the pilot, number of missions, number of resurrections, and
+number of kills.
+
+The Fast-Career list, shown by choosing the "see list of \Fastest
+careers" selection, is a list of the "rising star" pilots.  This is
+a career list sorted by average points per mission.  Thus, you can
+usually see which pilots got off to the best start with this list.
+There is a requirement of three missions to appear on the Fast-Career
+list.
+
+The first two of the lists show number of kills.  This is a three
+number field, showing, from left to right, number of missions objectives accomplished, number of primary kills, and number of other kills.
+Primary kills are defined as TETS, Fuel Dumps, AAA batteries, Missile
+or Vehicle Sites, and Orbs.  Other kills are KLA and vehicles.
+
+When pilots are deleted from the roster, their careers are frozen,
+and their names are marked in all the lists with an \*.  Thus, the
+same name could appear repeatedly in the career lists, if a pilot is
+deleted, and recreated.
+
+Each of the lists can be independently deleted by choosing the "\Delete
+one of the above lists" selection.
+
+ Delete a high score list menu
+
+Each of the High-Score lists can be deleted independently from the others.
+
+To delete the top score list, choose the "delete the list of top
+\Scores" selection.
+
+To delete the top score list, choose the "delete the list of top
+\Careers" selection.
+
+To delete the top score list, choose the "delete the list of \Fastest
+careers" selection.
+
+Each of these choices will require confirmation by pressing <CR>.
+
+
+ NEW SHAREWARE VERSION Registration Menu Info
+
+Sound Editor Help
+
+  This editor will let you edit the sounds in Corncob to your liking.
+Corncob stores all its sound parameters in a text file called 3.ADL.
+This editor will provide you with an easy way to modify this 3.ADL file,
+thus changing the character of the sounds.  You make distribute your
+version of Corncob's sound to other Corncob users simply by giving them
+your 3.ADL file.  The original default 3.ADL file is called DEF3.ADL.
+You can always recover the original Corncob sounds by copying DEF3.ADL
+to the file 3.ADL.  ( This is what the Restore option does. )
+
+  The main sound editor menu is self-explanatory.
+
+The Yamaha Synthesizer Chip Parameters
+
+  Sound boards which are compatible with ADLIB(tm) sound boards use the
+Yamaha synthesizer integrated circuit.  Details on exactly what these
+various parameters are available in both the ADLIB Programmers Manual
+booklet, or the information on the Yamaha chip.  A general description
+of typical synthesizer parameters will be given below.
+
+  The ADLIB card is capable of producing 11 simultaneous independent
+sounds.  Thus we say the card has 11 voices.  Each voice can be
+programmed to make a different kind of sound.  In Corncob, the board
+is put into 'Percussion' mode, where six of the voices are general
+synthesizer voices, and the other 5 are special case percussion noises.
+For example, the stall warning uses melodic voice #6, while the missiles
+and the wind noises both use the fixed snare drum voice.
+
+  To explain the various parameters used to create a sound, some
+general information about how the sounds are generated is needed.
+
+  A typical synthesizer will use an oscillator to make a pure tone.  An
+oscillator is just a device which generates a continuous single-frequency
+tone.  Since it is desirable to have other sounds than just pure tones,
+multiple oscillators are connected together in various ways to make
+interesting sounds.
+
+  In the Yamaha IC, the melodic voices use two oscillators per voice.
+One is called the modulator, and the other is called the carrier.  The
+carrier generates the basic pure tone, while the modulator perturbs the
+carrier in some fashion.  Thus if we turn down the modulator strength,
+the resulting voice will be generating a pure tone.  As we bring up the
+modulation strength, the sound will become odder as the modulation
+increases.
+
+Voice Parameters
+----------------
+
+  These parameters adjust characteristics of a voice.
+
+Connection
+
+  Most of the voices in Corncob are in FM mode.  This means that the
+modulator output modifies the carrier's frequency.  Thus if the modulator
+oscillating very slowly, we would hear the voice's pitch rising and
+falling continuously.  As we sped up the modulator's frequency, the rising
+and falling rate would speed up until the sound turns into a continuous
+warble.
+
+  The voices that are not in FM mode have the oscillators connected in a
+different way.  In Additive mode, the outputs of oscillators are
+simply overlaid, so that each voice consists of two pure tones added
+together.  These sounds typically sound organ-like.
+
+  You can change the mode used for each voice by changing the parameter
+labeled Connection in the sound editor.  Note that when 'Additive'
+mode is specified, the modulator and the carrier are renamed to 'Op1',
+and 'Op2', since in additive mode, they no longer function as modulator
+and carrier.
+
+Feedback
+  Feedback is just a way of distorting a pure wave by feeding its output
+back into its input (like EGR anti-pollution devices in an automobile).
+The result is that with feedback set to zero, you will get a pure tone
+from that voice, while at the higher feedback settings the voice may
+get so distorted that it may stop operating altogether.
+
+Operator Parameters
+-------------------
+
+  Both types of oscillator are referred to as Operators.  Most
+of the adjustable parameters affect way that these operators produce
+their tones.  The following parameters affect only one of the operators
+that make up a voice.  For each voice, you must specify the parameter
+for both the modulator and the carrier.
+
+Tremolo
+  This effect is common in electric guitar amplifiers.  It simply makes
+the pitch of the note warble at a low frequency.
+
+Vibrato
+  This effect is also common in electric guitar amplifiers.  It simply
+makes the loudness of the note warble at a low frequency.  The effect is
+most audible when used with the carrier.
+
+Sustain
+  On a synthesizer this makes the key produce a tone as long as it is held
+down, without limit.  In Corncob, some sounds like the engine, need sustain
+to be enabled to function properly, while other sounds like the missile
+swoosh need to have sustain off.
+
+Envelope Rate
+  Every sound one hears has a definite beginning and end.  Moreover, each
+sound has a definite loudness pattern which starts at 0 volume, then builds
+to a peak, an then drops off.  This loudness progression is called the
+envelope.  How fast the sound goes from nothing to full strength is
+called the attack.  How long it takes to drop back to its steady state
+level (assuming sustain is on) is called the decay.   The time spent
+while the signal is finally fading away after the key is released is
+called the release.
+  This parameter called envelope rate is a parameter which make the
+attack an decay rates go faster for higher notes.  This is to make
+the mimicking of real instruments like the guitar more realistic.  IE,
+the plink of a high note is much tighter than the belong of a low note.
+
+Frequency Multiplier
+  This parameter is one of the more useful.  Since one of the parameters
+one cannot directly set is the voice frequency, (that must be done by the
+program Corncob at run time) this is away to change the base voice
+frequency multiplier.  Example:  Say the carrier operator's frequency
+multiplier for the stall sound is set at 3.  If you change this multiplier
+to 6, then the stall indicator noise will sound twice as high.
+  The way the synthesizer is set up, both operators are always run at the
+same base frequency.  But since you typically want the carrier to be
+running at a pitch higher than the modulator, one will usually specify a
+low value for the modulator, and a medium or high value for the carrier.
+
+Low Pass Filter
+  Usually, the higher notes are more piercing, and we always want the
+lower notes to be turned up, so we can hear them.  This option allows
+and automatic adjustment of loudness which will increase the sound level
+for the low notes.
+
+Total Level
+  On most of the sounds in Corncob, this parameter will specify how loud
+to make the sound.  Some sounds such as the KLA, Orb, Saucer, and big Boom
+sounds are not adjustable, due to the fact that their sound levels are
+adjusted dynamically in the game, and therefore the initial board settings
+are irrelevant.
+  The sound level increases as the db number increases.
+
+Attack, Decay, and Release Rate
+  As explained in the envelope rate heading above, these parameters
+will affect how quickly a sound builds up, and drops off.  See the
+description above as to specific meanings of each term.
+
+Sustain Level
+  This is the sound level that a voice levels off to if the key is held
+down.  In a usual sound, the peak loudness occurs shortly after the sound
+begins, and then it relaxes down to the sustain level.  When the key is
+released, then the sound decays to zero.
+  Important Note:
+     These levels run from 0 to 15, where 0 is the LOUDEST,
+     and 15 is the softest.   If you choose a sustain level of 15,
+     you will have no sustain at all, the signal will instantly decay to 0.
+
+Waveform Select
+  Each operator can put out 4 different kinds of oscillations.  Here is a
+short description of their properties.
+
+Sine
+  This is the most pure of the possible waveforms.  It is the least harsh
+sounding.  In general, this is the best one to use for low frequency
+modulators.
+
+Half-Sine
+  This is a sine wave with the bottoms cut off.  This sounds a little
+harsher that the sine.
+
+ABS-Sine
+  This is a sine wave with bottoms folded up to the top.  This effectively
+doubles the base frequency, and adds more harshness.
+
+Pulse-Sine
+  This is the harshest and most piercing of the waveforms.  This wave is
+closer to a square wave than a sinusoid.  Use this for a buzzer effect.
+
+
+Special Notes on the Corncob Voices
+-----------------------------------
+  The authors of Corncob believe in clean living, and scrupulously avoid
+the major voices of everyday life.  However, the demands of the market
+pressure forced us to reconsider our ways, and have with this version of
+2.00 introduced ADLIB inflight sound support.
+  Here are some specific facts about some of the quirks with the
+implementation done in Corncob.
+
+Screech
+  The screech sound which occurs when the wheels of the plane touch the
+runway, is turned both on and off by the program, so the envelope
+adjustments may not reflect the usual flexibility.
+
+Missile, Crash, and Wind
+  The whoosh of the missile leaving your plane is done with a percussion
+sound, and therefore it does not operate exactly like a typical
+melodic voice.  In particular, it has only one operator, and most of the
+parameters will have no effect on the sound.
+  Sound level, and envelope may be the only useful parameters.  All three
+of these sounds are done with the same voice.  (You will never hear
+missiles in the wind in Corncob, since a voice can only make one sound at
+a time.)
+
+Big Boom from Bombs
+  These sounds are generated by the percussion voice, bass drum.  As
+of now, the parameters for this sound are not kept in the 3.ADL file,
+and therefore cannot be edited with the sound editor.
+
+
+ Orb, KLA, and Saucer noises
+  These sounds vary in loudness during game play, so that the initial
+sound level programmed into the card before play is immediate lost.
+Therefore, adjusting the sound levels of these voices is useless.
+However, by changing the character of the sound, you may be able to
+make it more or less obnoxious.  For example if you wanted to tone down
+the KLA noise, simply lower the frequency multiplier of the carrier.
+The lower frequency sounds will always be quieter, and less irritating.

@@ -6,8 +6,8 @@
 #include <memory>
 #include <stdexcept>
 #include "game/front_end.h"
-#include "resources/assets.h"
 #include "render/video_mode.h"
+#include "resources/assets.h"
 
 namespace {
 
@@ -162,34 +162,10 @@ int main(int const argc, char const *const argv[]) {
   if(front.music() != corncob::audio::music_cue::silent) throw std::runtime_error{"menu music continued into a sortie"};
   front.show_flight_help();
   if(front.music() != corncob::audio::music_cue::silent) throw std::runtime_error{"flight helper enabled menu music"};
-  unsigned int constexpr flight_help_page_count{10};
-  for(unsigned int page{0}; page != flight_help_page_count; ++page) {
-    front.render(frame);
-    if(argc == 3) capture(frame, std::filesystem::path{argv[2]} / ("help" + std::to_string(page) + ".ppm"));
-    front.command(game::interface_command::accept);
-  }
-  if(!front.in_flight()) throw std::runtime_error{"help sequence did not return to flight"};
-  // Pressing F4 again must not make help its own return destination, including direct launches such as --slalom.
-  for(bool const direct_flight : {false, true}) for(auto const advance : {game::interface_command::accept, game::interface_command::next}) {
-    game::front_end help{assets, career, true, direct_flight};
-    auto const destination{direct_flight ? game::interface_page::flight : game::interface_page::menu};
-    if(direct_flight) { help.begin_flight(); help.show_flight_help(); }
-    else help.command(game::interface_command::help);
-    help.command(game::interface_command::help);
-    for(unsigned int page{0}; page != flight_help_page_count; ++page) {
-      if(help.current_page() != game::interface_page::help) throw std::runtime_error{"help ended before its final page"};
-      if(page == flight_help_page_count / 2) help.command(game::interface_command::help);
-      help.render(frame);
-      help.command(advance);
-    }
-    if(!help.in_flight()) help.render(frame);
-    if(help.current_page() != destination) throw std::runtime_error{"help returned to itself instead of its caller"};
-    help.command(game::interface_command::help);
-    help.command(advance);
-    help.command(game::interface_command::help);
-    help.command(game::interface_command::cancel);
-    if(help.current_page() != destination) throw std::runtime_error{"repeated F4 lost the help cancellation destination"};
-  }
+  if(front.current_page() != game::interface_page::bindings) throw std::runtime_error{"F4 did not open current control bindings"};
+  front.render(frame);
+  front.command(game::interface_command::cancel);
+  if(!front.in_flight()) throw std::runtime_error{"control menu did not resume the current sortie"};
   for(unsigned int notice{0}; notice != static_cast<unsigned int>(std::to_underlying(corncob::resources::radio_notice::count)); ++notice) {
     auto const type{static_cast<corncob::resources::radio_notice>(notice)};
     auto const message{corncob::resources::read_radio_message(type)};
@@ -248,15 +224,13 @@ int main(int const argc, char const *const argv[]) {
   if(startup_muted->music() != corncob::audio::music_cue::silent || !career.music_enabled()) throw std::runtime_error{"startup music override changed the saved preference"};
   auto const setup_storage{std::make_unique<game::front_end>(assets, career, true)};
   auto &setup{*setup_storage};
-  setup.character('j');
-  setup.character('j');
+  setup.character('o');
+  setup.command(game::interface_command::down);
+  setup.command(game::interface_command::accept);
   if(setup.flight_controls().joystick_device != -1) throw std::runtime_error{"joystick menu did not select the joystick"};
-  setup.character('k');
+  setup.command(game::interface_command::accept);
   setup.render(frame);
   if(argc == 3) capture(frame, std::filesystem::path{argv[2]} / "control-setup.ppm");
-  setup.character('i');
-  setup.command(game::interface_command::cancel);
-  if(setup.current_page() != game::interface_page::control_setup) throw std::runtime_error{"joystick information returned to the wrong screen"};
   setup.command(game::interface_command::cancel);
   setup.character('c'); setup.character('m'); setup.character('p'); setup.character('c');
   if(setup.flight_controls().beginner_flight || !career.combat_invincible() || career.inflight_comments()) throw std::runtime_error{"combat menu toggles did not change their independent settings"};

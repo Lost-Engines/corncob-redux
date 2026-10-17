@@ -12,8 +12,9 @@
 #include "render/palette.h"
 #include "resources/airfield_survey.h"
 #include "resources/assets.h"
-#include "world/theatre_catalog.h"
+#include "resources/documentation.h"
 #include "world/airfields.h"
+#include "world/theatre_catalog.h"
 #include "world/world.h"
 
 namespace corncob::game {
@@ -21,25 +22,6 @@ namespace corncob::game {
 namespace {
 
 render::rgba_pixel constexpr white{255, 255, 255}, grey{170, 170, 170}, yellow{255, 255, 85}, blue{0, 0, 170};
-
-std::vector<uint8_t> plain_documentation(std::string_view const source) {
-  /// The DOS .DOC is ASCII with in-game emphasis markers and chapter form feeds, rather than a word-processor document.
-  std::vector<uint8_t> result;
-  result.reserve(source.size());
-  for(unsigned int offset{0}; offset < source.size(); ++offset) {
-    char const character{source[offset]};
-    if(character == '\\' && offset + 1 < source.size() && (source[offset + 1] == '(' || source[offset + 1] == ')')) {
-      ++offset;
-      continue;
-    }
-    if(character == '\r') continue;
-    if(character == '\f') {
-      result.push_back('\n');
-      result.push_back('\n');
-    } else result.push_back(static_cast<uint8_t>(character));
-  }
-  return result;
-}
 
 } // anonymous namespace
 
@@ -57,8 +39,10 @@ front_end::front_end(resources::collection const &assets, campaign_store &campai
   outcomes{campaign_assets().outcomes()},
   music_on{music_enabled.value_or(campaign.music_enabled())} {
   /// One state machine replaces the original title, menu, help and outcome helper processes
+  settings = preferences::load(campaign.save_directory() / "redux.cfg");
   page = start_in_flight ? interface_page::flight : skip_intro ? interface_page::menu : interface_page::story;
   group = campaign.current_campaign() == world::campaign_id::earth ? world::theatre_group::earth : world::theatre_group::other_worlds;
+  session_running = start_in_flight;
   saved_theatres = campaign.theatres();
   combat_invulnerable = campaign.combat_invincible();
   comments_enabled = campaign.inflight_comments();
@@ -90,6 +74,9 @@ void front_end::sync_pilot() {
   combat_invulnerable = campaign.combat_invincible();
   comments_enabled = campaign.inflight_comments();
 }
+std::string_view front_end::document_text(std::string_view const name) const {
+  return resources::documentation_text(campaign.current_campaign() == world::campaign_id::other_worlds, name);
+}
 void front_end::document(std::string_view text, unsigned int const section) {
   /// Form feeds separate the original documentation chapters and context-sensitive menu help
   for(unsigned int n{0}; n < section; ++n) {
@@ -111,7 +98,7 @@ void front_end::information(unsigned int const section) {
   /// Menu information is separate from F4's original in-flight artwork
   information_return = page;
   information_section = section;
-  document(campaign_assets().text("moag.inf"), section);
+  document(document_text("moag.inf"), section);
   if(!document_lines.empty()) document_lines.erase(document_lines.begin());
   navigate(interface_page::menu_information);
 }
@@ -160,7 +147,8 @@ void front_end::accept() {
     case interface_page::menu:
       if(session_running) {
         if(selection == 0) page = interface_page::flight;
-        else if(selection == 1) show_flight_help();
+        else if(selection == 1) navigate(interface_page::control_setup);
+        else if(selection == 2) show_flight_help();
         else ask_to_end_sortie();
       } else switch(selection) {
       case 0: navigate(interface_page::roster); break;
@@ -170,12 +158,12 @@ void front_end::accept() {
       case 4: navigate(interface_page::campaigns); break;
       case 5: navigate(interface_page::control_setup); break;
       case 6: music_on = !music_on; campaign.music_enabled(music_on); break;
-      case 7: document_chapter = 0; numeric_input.clear(); document(campaign_assets().text("corncob.doc"), 0); navigate(interface_page::documentation); break;
+      case 7: document_chapter = 0; numeric_input.clear(); document(document_text("corncob.doc"), 0); navigate(interface_page::documentation); break;
       case 8:
         {
-          auto const path{std::filesystem::absolute(campaign.save_directory() / "CORNCOB.txt").lexically_normal()};
-          platform::write_binary(path, plain_documentation(campaign_assets().text("corncob.doc")));
-          notice("Documentation saved to:\n" + path.string());
+          auto const directory{std::filesystem::absolute(campaign.save_directory() / "documentation").lexically_normal()};
+          for(auto const name : {"earth", "other_worlds", "hints", "mission_builder"}) platform::write_binary(directory / (std::string{name} + ".pdf"), resources::documentation_pdf(name));
+          notice("PDF manuals saved to:\n" + directory.string() + "\n\nearth.pdf, other_worlds.pdf, hints.pdf, mission_builder.pdf");
         }
         break;
       case 9: information(1); break;
@@ -193,7 +181,7 @@ void front_end::accept() {
         selection = 0;
         character('b');
       } else if(selection < 7) {
-        auto text{std::string{expansion_assets.text(selection == 5 ? "mbuilder.doc" : "hints.txt")}};
+        auto text{std::string{document_text(selection == 5 ? "mbuilder.doc" : "hints.txt")}};
         std::ranges::replace(text, '\f', '\n');
         document(text, 0);
         information_return = interface_page::campaigns;
@@ -278,13 +266,14 @@ void front_end::accept() {
       if(++announcement_index == announcements.size()) navigate(interface_page::post_mission_report);
       break;
     case interface_page::control_setup:
-      if(selection == 0 || selection == 1) {
-        controls.joystick_device = selection == 0 ? -2 : -1;
-        campaign.keyboard_control(selection == 0);
-      } else if(selection == 2 || selection == 3) automatic_centering = selection == 2;
-      else if(selection == 4) force_centering = true;
-      else if(selection == 5) information(5);
-      else navigate(interface_page::menu);
+      if(selection == 0) { return_page = interface_page::control_setup; navigate(interface_page::bindings); }
+      else if(selection == 9) { save_settings(); navigate(interface_page::menu); }
+      else adjust_setting(1);
+      break;
+    case interface_page::bindings:
+      if(selection < settings.bindings.size()) binding_capture = true;
+      else if(selection == settings.bindings.size()) { settings.bindings = default_bindings(); save_settings(); }
+      else navigate(return_page);
       break;
     case interface_page::training:
       switch(selection) {
@@ -393,7 +382,7 @@ void front_end::accept() {
         if(chapter < 1 || chapter > (campaign.current_campaign() == world::campaign_id::earth ? 17u : 22u)) break;
         document_chapter = chapter;
       } else if(++document_chapter > (campaign.current_campaign() == world::campaign_id::earth ? 17u : 22u)) document_chapter = 0;
-      numeric_input.clear(); document(campaign_assets().text("corncob.doc"), document_chapter); break;
+      numeric_input.clear(); document(document_text("corncob.doc"), document_chapter); break;
     case interface_page::registration: navigate(information_return); break;
     case interface_page::notice: feedback.clear(); navigate(information_return); break;
     case interface_page::help: if(++help_index == help_screens.size()) navigate(return_page); break;
@@ -469,15 +458,19 @@ void front_end::command(interface_command const command) {
     if(page == interface_page::records || page == interface_page::medals) detailed_records = !detailed_records;
     break;
   case interface_command::previous:
+    if(page == interface_page::control_setup) adjust_setting(-1);
     if(page == interface_page::new_theatre) { choose_group(static_cast<world::theatre_group>((std::to_underlying(group) + 2) % 3)); selection = 0; }
     if(page == interface_page::help && help_index != 0) --help_index;
     break;
   case interface_command::next:
+    if(page == interface_page::control_setup) adjust_setting(1);
     if(page == interface_page::new_theatre) { choose_group(static_cast<world::theatre_group>((std::to_underlying(group) + 1) % 3)); selection = 0; }
     if(page == interface_page::help || page == interface_page::story || page == interface_page::title) accept();
     break;
   case interface_command::cancel:
     switch(page) {
+    case interface_page::control_setup: save_settings(); navigate(interface_page::menu); break;
+    case interface_page::bindings: binding_capture = false; navigate(return_page); break;
     case interface_page::radio: accept(); break;
     case interface_page::ending: ending.reset(); show_outcome(14); break;
     case interface_page::demonstrations: navigate(interface_page::campaigns); break;
@@ -502,7 +495,7 @@ void front_end::command(interface_command const command) {
     case interface_page::score_delete_confirmation: navigate(interface_page::score_delete); break;
     case interface_page::menu_information: navigate(information_return); break;
     case interface_page::documentation:
-      if(document_chapter != 0) { document_chapter = 0; document(campaign_assets().text("corncob.doc"), 0); }
+      if(document_chapter != 0) { document_chapter = 0; document(document_text("corncob.doc"), 0); }
       else navigate(interface_page::menu);
       break;
     case interface_page::unavailable_pilot: case interface_page::resurrect_activate: navigate(interface_page::roster); break;
@@ -515,9 +508,8 @@ void front_end::command(interface_command const command) {
     }
     break;
   case interface_command::help:
-    // F4 while reading help must preserve both the current page and the original return destination.
-    if(page == interface_page::help) break;
-    return_page = page; help_index = 0; navigate(interface_page::help); break;
+    if(page != interface_page::bindings) { return_page = page; navigate(interface_page::bindings); }
+    break;
   }
 }
 void front_end::begin_ending(graphics::indexed_framebuffer const &backdrop, std::array<render::rgba_pixel, 16> const &colours) {
@@ -542,8 +534,24 @@ void front_end::advance(double const seconds) {
   }
 }
 void front_end::show_radio(resources::radio_notice const notice, render::framebuffer const &backdrop, bool const enter_map) {
-  /// BLACKBOX overlays the retained flight screen and pauses flight until the pilot acknowledges its original text
+  /// Preserve the original warning layout while showing the current bindings.
   radio = resources::read_radio_message(notice);
+  auto label{[&](control_id const id){
+    auto const found{std::ranges::find(settings.bindings, id, &control_binding::id)};
+    return found == settings.bindings.end() ? std::string{"Unbound"} : binding_name(*found);
+  }};
+  if(notice == resources::radio_notice::ground_steering) {
+    radio->lines[1].text = "  Rudder: " + label(control_id::rudder_left) + " / " + label(control_id::rudder_right);
+    radio->lines[2].text = "  Brakes: " + label(control_id::brakes);
+    radio->lines[3].text = "  Hold the brake control until the aircraft stops.";
+  } else if(notice == resources::radio_notice::low_altitude) {
+    radio->lines[4].text = "  Pull up: " + label(control_id::pitch_up);
+  } else if(notice == resources::radio_notice::leave_on_foot) {
+    radio->lines[1].text = "  Call rescue: " + label(control_id::rescue);
+  } else if(notice == resources::radio_notice::training) {
+    radio->lines[1].text = "    F4: current control bindings";
+  }
+
   radio_backdrop = backdrop;
   map_after_radio = enter_map;
   page = interface_page::radio;
@@ -567,6 +575,7 @@ bool front_end::take_map() {
 }
 void front_end::show_menu() {
   /// The native helper flow can return to a retained flight without recreating its world
+  if(page == interface_page::flight) session_running = true;
   page = interface_page::menu;
   selection = 0;
 }
@@ -581,11 +590,10 @@ void front_end::begin_flight() {
   page = interface_page::flight;
 }
 void front_end::show_flight_help() {
-  /// F4 opens the original in-flight help sequence and returns to the same session
+  if(page == interface_page::bindings) return;
+  return_page = page;
   session_running = true;
-  return_page = interface_page::flight;
-  page = interface_page::help;
-  help_index = 0;
+  navigate(interface_page::bindings);
 }
 void front_end::ask_to_end_sortie() {
   /// Escape requires a deliberate confirmation and keeps the current flight available on cancellation
@@ -629,7 +637,10 @@ void front_end::render(render::framebuffer &target) const {
       auto fill{[&](resources::message_box const &box, render::rgba_pixel const colour){canvas.rectangle(box.left, box.top, box.left + box.width, box.top + box.height, colour);}};
       fill(radio->border, {170, 0, 0});
       fill(radio->background, {0, 0, 0});
-      for(auto const &line : radio->lines) canvas.text(line.column * 8, line.row * 14, line.text, grey);
+      for(auto const &line : radio->lines) {
+        auto const columns{static_cast<unsigned int>(std::max(0, (radio->background.left + radio->background.width - line.column * 8) / 8))};
+        canvas.text(line.column * 8, line.row * 14, std::string_view{line.text}.substr(0, columns), grey);
+      }
     }};
     if(target.width == render::screen_layout::width && target.height == render::screen_layout::height) {
       draw_message(target);
@@ -692,10 +703,12 @@ void front_end::render(render::framebuffer &target) const {
 unsigned int front_end::choice_count() const {
   /// Counts describe the original selectable entries, excluding status text and panel decorations
   switch(page) {
-  case interface_page::menu: return session_running ? 3 : 11;
+  case interface_page::menu: return session_running ? 4 : 11;
   case interface_page::roster: return 9;
   case interface_page::theatres: return 10;
-  case interface_page::training: case interface_page::control_setup: return 7;
+  case interface_page::training: return 7;
+  case interface_page::control_setup: return 10;
+  case interface_page::bindings: return static_cast<unsigned int>(settings.bindings.size()) + 2;
   case interface_page::training_counts: case interface_page::training_wickedness: return 4;
   case interface_page::campaigns: return 9;
   case interface_page::demonstrations: return 4;
@@ -716,6 +729,68 @@ audio::music_cue front_end::music() const noexcept {
     return audio::music_cue::silent;
   if(campaign.current_campaign() == world::campaign_id::other_worlds) return page == interface_page::title ? audio::music_cue::other_title : audio::music_cue::other_menus;
   return page == interface_page::title ? audio::music_cue::title : audio::music_cue::menus;
+}
+preferences &front_end::options() noexcept {
+  return settings;
+}
+void front_end::save_settings() {
+  settings.save(campaign.save_directory() / "redux.cfg");
+}
+bool front_end::capturing_binding() const noexcept {
+  return binding_capture;
+}
+bool front_end::bind_input(int const key, int const mouse) {
+  if(!binding_capture) return false;
+  binding_capture = false;
+  if(key >= 290 && key <= 293) { notice("F1-F4 are reserved for boss, intelligence, score and control help."); return true; }
+  if(key == 256) return true; // Escape cancels capture.
+  auto &binding{settings.bindings.at(selection)};
+  bool const clear{key == 259 || key == 261};
+  if(!clear) for(auto &other : settings.bindings) {
+    if(other.id == binding.id || (other.context != binding.context && other.context != control_context::both && binding.context != control_context::both)) continue;
+    if(key >= 0) { if(other.key == key) other.key = -1; if(other.alternate == key) other.alternate = -1; }
+    if(mouse >= 0 && other.mouse == mouse) other.mouse = -1;
+  }
+  if(clear) { binding.key = binding.alternate = binding.mouse = -1; }
+  else if(mouse >= 0) binding.mouse = mouse;
+  else { binding.key = key; binding.alternate = -1; }
+  try { save_settings(); } catch(std::exception const &error) { notice(error.what()); }
+  return true;
+}
+void front_end::adjust_setting(int const direction) {
+  switch(selection) {
+  case 1: controls.joystick_device = controls.joystick_device == -2 ? -1 : -2; campaign.keyboard_control(controls.joystick_device == -2); break;
+  case 2: controls.beginner_flight = !controls.beginner_flight; campaign.beginner_flight(controls.beginner_flight); break;
+  case 3: settings.scene.horizontal_fov = std::clamp(settings.scene.horizontal_fov + direction * 2, graphics::scene_settings::minimum_fov, graphics::scene_settings::maximum_fov); break;
+  case 4: settings.scene.draw_distance = std::max(0.0, settings.scene.draw_distance + direction * 5); break;
+  case 5: settings.scene.ground_points = static_cast<unsigned int>(std::clamp(static_cast<int>(settings.scene.ground_points) + direction * static_cast<int>(graphics::scene_settings::original_ground_points), 0, static_cast<int>(graphics::scene_settings::maximum_ground_points))); break;
+  case 6:
+    {
+      std::array<render::video_size, 6> constexpr sizes{{{640,350}, {960,540}, {1280,720}, {1600,900}, {1920,1080}, {2560,1440}}};
+      int index{-1};
+      if(!settings.window_resolution) for(unsigned int n{0}; n < sizes.size(); ++n) if(sizes[n].width == settings.scene.resolution.width && sizes[n].height == settings.scene.resolution.height) index = static_cast<int>(n);
+      index += direction;
+      if(index > 5) index = -1;
+      if(index < -1) index = 5;
+      settings.window_resolution = index == -1;
+      if(index >= 0) settings.scene.resolution = sizes[static_cast<unsigned int>(index)];
+    }
+    break;
+  case 7: settings.mouse_sensitivity = std::clamp(settings.mouse_sensitivity + direction * 2, 1.0, 200.0); break;
+  case 8: settings.invert_mouse = !settings.invert_mouse; break;
+  default: return;
+  }
+  save_settings();
+}
+void front_end::wheel(int const steps) {
+  // Wheel motion stops at list ends; keyboard navigation retains wraparound.
+  if(binding_capture || steps == 0) return;
+  if(page == interface_page::briefing) { tower.move(steps * 3); return; }
+  if(page == interface_page::documentation || page == interface_page::registration || page == interface_page::menu_information || page == interface_page::airfield_information) {
+    for(int n{0}; n < std::abs(steps) * 3; ++n) command(steps < 0 ? interface_command::up : interface_command::down);
+  } else if(page != interface_page::flight && page != interface_page::radio && page != interface_page::story && page != interface_page::title) {
+    selection = static_cast<unsigned int>(std::clamp(static_cast<int>(selection) + steps, 0, static_cast<int>(choice_count()) - 1));
+  }
 }
 control_setup const &front_end::flight_controls() const noexcept {
   /// New sessions and platform polling consume the same settings shown by the front end
@@ -747,8 +822,9 @@ std::optional<world::mission_start> front_end::take_relocation() {
   return std::exchange(pending_relocation, std::nullopt);
 }
 void front_end::character(uint32_t const codepoint) {
+  if(page == interface_page::control_setup || page == interface_page::bindings) return;
   if(page == interface_page::menu && !session_running && (codepoint == 'r' || codepoint == 'R')) {
-    document(assets.text("moag.inf"), 9);
+    document(document_text("moag.inf"), 9);
     if(!document_lines.empty()) document_lines.erase(document_lines.begin());
     information_return = interface_page::menu;
     navigate(interface_page::registration);
@@ -831,14 +907,14 @@ void front_end::character(uint32_t const codepoint) {
   if(page == interface_page::high_scores || page == interface_page::notice || page == interface_page::current_score || page == interface_page::sortie_summary) { accept(); return; }
   std::string_view shortcuts;
   switch(page) {
-  case interface_page::menu: if(!session_running) shortcuts = "dcthsjmvpix"; break;
+  case interface_page::menu: if(!session_running) shortcuts = "dcthsomvpix"; break;
   case interface_page::campaigns: shortcuts = "eopdbihtr"; break;
   case interface_page::demonstrations: shortcuts = "123r"; break;
   case interface_page::roster: shortcuts = "cadlenvir"; break;
   case interface_page::theatres: shortcuts = "foadvpmcir"; break;
   case interface_page::training: shortcuts = "fwndpir"; break;
   case interface_page::training_counts: case interface_page::training_wickedness: shortcuts = "mgar"; break;
-  case interface_page::control_setup: shortcuts = "kjamfir"; break;
+  case interface_page::control_setup: case interface_page::bindings: break;
   case interface_page::high_score_menu: shortcuts = "scfdir"; break;
   case interface_page::score_delete: shortcuts = "scfir"; break;
   case interface_page::story: case interface_page::title: accept(); return;

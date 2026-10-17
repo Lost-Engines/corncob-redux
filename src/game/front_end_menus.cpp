@@ -1,14 +1,14 @@
-#include "front_end.h"
-#include "game/report_format.h"
 #include <algorithm>
 #include <format>
 #include <numeric>
+#include "front_end.h"
+#include "game/report_format.h"
 #include "graphics/menu_canvas.h"
 #include "maths/integer.h"
-#include "resources/assets.h"
 #include "resources/airfield_survey.h"
-#include "world/theatre_catalog.h"
+#include "resources/assets.h"
 #include "world/airfields.h"
+#include "world/theatre_catalog.h"
 
 namespace corncob::game {
 
@@ -16,8 +16,8 @@ namespace {
 
 std::array<std::string_view, 11> constexpr main_choices{
   "\\Duty roster", "\\Combat missions", "\\Training missions", "display \\High score list", "\\Select campaign / world group",
-  "keyboard/\\Joystick setup", "\\Music toggle", "\\View  the Corncob 3D documentation",
-  "save documentation as \\Plain text", "get \\Information about this menu", "e\\Xit to dos",
+  "\\Options and controls", "\\Music toggle", "\\View  the Corncob 3D documentation",
+  "save documentation as \\PDF", "get \\Information about this menu", "e\\Xit game",
 };
 std::array<std::string_view, 9> constexpr roster_choices{
   "\\Create Pilot", "\\Activate Pilot", "\\Deactivate Pilot", "de\\Lete Pilot", "r\\Esurrect Pilot",
@@ -31,11 +31,6 @@ std::array<std::string_view, 10> constexpr combat_choices{
 std::array<std::string_view, 7> constexpr training_choices{
   "\\Fly mission", "modify \\Wickedness of enemies", "choose \\Number of enemies", "choose \\Default values",
   "toggle invulnerable \\Plane", "get \\Information about this menu", "\\Return to previous menu",
-};
-std::array<std::string_view, 7> constexpr joystick_choices{
-  "choose \\Keyboard control", "choose \\Joystick control", "choose \\Automatic joystick centering",
-  "choose \\Manual joystick centering", "\\Force joystick re-centering next flight",
-  "get \\Information about this menu", "\\Return to previous menu",
 };
 std::array<std::string_view, 6> constexpr score_choices{
   "see list of high \\Scores", "see list of top \\Careers", "see list of \\Fastest careers",
@@ -523,15 +518,40 @@ void front_end::render_menus(render::framebuffer &target) const {
     }
   } else if(view == interface_page::control_setup) {
     screen.colours(1, 3, 6);
-    screen.heading("Keyboard/joystick setup");
-    screen.panel(10, 5, 66, 20);
-    screen.text(20, 6, "Use arrow keys or type highlighted");
-    screen.text(22, 7, "letter to choose action:");
-    options(20, 9, joystick_choices, selected(interface_page::control_setup));
-    screen.text(12, 17, "Current", 14); screen.text(13, 18, "choices:", 14);
-    screen.text(24, 17, std::string{"\xfe"} + (controls.joystick_device == -2 ? "Keyboard control." : "Joystick control."), 15);
-    if(controls.joystick_device != -2) screen.text(26, 18, std::string{automatic_centering ? "Automatic" : "Manual"} + " joystick recentering.");
-    if(force_centering) screen.text(13, 19, "Forcing joystick recenter next flight.");
+    screen.heading("Redux Options and Controls");
+    screen.panel(5, 5, 74, 22);
+    auto const &s{settings.scene};
+    std::array<std::string, 10> const labels{
+      "Configure key and mouse bindings",
+      std::string{"Flight input: "} + (controls.joystick_device == -2 ? "Keyboard" : "Joystick (automatic)"),
+      std::string{"Flight model: "} + (controls.beginner_flight ? "Beginner" : "Advanced"),
+      std::format("Horizontal FOV: {:.0f} degrees", s.horizontal_fov),
+      s.draw_distance == 0 ? "Draw distance: Unlimited" : std::format("Draw distance: {:.0f} km", s.draw_distance),
+      std::format("Ground detail: {} points", s.ground_points),
+      settings.window_resolution ? "Resolution: Match window" : std::format("Resolution: {} x {}", s.resolution.width, s.resolution.height),
+      std::format("Mouse sensitivity: {:.0f}", settings.mouse_sensitivity),
+      std::string{"Invert mouse look: "} + (settings.invert_mouse ? "Yes" : "No"),
+      "Back",
+    };
+    options(10, 8, labels, selection);
+    screen.text(9, 19, "Left/Right changes values; Enter selects; Escape returns.", 15);
+    screen.text(9, 20, "Settings are saved automatically.", 14);
+  } else if(view == interface_page::bindings) {
+    screen.colours(1, 3, 6);
+    screen.heading("Control Bindings");
+    screen.panel(3, 4, 76, 23);
+    unsigned int const count{static_cast<unsigned int>(settings.bindings.size())};
+    unsigned int const first{selection < count ? (selection / 12) * 12 : (count - 1) / 12 * 12};
+    screen.text(6, 5, binding_capture ? "Press a key or mouse button; Escape cancels." : "Enter: rebind   Delete while capturing: clear", 15);
+    for(unsigned int n{first}; n < std::min(first + 12, count); ++n) {
+      auto const &b{settings.bindings[n]};
+      std::string const scope{b.context == control_context::walking ? "Walk  " : b.context == control_context::flight ? "Flight" : "Both  "};
+      screen.option(6, 7 + static_cast<int>(n - first), std::format("{}  {:28} {}", scope, b.name, binding_capture && n == selection ? "..." : binding_name(b)), n == selection);
+    }
+    screen.text(62, 6, std::format("{}-{}/{}", first + 1, std::min(first + 12, count), count), 14);
+    for(unsigned int row{0}; row < 12; ++row) screen.text(73, 7 + static_cast<int>(row), row == first * 11 / count ? "#" : "|", 14);
+    screen.option(6, 20, "Restore control defaults", selection == count);
+    screen.option(6, 21, return_page == interface_page::control_setup ? "Back to options" : "Back", selection == count + 1);
   } else if(view == interface_page::high_score_menu || view == interface_page::score_delete || view == interface_page::score_delete_confirmation) {
     screen.colours(1, 3, 6);
     bool const deleting{view != interface_page::high_score_menu};
@@ -604,7 +624,7 @@ void front_end::render_menus(render::framebuffer &target) const {
     if(view == interface_page::quit_confirmation) {
       std::array<std::string_view, 2> constexpr choices{"Yes", "No - return"}; draw_menu(canvas, "End this sortie?", choices);
     } else {
-      std::array<std::string_view, 3> constexpr choices{"Resume flight", "Flight controls and help", "End current sortie"}; draw_menu(canvas, "Main menu", choices);
+      std::array<std::string_view, 4> constexpr choices{"Resume flight", "Options and controls", "Control bindings", "End current sortie"}; draw_menu(canvas, "Main menu", choices);
     }
   }
   if(page == interface_page::documentation || page == interface_page::registration || page == interface_page::menu_information) {

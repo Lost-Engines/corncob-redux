@@ -1,0 +1,3322 @@
+Corncob Redux edition
+
+The story, objects and flight advice below come from the original
+manuals.
+Spelling has been corrected and controls and changed rules updated.
+Historical hardware, ordering and contact details are retained as
+archival
+material; they are not current requirements, offers or support contacts.
+Both campaigns are included. No DOS installation is required.
+Use Options and controls for display settings and bindings. Save
+documentation as PDF exports the manuals into your Redux save directory.
+
+1.) Getting Started
+2.) Title and legal information
+3.) The Story So Far
+4.) Hardware Requirements / What to Try if Corncob Crashes Your Computer
+5.) Keyboard Controls: Inflight & Standing on the Ground
+6.) Keyboard Play and How to Handle the Rudder
+7.) Training Missions
+8.) Combat Missions: Theaters-of-Operation
+9.) Friendly Objects
+10.) Enemy Defenses
+11.) How to Take Off, Fly Level, and Land
+12.) How to Turn Your Plane
+13.) Dealing With the Air Density and Gravity Variations
+14.) How to Use Your Missiles, Bombs, and Guns
+15.) Defensive Flying & Coming Home With a Shot-up Plane
+16.) Running Around -- Welcome the Assassin
+17.) Scoring and Promotion Rules
+18.) Commonly Asked Questions and Answers
+19.) Game Play Hints
+20.) The Corncob Program Itself
+21.) Contacting MVP Software & the Corncob 3D BBS
+22.) Using the Mission Builder
+
+
+Getting Started
+
+ Thank you for purchasing the Corncob Other Worlds Campaign!
+
+  The game is easy to install and use.  To install Corncob, insert the
+distribution disk into your computer's drive.  Type INSTALL, and press
+<ENTER>.  Answer the questions on installation drive and directory.
+After
+the installation program is finished installing the software, type
+CORNCOB
+to begin the game.
+
+
+  If you just want to get in the cockpit and fly, then press <ENTER> at
+the main menu. Doing so will bring up the Training Missions menu.  Just
+press <ENTER> again, and you will receive the pre-flight report, which
+gives information about the missions you fly.  You can exit the
+pre-flight
+report with <ENTER>, and you will be in the cockpit.
+
+
+  You may get help for the various submenus by pressing I.  For help
+inflight, please use the F4 key.  If you are having difficulty flying
+and
+turning, please read the documentation.
+
+
+[Historical DOS documentation - retained for reference]
+
+Corncob 3D
+  The Other Worlds Campaign
+
+
+  A VGA Air Combat Game
+  by
+  Kevin Stokes
+
+
+  An MVP Software Production
+
+
+  For IBM and compatible computers
+  1992 Pie in the Sky Software
+  Printed in the United States
+
+
+  THIS SOFTWARE IS DISTRIBUTED ON AN AS IS BASIS.  MVP SOFTWARE AND
+  PIE IN THE SKY SOFTWARE MAKE NO WARRANTIES, EITHER EXPRESS OR
+  IMPLIED, WITH RESPECT TO THIS SOFTWARE, INCLUDING, BUT NOT LIMITED
+  TO, IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE AND
+  MERCHANTABILITY.  ACCORDINGLY, THE ENTIRE RISK AS TO THE USE, RESULTS
+  AND PERFORMANCE OF THE SOFTWARE IS ASSUMED BY THE USER.  IN NO
+  EVENT WILL MVP SOFTWARE OR PIE IN THE SKY SOFTWARE BE LIABLE FOR
+  ANY DAMAGES, INCLUDING CONSEQUENTIAL DAMAGES, EVEN IF MVP SOFTWARE
+  OR PIE IN THE SKY SOFTWARE HAVE BEEN ADVISED OF SUCH DAMAGES.
+
+
+  IF ANY OF THE PROVISIONS, OR PORTIONS THEREOF, OF THIS DISCLAIMER
+  ARE INVALID UNDER ANY APPLICABLE STATUTE OR RULE OF LAW, THEY ARE
+  TO THAT EXTENT DEEMED TO BE OMITTED.  ALL OTHER PROVISIONS, HOWEVER,
+  REMAIN IN EFFECT.
+
+
+
+
+The Story So Far
+  The date is August, 1949.  This is not the 1949 that we remember,
+though.  In this 1949 WWII never happened (this is because among other
+factors, Adolf Hitler was killed at the age of 19 when hit in the head
+by
+a thrown beer bottle), but all was not peaceful in this alternate age.
+
+
+  In 1938 aliens swept down out of the skies and began to set up
+structures.  Although many attempts were made to communicate, the aliens
+did not respond.  It soon became obvious that these creatures simply
+were
+not interested in us, or in any other life on the planet.  When human
+dwellings or sites were in their way, the aliens destroyed them and
+continued their seemingly random construction plans.
+
+
+  So in 1941 the world governments agreed to band together in an
+alliance
+for humanity.  No attacks were launched until November 1941.  The plan
+consisted of a simultaneous all out blitz against the extraterrestrials
+in
+every part of the globe.  The battle was waged for over four years.
+Finally the effort succeeded and the aliens were driven from earth.
+
+
+  Now, however, they have set up residence on other planets in the solar
+system.  Clearly they are planning another conquest of earth.  Once
+again
+the world's governments are banding together, but this time to drive
+them
+from the solar system.
+
+
+  Your mission is critical in this plan.  You must go to other planets,
+destroy several alien structures, and in the process, many aliens
+themselves.  If you do not succeed the entire human effort will fail.
+
+
+[Historical DOS documentation - retained for reference]
+
+Hardware Requirements
+  Corncob requires an IBM PC/AT-type computer with a speed of 12Mhz or
+higher, a VGA color monitor, a hard drive, and 570K free RAM.  A
+joystick
+is recommended but not required for successful game play.
+
+
+  For music and inflight sound, you must have an ADLIB compatible sound
+card installed in your computer.
+
+
+What to do if Corncob Crashes Your Computer
+  Corncob has been tested on a variety of systems and has run reliably
+with no crashes for weeks of game play.  However, Corncob does do some
+rather unorthodox things that may cause problems with certain TSR
+programs.
+
+
+  If you have a problem running Corncob on your system, reboot your
+computer from a floppy disk, with no TSRs or other software loaded.
+
+
+  NOTE: If Corncob fails during loading, please delete or rename the
+file
+CCTITLE.EXE, and then let us know about it.  This will prevent the
+animated title screen from running.
+
+
+Redux Controls
+
+These are the default bindings. F4 opens the current bindings during
+flight; Enter selects a binding to change it. Escape or P opens the
+pause menu, including display and control options. Delete clears a
+binding during capture; Escape cancels capture. Keyboard and mouse
+bindings can coexist: capturing a key changes the keyboard binding;
+capturing a mouse button changes the mouse binding. Delete clears both.
+
+Flying
+  Arrow keys or keypad 4/6 and 8/2: roll and pitch.
+  Z / X or keypad 7 / 9: left / right rudder.
+  + / - or keypad + / -: throttle up / down.
+  Period or keypad 0: hold wheel brakes.
+  Space or left mouse button: machine guns.
+  Left Shift: heavy cannon. C or right mouse button: missiles.
+  S: toggle sound effects. A: autopilot. F: flaps. I: rocket booster. B:
+drop bomb.
+  E: leave the aircraft or eject.
+  R: rear view. L: cockpit. Num Lock: look mode.
+  Hold Ctrl with arrow keys to look around.
+
+On foot
+  W / A / S / D: forward / left / backward / right.
+  Mouse: look around. Space: jump immediately.
+  Left Ctrl: drop through a supporting platform.
+  Left mouse button: pistol. Q: open parachute.
+  Semicolon: plant assassin charge. B: arm/detonate charges.
+  V: call rescue. Caps Lock: remote control of your aircraft.
+
+Shared controls
+  M: map. O: toggle radio messages. G: ground detail.
+  P / Escape: pause menu. F1: boss screen.
+  F2: intelligence. F3: current score. F4: control bindings.
+  Mousewheel: scroll menus, documentation and tower briefings.
+
+Joystick buttons 1 and 2 fire guns and missiles during flight.
+Modern joysticks do not need the DOS calibration controls.
+
+There is no accelerated-time key in Redux. Enemy production and
+movement follow the simulation clock, independently of rendering.
+
+Menus, documentation and the tower
+  Arrow Up / Down: select or scroll; mousewheel also scrolls.
+  Enter: accept. Escape: back/cancel. Backspace: erase text or go back.
+  Home / End: first / last entry or beginning / end of a document.
+  Page Up / Page Down: scroll documents by a page.
+  Left / Right: adjust options; switch world groups in the world list.
+  Insert: toggle detailed pilot records. Highlighted letters: shortcuts.
+  Type a chapter number in the documentation contents, then Enter.
+  In the tower, Enter selects a highlighted mission and closes the
+  briefing; if airborne, this relocates your aircraft to that mission.
+  Tower aliases: J/K or 2/8 scroll down/up; D/U move half a page;
+  Space pages down; G goes to the start, Shift+G to the end; Q exits.
+  Ctrl+F/N and Ctrl+B/P scroll; Ctrl+Y pages down, Ctrl+O pages up;
+  Ctrl+T goes to the start, Ctrl+R to the end; Ctrl+H exits.
+
+Map mode
+  Arrows or keypad 4/6 and 8/2: move the map viewpoint.
+  Page Up / keypad 9: descend (zoom in).
+  Page Down / keypad 3: climb (zoom out). Hold S for slower zoom.
+  Home / keypad 7: reset the map to your position.
+  Hold Left Shift with arrows: rotate the map viewpoint.
+  Escape, Enter, Space, or the configured Map key: return to flight.
+  Map mode pauses the sortie; looking at a map does not advance enemies.
+
+Mission builder (fixed editor keys, separate from flight bindings)
+  In the world list, B opens the selected world in the builder.
+  Arrows: turn the view; keypad 5/0: move forward/backward.
+  Page Up / Down: lower/raise the viewpoint. 1..8: movement speed.
+  Left Shift: show cursor or commit object; Left Ctrl: hide cursor.
+  C: create an object. Space: select a nearby object. D: delete it.
+  + / -: next/previous object type. ] / [: next/previous quality.
+  Hold Left Alt with arrows and Page Up/Down: move cursor/object.
+  Hold A with arrows: rotate selected object.
+  F9: toggle special flag. F10: toggle objective-complete flag.
+  Caps Lock: level the view. Alt+H: remember cursor height.
+  H: move cursor to the remembered height.
+  B, M or Escape: switch overhead/3D view. F5: save and return.
+  Edits are exported under custom_worlds in the Redux save directory.
+
+Other retained shortcuts
+  Ctrl+C during flight: abort the sortie without awarding a score.
+  Alt+I: enable invulnerability; in Other Worlds this toggles it.
+  Escape stops a recorded demonstration without saving it.
+  While a radio message is visible, O disables future messages;
+  any other non-modifier key dismisses the message.
+  F1's boss screen dismisses on any non-modifier key.
+
+Mouse sensitivity and inverted look are adjustable in Options and
+controls. Losing focus releases the mouse and pauses the game.
+FOV, draw distance and ground detail do not affect simulation speed.
+
+
+Keyboard Play and How to Handle the Rudder
+  A great deal of effort was put into Corncob to make keyboard play work
+well.  The keyboard is interrupt driven, and your key presses are timed
+to
+within 1/1000th of a second.  Also, Corncob has no problem detecting
+keystrokes even when 3 keys are held down at once.
+
+
+  The keys that even joystick players have to contend with are the
+rudder
+keys.  The problem is how do you command just a little rudder?  If you
+hold the key down the plane will go into a heavy sideslip, and
+eventually
+stall.  The method of varying the amount of rudder desired is by rapidly
+pressing and releasing the key.  The average amount of time in which the
+key is down communicates to the game how much rudder is desired.
+
+
+  This will take some getting used to, but when you get used to it, it
+becomes second nature. To operate the rudder, the best finger position
+leaves the left hand middle finger on the z key for left rudder.  This
+leaves the right index finger on the x key for right rudder.  Now your
+3rd
+finger is well positioned for pressing the left shift key down for
+cannons (use Period or keypad 0 for brakes).  For lefties, the rudder
+controls are 7,9 on the keypad.
+
+
+  For the keyboard player, the plane must be controlled from the keypad.
+Put your middle finger permanently on the 5 key.  Use this middle finger
+for both the 2,8 nose up/down keys, and use the index and 3rd finger for
+your left/right roll keys.  It's very important always to use the above
+fingers for best performance.  The reason is that in Corncob, you
+frequently must use more than one arrow key at once to perform a
+maneuver.
+ If you peck the keys with just one finger, your ability to react
+quickly
+and use combinations will be limited.  It's best to force yourself to do
+it the above mentioned way, or else you will be stuck at the harder
+missions that require more precise flying.
+
+
+  Remember that to apply gentle tweaks to the control, you must press
+keys
+on and off rapidly, with the average time spent down being the desired
+roll/pitch rate.  You have three displays on the front panel that show
+you
+what you are presently sending to the control stick.  These meters are
+just to the right of the ALT light.
+
+
+  Don't forget to use the rudder with the left hand.  Using the rudder
+can
+really help you pick off targets without having to bank and pull back on
+the stick.
+
+
+  NOTE: If the arrow keys suddenly appear not to be functioning
+properly,
+perhaps you have bumped the numlock key.  Numlock chooses the mode in
+which your keypad keys operate between control/views.  Note that the
+numlock light will not change state as you switch between views, and
+control.
+
+
+
+
+Training Missions
+  If you don't want to fight in an actual theater; i.e., you just want
+to
+hop in a plane and shoot at aliens, then the Training Missions are for
+you.  Use the menu to specify the number of enemy KLA sites, AAA
+batteries, and ground vehicle sites, and you are ready to engage in
+combat.
+
+
+  You will be placed in a universe that is empty except for your
+airstrip
+and the enemy field of operations.  The basic setup of the enemy
+territory
+will always be the same.  There will always be an orb protected by
+forcefields, and 15 fuel storage facilities.  The fuel storage canisters
+(or Ticks, as the pilots call them) are always the primary mission
+objective.
+
+
+  If you are flying training missions with a non-trainee pilot, be aware
+that your pilot scores will be affected by your performance on your
+flight, and your pilot can be just as easily killed or captured as when
+you are flying in a theater.
+
+
+  This is why it is important to remember to fly the training mission as
+a
+trainee if you just want to bomb around.
+
+
+
+
+Combat Missions: Theaters-of-Operation
+  To fly a mission a pilot first chooses in which theater of operations
+he
+wishes to fly.  A theater of operations is a terrain filled with
+airports
+and areas of enemy concentrations.  After opening a theater, select F
+from
+the combat missions menu in order to fly a mission in that theater.
+
+
+  A pilot selects his mission by either flying there from the airstrip
+or
+simply pressing F2 to bring up a list of the local missions.  The pilot
+selects the mission by using the arrow keys. Then by pressing the
+<ENTER>
+key, he/she will be teleported right to the action.
+
+
+  After you have completed your mission you must fly back to your
+airstrip
+to get credit for your victory.  If you can land the plane, your points
+will be much higher than if you quit during a flyby.
+
+
+  Still, even if you cannot land the plane safely, quitting the flight
+via
+the <ESC> key must be done close to airstrip to avoid losing a plane.
+The
+definition of close to your airstrip is when your airstrip's radar dish
+is blinking.
+
+
+  Most theaters of operation have nine airbases from which the pilot can
+take off and in which he can land.  Each airbase has intelligence
+information about the enemy forces in the vicinity. Intelligence info
+can
+be gotten from entering the control tower on foot or by using your radio
+(F2 key) when in the air.  The information you receive will always be
+from
+the last airport you were in.
+
+
+  If you wish to get intelligence info from a different airstrip, simply
+do a flyby over the tower of the new airstrip.  Then the next time you
+use
+your radio via F2, you will get the intelligence about the missions
+surrounding that airstrip.
+
+
+  For example, suppose you started a combat mission from the RDU
+airstrip.
+ Once you hit F2 you realize that you have already completed all the
+missions here, and you would like to fly the missions at the Crickety
+Point airstrip.  So you simply fly due North until you make a sighting
+of
+the Crickety Point airstrip.  Then you make a flyby of the tower, and as
+a
+result the Crickety Point radar tower starts flashing.  Now when you hit
+F2, your intelligence report will be from Crickety Point.
+
+
+  One of the most important things about theaters is that they have a
+history capability.  This means that anything a pilot has destroyed will
+stay destroyed forever.  For example, say that yesterday a mission was
+flown in which the Devil's Aquarium was demolished.  If that same
+theater
+is flown in today the wreckage will remain.  This applies to friendly
+objects as well as enemy objects.  Your goal in each theater is to
+accomplish all the mission objectives listed in the intelligence
+reports.
+Typically this will take many missions, and on your last few missions
+the
+theater will be filled with destroyed alien targets.  If you use up all
+your planes, you will have to open a new version of that theater (with
+all
+alien bases intact) and start again from scratch.
+
+This brings us to the topic of plane conservation.  Planes are a
+precious
+resource that should not be wasted.  Each theater has only so many
+planes
+parked at the various airstrips.  If a pilot is not careful and loses
+too
+many planes via ejection, then the unfortunate pilot will find himself
+with no airplanes left in the whole theater.
+
+
+  The method to get the most points, and the way to get through a
+theater,
+is by nearly always nursing planes back to the nearest airstrip.
+
+
+  Even a heavily damaged plane can be repaired simply by landing and
+strolling over to the control tower on foot.  If the pilot cannot land,
+then ending the mission with a low flyby will assume a safe landing with
+plane intact, and the next time the game is played the plane will be
+repaired.  Please note that even a crashlanded plane can be repaired if
+the wreckage is close enough to the airstrip tower.
+
+
+  If desired, some older model planes can be brought out of storage, but
+this should be used only when desperate.  These brown planes have
+reduced
+performance specs.  The option for bringing these planes out of storage
+is
+only available when you attempt to fly a mission from an airstrip that
+has
+no airplanes available. Of course, if a pilot runs out of planes in a
+theater, or would like a fresh start, there is always the option of
+reopening a new theater.  A pilot can have up to 15 theaters open at one
+time, so he may fly one mission in MILKRUN theater, then fly a mission
+in
+FLATLAND, and so on.  Closing an undesirable theater does not affect the
+pilot's record.  In fact even if a pilot is killed in action, he can be
+resurrected.  The only cost of resurrection is the fact that the
+computer
+keeps track of how many resurrections you did and places this number by
+your name in all records.
+
+
+  Each pilot has records kept both for his total career and his
+performance in each theater in which he has flown.
+
+
+
+
+Friendly Objects
+
+Airplanes
+  Every airstrip contains one or more airplanes you may fly.  To get
+into
+a plane, simply walk up to it and enter.  To get out of a plane use the
+e
+key.  There are three different plane types in the game.
+
+
+  The blue-winged planes are the standard front-line ground attack
+planes.
+ The brown-winged planes are older planes that have been brought out of
+storage in the case of an emergency. These planes have less engine
+power.
+
+
+  Lastly, there are experimental black flying-wing planes.  These planes
+use the latest stealth technology, and there are some drawbacks.  First,
+these planes are extremely heavy, so the ground crew cannot move them.
+When you fly the missions you must find the plane yourself, and it
+should
+be wherever you left it.  Also note that these planes will fall like a
+rock when stalled.  You will have less than half the time to bail out
+before hitting the ground in these aircraft.
+
+
+  The high speed of these planes is actually faster than the initial
+speed
+of their missiles. When you fire missiles you will see them fall behind
+in
+the rear view.  But depending on your airspeed, they may pass you as
+they
+accelerate towards the target.  Your gun tracers will appear to be
+strangely affected also.  This too is a side effect of your great speed.
+
+Control Tower
+  Every airstrip has a control tower.  This tower contains the radio
+equipment and intelligence officers.  If a pilot enters the door of the
+control tower on foot, his plane will be repaired if close enough.
+
+
+  If a control tower is destroyed it may be impossible to get
+intelligence
+on future missions.
+
+
+Radar Unit
+  The radar tower watches for your safe return to home base.  If you
+want
+to have your plane on the next mission, you must make sure the radar
+tower
+is flashing before ending the mission with the pause menu's End current
+sortie option.  The radar
+tower begins flashing when you get to within a certain distance of the
+control tower.
+
+Ending the mission with the radar tower flashing makes a big difference
+in
+the computed pilot score.
+
+Runways
+  Runways are the ideal location for taking off and landing.  Your plane
+can also do both on the grass, but the risk of crashlanding is much
+higher
+when not landing on the runway.  Taxiing on the grass bounces the plane
+about and can cause a crashlanding even at low speeds.
+
+Rescue Van
+  When a pilot is downed behind enemy lines he can be rescued by the
+rescue van.  He must first eject from the plane and then use his
+handheld
+portable radio to call for assistance.  (Press the v key.)  You may only
+call the rescue van when standing on the ground.  The handheld radio
+will
+not function in your plane or while floating to earth with your chute.
+
+
+  When called, a rescue van will be dispatched and will appear shortly.
+The van will approach you and stop when within a few feet of the pilot.
+When the pilot enters the van the mission is over, and the pilot is
+considered home safe.
+
+
+  The rescue van is not indestructible.  The van will be destroyed if it
+collides with another object on its way to pick you up.  It is up to the
+pilot to maneuver himself so that there are no obstructions between the
+approaching van and himself.
+
+If the rescue van crashes you must call another one.
+
+Spies
+  Some missions require you to pick up information on foot from spies.
+Spies are people who wear all black.  They give you the thumbs up when
+you come close enough to grab the info. Consider your mission objective
+complete when you get this hand signal from the spy.
+
+
+
+
+Enemy Defenses
+
+Force Fields
+  Force Fields are passive defense systems used to protect resources by
+shielding them from firepower, and preventing our aircraft from flying
+through.  Some forcefields shimmer, others are solid colors.  Some
+fields
+appear as a rectangular frame that may or may not vary in size with the
+passage of time. The solid and shimmering force fields require the most
+power and therefore only click on when needed.  When a bullet or
+missile,
+or a plane itself comes near a solid forcefield, the forcefield will pop
+into existence.  Almost all bullets and missiles are stopped by the
+forcefields, as well as bombs.  Do not use missiles when your plane is
+too
+close to field, as they will explode in your face when launched.  A
+forcefield will cause damage to a plane at a certain rate during the
+time
+in which the airplane is flying too close.  If a forcefield must be
+flown
+through, then to minimize damage, fly through perpendicular to the
+surface, and the higher the airspeed the better.
+
+
+  Note that the shimmering solid fields are in fact opaque, even though
+the optical illusion makes them look translucent.
+
+
+  The force fields that vary their size and shape with time stay on at
+all
+times.  The boundary of deadliness of these fields moves with the
+field's
+image.  You can use this fact to eek in a few shots at protected
+targets.
+
+
+  In almost all cases forcefields are powered by a local generator orb.
+Therefore when you take out the orb, all the local forcefields will
+drop.
+
+
+  Note that the enemy's fire can be stopped by forcefields also.  A
+favorite technique of our pilots is to lure KLAs into a nearby field.
+Also AAA shells are stopped by FFs, so sometimes they can work to our
+advantage.
+
+
+  Please note that although forcefields will damage your plane, they
+will
+cause no damage to organic flesh, and in fact all forcefields can be
+walked on with no ill effects.
+
+Barrage Balloons
+  Barrage balloons are huge membranes filled with a lighter-than-air
+gas.
+They float up and down randomly.  Their purpose is simply to be in the
+way.  They are organic and self-regenerating, so although they stop all
+our firepower, they themselves are indestructible.
+
+
+  Your plane can fly through them, but at a cost of many damage hits.
+BBs
+never go higher than a couple thousand feet.  Their colors show
+something
+about the speed at which they rise and fall.
+
+Bee Swarms
+  Bee swarms are very similar to the barrage balloons discussed above.
+They float up and down, but they are much harder to see, and it is more
+difficult to determine their exact position due to their indistinct
+appearance.
+
+AAA Batteries
+  These are one of the most threatening of the enemy's active defenses.
+AAA sites track your plane and send up volleys of explosive shells that
+burst in the air around you.  You do not have to be hit directly to take
+damage from an AAA shell.  The shells are designed to explode into
+fragments that tear through your plane, even if you are hundreds of feet
+from the explosion.
+
+
+  The AAA batteries vary wildly from site to site.  We have found that
+there is a correlation between muzzle color and deadliness.  Usually the
+brown AAA is the least threatening, while the white AAA is devastating.
+
+
+  The AAA quality value affects several capabilities.  The lower quality
+sites cannot turn fast enough to track your plane if you are flying
+past.
+Also, quality affects the maximum firing rate, the accuracy of the
+shells,
+and whether or not the AAA has the intelligence to lead the target.
+
+
+  Note that AAA shells can explode KLAs.  In the early days before the
+leading technology AAA sites were developed, the classic method of
+defense
+against deathballs was to fly past AAA sites at a certain range.  All
+the
+shells would fall behind your plane to where the chasing missiles were.
+
+
+  Note also that ground-mounted AAA sites cannot fire horizontally.  If
+they did, the AAA batteries would be destroying their own forces.  You
+can
+use this to your advantage, if you have the ability to fly extremely
+low.
+The closer you are to an AAA site, the lower you must fly.
+
+KLA Deathballs
+  These are enemy missiles that lock on to your plane and attempt to
+explode when close enough.  They are launched either from missile sites
+or
+from saucers.  These missiles have varying abilities which you can
+determine from their color.
+
+
+  When a KLA becomes active, it will show up as a green dot on your
+radar
+screen.  When you see one visually you will notice that when it is
+pointed
+at you it begins to flash.  At this point the KLA has a lock on you.
+Most
+KLAs will accelerate forward when they get a lock.
+
+
+  Note that deathballs always head directly towards you, and do not lead
+your plane, like AAA batteries do.
+
+
+  When a deathball is close to you, you will hear a strange thrumming
+sound.  The higher the pitch, the more deadly that KLA is.  The louder
+the
+sound, the closer the KLA is to your plane.
+
+Generator Orbs
+  Generator orbs produce power for force fields and normally act as a
+central structure to each concentration of enemy activity.  The process
+used by the aliens to generate power has a strange disorienting effect
+on
+humans when close to the orb.  Usually this effect decreases with
+distance, but under certain circumstances can become independent of
+position.
+
+
+  The triangular base of the orb is indestructible, but the ball on the
+top is not.  When attempting to destroy it, aim for the center of the
+flashing ball.  These structures are tough.  It takes maybe ten missiles
+or two bombs and a few missiles to destroy one. When an orb is destroyed
+all the force fields in the immediate vicinity drop.  This makes them of
+extreme strategic importance on some missions.  In some situations it is
+wise NOT to destroy the orbs, since sometimes the aliens' force fields
+can
+be used to our advantage.
+
+
+  There is a special kind of orb that has an tractor beam that exerts a
+pulling force on your plane.  This force is so strong that your plane
+can
+be pulled backwards through the air in some cases.  This effect
+decreases
+with distance, so be careful about flying too close to this type of orb.
+
+
+  Some orbs have been designed to be invincible to normal weapons, and
+the
+only effective way to take them out is via suiciding the plane into
+them.
+Make sure you bail out before contact, or else you will be killed in the
+ensuing explosion.  If you must bail a good way away from the target,
+hit
+Caps Lock to control your plane remotely.
+
+TRFRU
+  Tetrahedral Radio Frequency receiving units, or TRFRU, are antenna
+systems used for spying on all human military communications.  They look
+like small black tetrahedrons spinning in the air.  Guns are the weapon
+of
+choice for taking out tofu (tofu is the unofficial name).  Be especially
+careful when attacking suspended tofu.  They are so small that many
+pilots
+wait too long before peeling off to the left or right.  This can result
+in
+a disastrous collision.
+
+Mortars
+  Mortars are simple devices that are mounted on the ground and spew
+incendiaries when any human is near.  They are used to deny low altitude
+flying.
+
+Mind Benders
+  Mind benders are small tofu-like structures that have a hallucinatory
+effect on the human nervous system.  These devices blaze with flashing
+colors and spin slowly about the ball in their centers.  They are
+extremely tough, and can only be taken out with a bomb.  In many
+missions
+they are unreachable from the air.  In this case a volunteer must land
+his
+plane in enemy territory and proceed on foot to plant an assassin bomb
+on
+the device, then blow it up remotely from a distance.
+
+Aliens
+  Aliens are very light and like to be in constant motion.  They rarely
+are seen on open ground and must be approached on foot most of the time.
+The hand gun is the weapon of choice for assassinating aliens.  Upon
+death, chemical reactions take place that may cause the body to float up
+into the sky.
+
+
+  If an alien touches you while you are not in your plane you are
+captured.
+
+
+  In the game, aliens are inactive and undestroyable until you have
+approached them on foot. Then they begin to bounce about and can be shot
+with the hand gun.  Alternatively, the pilot may re-enter his/her plane,
+and make effective strafing runs against them.  The cannons are more
+effective than regular rounds.
+
+Ground Transports
+  These ground vehicles look like three wheeled radio controlled cars.
+They are no threat to the airborne pilot; however it is a different
+story
+for the pilot on foot.  These shopping carts (unofficial name) can
+capture
+an ambulatory pilot.  Some of the higher quality carts are very
+persistent.  There are two ways to avoid capture while on the ground.
+One
+is to use your handgun to destroy approaching carts.  The other method
+is
+to lead them into some wreckage or other structure that will cause the
+cart to turn onto its side and die.  Ground vehicles are notoriously
+stupid and do not appear to be capable of avoiding obstacles.
+
+
+  When a shopping cart comes near, a human on foot feels a force
+inexorably pulling him towards the cart.  The human must escape this
+cart
+or be captured and removed from Earth.
+
+
+  Ground transports are exuded from triangular sites that appear to be
+nothing but simple triangles lying on the ground.  The color indicates
+the
+quality of the cart produced.  At any one time the number of carts in
+the
+area should be roughly equal to the number of sites in the area.
+
+
+  The shopping carts with the flashing white antennas are special elite
+carts.  These vehicles can pass through obstacles with no damage, and
+can
+only be destroyed with guns, bombs or missiles.
+
+Flying Saucers
+  Saucers are the primary vehicle for alien airborne transportation.
+They
+vary widely in self-defense capability.  Some have AAA built in, some
+have
+missile launchers (KLA) aboard. All but the dumbest have the ability to
+execute evasive maneuvers.  All saucers have the ability to make bombing
+runs against airfields.  The color of the top ball on the saucer
+indicates
+its intent.
+
+
+  All saucers make a peculiar warbling noise.  As you damage the saucer,
+the pitch of the noise will deepen, and quit altogether upon
+destruction.
+
+Saucers emanate from saucer sites.  These sites look like large square
+cookie tins with an x in the bottom.
+
+Portals
+  The aliens have developed a means of instantaneous travel.  Portals
+are
+small force fields that look like rectangles with the corners clipped.
+There are several different types of portals. Some are used by saucers
+to
+appear directly over the home airstrip.  These can be used by the clever
+pilot as a means of getting home when his plane is not serviceable
+enough
+to fly back.
+
+
+  Other kinds take you to a random place in the theater, depending on
+whatever the aliens used it for last.  Others are placed as traps that
+result in a destroyed plane, or worse, instant death. Flying through one
+of these tiny portals can be difficult.  Do not point your gunsight
+directly at it, especially at a low airspeed.  If you do so, you will
+surely fly under it.  Remember that to keep a constant altitude, you
+must
+keep your nose above the horizon to produce lift.
+
+Fences
+  Fences are harmless objects that appear to be a means to keep idiot
+shopping carts from accidentally destroying other enemy structures.
+They
+have no effect on us except that a collision with one will destroy a
+plane.
+
+
+
+
+How to Take Off, Land, and Fly Level
+  The key to success in Corncob is to become a good flyer.  Only when a
+pilot learns the abilities and limitations of his plane can he make the
+complex maneuvers required to make it to the rank of General.
+
+Takeoffs
+  Pulling your plane up into the air is the easiest part of flying.
+Merely put the throttle to the maximum, and pull up on the stick when
+you
+reach over 150 mph.
+
+
+  However, there are some details of which the pilot should be aware.
+If
+your plane is not lined up on the runway, you will have to maneuver on
+the
+ground.  To steer your plane while taxiing the joystick is useless.  The
+joystick controls the tilt of the plane; it cannot turn the plane.
+Therefore, use the rudder controls to steer while on the ground.
+Keyboard
+controls for the rudder are the x and z keys, as well as the 7 and 9
+keys
+on the keypad.
+
+
+  To bring the plane to a stop you must use the brakes.  These are the
+left Shift key, the . key, or the 0 key on the keypad.  The plane must
+be brought to a complete stop to qualify as a landing.
+
+
+  Once you are lined up, bring the throttle up to max.  When you reach
+100
+mph, the tail of your plane will rise off the ground.  Keep the plane on
+the runway by tapping the rudder keys if needed.  When you surpass 150
+mph, pull back gently on the stick.  If you pull back too hard, the tail
+will swing down so quickly that it will slam back down onto the runway,
+thus kicking down your nose due to the bounce.  This can cause a crash,
+so
+be careful.
+
+Level Flight
+  When in the air the most important thing is to avoid crashing into the
+ground.  To achieve level flight you must keep your gunsight above the
+horizon.  How high you must keep your nose depends on your airspeed.
+Near
+the stall speed of 100 mph, the nose must be kept much higher above the
+horizon than when you are flying at 350 mph.
+
+
+  There is an altimeter and a climb rate meter to help you fly level.  A
+warning light will flash if your altitude drops below 150 feet. When
+climbing, keep an eye on your airspeed.  If this drops below 100 mph,
+then
+you may not have enough airspeed to fly.  This makes a stall possible.
+
+Stalls and Advanced Aerodynamics
+  A stall occurs when the air traveling over the wings becomes
+turbulent.
+This results in a dramatic loss of lift, and unless corrected, the plane
+will invariably fall to the ground.  Stalling can be brought about by
+letting your airspeed drop below stall speed, or it can also occur as a
+result of an imprudent aerobatic maneuver.
+
+
+  Ordinarily one thinks of the wind striking a plane from directly head
+on.  However in real flight the wind must be coming from a direction
+slightly below the nose.  This is required because the wind must hit the
+wings on the bottom surface to push the plane up to counteract the
+downward pull of gravity.  The variation of the wind direction from the
+directly head on direction is called the angle of attack.  The greater
+the
+angle of attack is, the more the wind direction appears to be coming up
+from below the nose.
+
+
+  The greater the angle of attack, the more lift your plane feels.  When
+you pull back hard on the stick, you are tilting up the nose of your
+plane
+while tilting the tail downward.  This act changes the apparent
+direction
+of the wind.  Before you pulled back on the stick the wind was coming
+almost head on.  After tilting your plane's nose, the apparent wind is
+coming from beneath the plane.  The wind hitting the bottom of wings is
+what starts lifting the plane (accelerating the plane in the upward
+direction).  As the nose lifts, you are increasing the angle of attack,
+thereby increasing the lift, and the plane will begin to rise.
+
+
+  Once the plane has accelerated in the upward direction, then the
+apparent wind angle lessens. This is because the upward speed of the
+plane
+has changed the apparent wind direction.  (Sailors are familiar with
+this
+effect; the apparent wind direction depends on what direction and how
+fast
+their boat is moving.)
+
+
+  Stalls occur when the angle of attack is too great.  At this point the
+air no longer travels smoothly over the wing.  This determines the
+lowest
+flying speed of a plane.  The lower the airspeed of the plane, the
+greater
+the angle of attack must be to maintain level flight.  If the airspeed
+is
+too low the plane begins to lose altitude, thus increasing the angle of
+attack (just as the upward motion of the plane decreases the angle of
+attack).  If the pilot then raises the joystick in an attempt to stop
+losing altitude, that angle of attack may go beyond the stall angle,
+thus
+causing the stall.
+
+
+  In a real plane a pilot can use his senses to judge when he is close
+to
+the stall speed, but in Corncob there are just the instruments.  In a
+real
+plane the pilot knows how much force he can put safely on the stick.
+
+
+  However, in a computer simulation, the joystick tension does not
+reflect
+the flight situation. Therefore, Corncob has in it an automatic stall
+preventer that limits the stick travel to the maximum attainable without
+causing a stall.  This does not mean that it is impossible to stall. The
+stall preventer simply limits the control stick from causing a stall
+which
+would be the result of pulling back too hard.
+
+  The most common cause of a stall is simply that the airspeed dropped
+too
+low to sustain flight.  Another common cause is excessive sideslipping.
+The aerodynamic model that Corncob uses includes sideways motion of the
+plane through the air.  When the rudder is used it kicks the nose of the
+plane to the right or left, without necessarily changing the direction
+of
+motion of the plane.  This changes the apparent wind direction to be
+either to the left or right of head on. This sideslipping can also
+result
+from turning the plane on its side, and letting gravity pull the plane
+downward.  (You obviously cannot fly level with the plane on its side,
+since then the wings' lift is not pulling against gravity.)
+
+
+  If the plane is in a fast sideslip, and then the plane is quickly
+righted, and the stick is pulled, the momentum of the plane can result
+in
+the effects of left-right wind angle being added to the up-down angle of
+attack, thereby pushing your angle of attack over the stall angle.
+
+
+  Also, a damaged plane can be much more likely to stall.  Wing damage
+will lower the lift of the wings, and control damage can make the stick
+jitter beyond what the automatic stall preventer can handle.  Of course
+engine damage will lower airspeed, and rudder damage will increase level
+flight sideslip.
+
+How to Get Out of a Stall
+  To get out of stall means getting your forward airspeed up.  Since
+your
+direction of motion is invariably down when stalled, the best idea is to
+get the nose pointed down.  Of course your throttle should be place to
+maximum also.
+
+
+  Getting out of a stall can depend on interpreting the airspeed
+direction
+indicator.  The red ball tells which direction the apparent wind is
+coming
+from.  In level flight it should be riding not in the center, but below
+center.  When you yank back on the stick you will see the red ball drop
+as
+the angle of attack increases and the opposite when you slam the stick
+forward.
+
+
+  When you are slipping sideways the ball will go to the left or right.
+Try hitting the rudder keys to watch as the apparent wind direction
+moves
+to the left or right, then snaps back.  It snaps back because all stable
+planes are balanced to have the plane automatically turn into the
+sidewinds.  How fast it snaps back depends on your airspeed.
+
+
+  So now that we understand the red ball, here is how it can help you.
+When the red ball is somewhere near the center you are OK.  When stalled
+the wind direction can be so far off center that it disappears from the
+display altogether.  To become unstalled involves getting that red ball
+back on the screen.  If you were doing a hairy maneuver at the time, try
+just reversing the stick to try to undo whatever aerodynamic motion you
+did last.  If you are below 1,000 ft, consider ejecting.  It takes time
+and altitude to recover from a stall.
+
+
+  Note that when the stall is so bad that your airspeed is nil, then you
+have lost the ability to control the plane with the control surfaces.
+In
+fact, it is even possible for your plane to fly backwards with the
+controls operating in a reversed fashion.  Even backwards airspeed is
+better than zero.  If you are falling backwards, pull the stick back to
+push the nose down.  Once the nose is down, hold her there until you get
+some forward airspeed.
+
+Landing
+  This is one of the hardest parts of learning to fly.  This requires
+much
+patience, but in time you will be able to swoop down from the vertical
+direction and pop the plane down in seconds.
+
+
+  The biggest problem for beginners is to get lined up properly.  One
+point to remember is that you must not fly toward the middle of the
+runway.  Fly towards the close end of the runway, or a point on an
+imaginary line running the length of the runway and beyond.  Once you
+are
+over that imaginary line, then turn your nose to point towards the end
+of
+the runway.  Getting lined up is especially difficult in Corncob, due to
+fact that the plane may be slipping sideways.
+
+
+  When you get close enough to the runway where it starts to switch from
+being drawn as lines, to being drawn with filled black rectangles,
+engage
+the flaps, and drop your throttle to zero.  (But if your airspeed drops
+below 100 mph you may need to bump it up again.)  At this point you
+should
+be no higher that 1,000 ft.
+
+
+  In Corncob your plane has automatic landing gear that pops down as
+required.  (It's actually a force field gear using stolen technology.)
+The pilot does not need to explicitly engage the gear.
+
+
+  Now let the plane drop, shedding that altitude before you reach the
+end
+of the runway. When you get to 100 or 200 feet, level the plane out for
+the final drop to the runway.  If you are not lined up well, be ready to
+punch the throttle and take off for another pass.  This is very
+important,
+because with your throttle dropped, once you have leveled out, the plane
+begins to decelerate.  As the airspeed drops below 100 mph your plane
+becomes very unresponsive to the stick.
+
+
+  If you are not perfectly lined up, but are low and over the runway,
+then
+drop and steer with the rudder once your wheels touch.  The gear of your
+plane is quite tough, and on the runway surface you can have your rate
+of
+climb meter almost pegged negative and still survive.  Landing on the
+grass can be done, but requires a much more sensitive touch down.
+
+
+  It is a good idea to be holding down the brake key throughout the
+whole
+landing process. The left Shift key is situated conveniently for the
+left
+hand to operate the brakes and rudder controls.  For those that use the
+left hand on the joystick, use the keypad rudder and brake controls.
+
+
+  Once you have solidly touched down you may taxi about using your
+rudder.
+ Be careful to keep your speed down while taxiing (especially if your
+flaps are down) because it may cause you to lift into the air
+inadvertently, and then cause a crashlanding.  Remember that on the
+ground, the stick is useless, and you must steer with the rudder keys.
+Pulling the stick over on the ground may cause your plane to flip and
+cause death.
+
+
+  There are two different types of crashes.  One is a fatal wreck and
+the
+other type is a crashlanding.  A crashlanding is where your plane is
+brought down too hard, and the landing gear fails.  The plane then spins
+to a stop on the ground.  When it stops, your plane is dead and will not
+fly again until repaired.  If you are close to your airstrip the repair
+crew can fix it.  (Do this by entering the control tower through the
+door
+on foot.)
+
+
+  The other type of crash is the fatal crash.  This happens if you slam
+into the ground too hard, or if your plane is so tilted during landing
+that your wing tip hits.
+
+Midair Collisions
+  There are many types of objects that will destroy your plane if you
+collide
+with them.  When this happens your plane bounces and the damage
+indicators
+immediately max out.  The screen border turns dark red, and the eject
+light begins to flash.  At this point you should bail out, since it is
+likely that you will die if you try to land the plane.  Don't bother
+trying to make it back to base.  (Although landing such a plane has been
+done on occasion, it most often proves to be a fatal mistake.)
+
+
+  Some of the objects that will destroy your plane in a collision are:
+saucers, fuel dumps, TRFRUs, and generator orbs.
+
+
+
+
+How to Turn Your Plane
+  A combat aircraft is a very heavy object.  (A Corsair weighs 14,000
+pounds.)  Changing the course of such a massive object takes a huge
+amount
+of force.  Negotiating a turn requires an aircraft to be pushed
+laterally
+with a large force.  Although one might think that the rudder pushes the
+plane through a turn, this is not true.  The rudder and the other
+control
+surfaces only rotate the plane; to change the plane's flight path
+requires
+using the force of lift from the wings.
+
+
+  An airplane turns very differently than an automobile.  A non-skidding
+car will instantly travel in the direction it is pointed.  A plane
+however
+can easily slide sideways with little resistance.  Think of the plane as
+a
+car with greased metal tires.  When the driver turns the nose of the car
+it will simply slip sideways.  But if the driver could find a nice
+banked
+curve, he could use the sideways force from the bank to provide the
+sideways force needed to push his car around in a turn, thus turning his
+car quickly without needing good traction.
+
+
+  An airplane turns using this method. The pilot banks the aircraft,
+thus
+using the tendency of the plane to sideslip to the downward side to
+exactly counteract the sideslip caused by turning the plane's nose.  So
+the sideways force needed actually to make the flight path of the plane
+follow a turn is provided by making the huge lifting force of the wings
+pull the plane sideways.
+
+How to Turn Your Plane in Corncob
+  Corncob's advanced flight model makes turning different than on many
+commercial flight games that have simpler models.  With a little
+practice,
+however, you will find the plane is just as maneuverable.
+
+
+  To turn your plane simply move the stick left or right.  The plane
+will
+begin to bank. Don't be too shy, give the plane a nice 45 degree bank.
+Now that the wings' lift is no longer pulling straight up, you will lose
+some lift, and your nose may drop.  Pull back on the stick to keep the
+nose above the horizon.  You will notice that as you pull back on the
+stick, your nose will be pulled into the turn.  To make a typical combat
+turn, place the plane on its side, so that the horizon forms a vertical
+line.  Then pull all the way back on the stick, and hold it there until
+you have the compass reading what you desire.  Then simply flatten your
+plane back to the level.  Be careful not to let the nose drop during the
+turn.  You can always bring it up by unbanking the plane a little, and
+the
+nose will lift since you are holding the control stick back. This method
+of turning is actually easier than a slow coordinated turn.  The price
+for
+the fast turn is airspeed.
+
+
+  The fastest turns are done with the flaps engaged, since this greatly
+increases the lift from the wings.  Be careful not to let your airspeed
+drop too much.  Flaps increase drag also.
+
+
+  Note that the amount of time required for the turn depends very much
+upon your airspeed. (Just like in an automobile, when moving fast you
+cannot make tight turns.)
+
+
+
+
+Dealing With Air Density and Gravity Variations
+  In the Corncob Other Worlds Campaign you will be flying missions on a
+wide variety of planet types with different sizes and atmospheres.  Here
+are some of the simpler ways your plane is affected by these variations.
+
+Thin Air
+  The plane will maneuver more sluggishly in thin air.  Your nose will
+have to be kept much higher above the horizon to fly level, and stalling
+is much easier.  Flaps are a must, as well as plenty of airspeed.  One
+good thing about thin air is that the air drag is much lower, thus
+enabling higher airspeeds and acceleration.
+
+Thick Air
+  Thick air improves maneuverability and increases air drag.  It is much
+harder to stall.  Thick atmosphere is in some ways equivalent to flying
+with the flaps engaged.  Maximum airspeed is lower in thick air.  Your
+stall speed is lower, thus making landings easier.
+
+Weak Gravity
+  Weak gravity raises maximum airspeed of level flight, and the nose is
+kept closer to the horizon.  Certainly climbing is much easier, and in
+some cases, continuous vertical flight is possible.  Caution must be
+exercised, however, as the unwary pilot may find himself in orbit by
+mistake.
+
+
+  The good news is that in a stall situation the pilot will have more
+time
+to get the plane under control before hitting the ground.
+
+Heavy Gravity
+  Strong gravity decreases maximum airspeed of level flight, and the
+nose
+is kept farther above the horizon.  Certainly climbing is much harder.
+Keep in mind that your stall speed will be much higher, and that could
+make landings a little more difficult.
+
+
+  The airspeed picked up in a dive will be more significant, and the
+time
+you have to get out of a stall before plummeting to the ground will be
+much reduced.
+
+
+
+
+How to Use Your Missiles, Bombs, and Guns
+
+Aiming
+  Your main goal in Corncob is to destroy alien forces.  You accomplish
+this by using your guns, missiles, and bombs against enemy targets.  In
+addition, you must sometimes use your offensive weapons for
+self-defense.
+(For example, your guns can explode approaching AAA shells, and enemy
+missiles).
+
+
+  The most obviously important requirement for successful gunnery is
+aiming.  Your gunsight shows where the bullets will strike a non-moving
+target.  There is much technique involved with holding the gunsight on
+target, since your plane has to follow the rules of aerodynamics.  This
+technique will have to be developed over time and cannot be learned by
+any
+other way but experience.  However, don't be afraid to use the rudder.
+The rudder is an excellent way of turning your nose fast for a quick
+shot
+to the side.  An experienced pilot who uses the rudder can destroy twice
+as many targets as the pilot who uses the stick alone.
+
+
+  As far as shooting moving targets, don't forget to lead your target
+properly.  By the time your bullets reach the target, most likely the
+target will be somewhere else.  When attacking a KLA for example, try to
+judge where it will be when the bullets get there, and fire ahead of it.
+
+When shooting at ground targets the most important thing to remember is
+to
+watch your altitude.  Remember that you must keep your nose above the
+horizon to maintain altitude, so that means you can only shoot at the
+ground for a limited time before breaking off to regain altitude.
+
+
+  Both your guns and missiles can be used continuously, but after an
+initial burst, the firing rate will drop to a slow plodding beat.  If
+you
+want a better chance of taking out something quickly, wait until you are
+on target, and release a volley.
+
+
+  An important consideration when attacking fixed targets is rate of
+closure.  To destroy something in the least amount of time, you would
+like
+to make as few passes over it as possible. If you come screaming in over
+the target at 350 mph, then chances are you will get in only a few shots
+before you must pull up and around for another pass.  That's why it is
+sometimes a good idea to cut the throttle, and throw down the flaps when
+engaging a ground target.  With an airspeed of 150 mph you have twice
+the
+amount of time to pound the target.  Many times this gives you enough
+time
+to take out the mission objective in one pass.  If you do this, however,
+be sure keep an eye on your airspeed.  As soon as you level out or start
+to climb, your airspeed will quickly fall below stall speed unless you
+remember to slap the throttle back up.
+
+Guns vs. Missiles
+  When should you use guns, and when should you use missiles?  Guns are
+fast, delivering a stream of destruction.  Missiles take time to
+accelerate and deliver isolated punches of firepower.
+
+Although missiles have more punch, they have a tendency to blow up in
+your
+face if used at the wrong time.  Missiles explode when any object is
+within their proximity.  This makes them less sensitive to aiming errors
+but also dangerous to use.  Never use missiles when close to a
+forcefield.
+ The fields will often blow your missiles up us soon as they leave their
+launch tubes, thus causing brutal damage to your plane.  This can happen
+even though your plane is well away from the forcefields.  Never use
+missiles alone to engage AAA sites.  The shells from the AAA will be
+flying so near you that the missiles may explode directly in front of
+you
+as they encounter AAA shells.  The combination of guns and missiles
+works
+well, though, since the guns explode the shells long before they come
+near
+your plane.  Be sure to open up with guns first, then start the
+missiles.
+Never use missiles when you are too close to the target.  The explosion
+will damage your plane.
+
+
+  Your guns are almost always safe to use.  Although the bullets may
+also
+explode when they contact forcefields, they are safer to use.  Most
+explosions caused by gunfire are safe to fly through, so it is the
+weapon
+of choice for close engagements.  They are particularly good for taking
+out KLAs, since they are easier to aim when leading the target and send
+a
+stream of firepower, rather than discrete charges.  If a KLA is charging
+down your throat, use guns, not missiles.
+
+
+  Most of the time a combination works well.  On tough targets, use the
+guns first, and when you start getting hits on the target, send a volley
+of missiles.
+  Bombs
+  Although your plane can create unlimited bombs, they regenerate at a
+slow pace.  Your bomb display shows how many you have available to you.
+The maximum number of bombs available at any time is three.
+
+
+  These bombs cause an initial impact, and then release clusters of
+bomblets that cause additional damage.  As you watch your bomb explode
+in
+the rear view, you can see the yellow bomblets take to the air, then
+fall
+back to earth.  So although you need a direct hit to cause serious
+damage,
+the bomblets can damage neighboring targets.  If the bomb detonates near
+the ground, a crater is formed.  This crater is very hot, and will
+continue to damage targets in contact with the crater at a constant rate
+until the crater disappears.
+
+
+  The bombs are very light for their volume and decelerate quickly once
+they leave the plane. There is a lot of technique for making successful
+bombing runs.  In Corncob, most of the bombing is divebombing, since
+there
+is no bomb sight for high altitude bombing.  Most of the time your plane
+is at about 200-600 feet, and just as your target disappears from your
+view as you pass over it, release your bombs.  Then pull up fast to get
+away from the blast and to watch the bombs hit in the rear view.  The
+craters will tell how close you were to the target.
+
+
+  Note that exactly when to release depends heavily on your airspeed and
+altitude, as well as your direction of flight during the drop.  This
+will
+simply have to be learned via trial and error.
+
+
+  As with missiles, bombs are proximity devices.  This means you should
+be
+careful in the presence of forcefields or AAA shells.  Bombing
+high-quality AAA sites is not always such a good idea, since the AAA
+shells can explode the bomb in your belly, and also because you are a
+perfect target as you fly away.
+
+
+  Be careful when dropping bombs at low altitude, especially when your
+airspeed is low.  The bomblets reach hundreds of feet into the air.
+
+
+  Bombs have been successfully used against KLAs that are right on the
+tail, and against saucers, but this sort of bombing is very tricky.
+Bombing shopping carts is great sport, because you can take advantage of
+the fact that some kinds of them follow your plane fairly well.
+
+
+  Bombs can be dropped from any position, even while inverted.  The bomb
+delivery mechanism is very flexible.
+
+
+
+
+Defensive Flying & Making it Home With a
+  Shot-up Plane Bringing your plane back to base is necessary to earn a
+good score.  Although any clown can make effective suicide runs into
+enemy
+targets, it takes a seasoned pilot to weather the enemy storm, and still
+make it back to base.
+
+
+  The two most important air threats are deathballs and AAA sites.  To
+avoid being shot out of the sky by AAA requires some facts about AAA.
+In
+Corncob the aliens' AAA shells glide slowly up from the AAA sites,
+without
+gravity effects.  The shells can be seen as brown dot or spheres fly
+upwards towards you.  Coming near anything will set off the AAA shells,
+and bullets will certainly do the job.  If you are attacking a lone AAA,
+or a close bunch of AAA, your best defense is a good offense.  Blowing
+away those approaching shells with gunfire is the most effective
+defense.
+This technique is limited in the presence of KLAs however, since you
+cannot stay flying in a straight line when deathballs are charging up on
+your tail.  This method will also fail for widely dispersed AAA, since
+the
+shells coming from the side will be pounding you as you stay locked on
+another installation.
+
+
+  These shells are equally capable of destroying alien targets as well.
+As result of that fact, ground based AAA will only fire so low.
+Anything
+on the ground should be safe from AAA. It is possible to fly under their
+range of fire.  This means flying under 150 feet (or lower if you are
+close to the site).  This method is also limited in the presence of
+enemy
+KLAs, since you will need room to do evasive maneuvers.
+
+
+  AAA sites have the same problem as any other gunner does when the
+target
+is moving. This is the problem of leading the motion of the target, so
+that you are actually firing at where the target will be, not where it
+is
+now.  The aliens have 8 different qualities of AAA.  The lower 4
+qualities
+do not have to ability to lead targets.  Therefore, if you can always be
+flying with the AAA on your side, you will not be hit if you keep your
+airspeed up.  The higher quality AAA can lead, so to avoid them you must
+change your flight path often in such a way as to make them anticipate
+incorrectly.  The target-leading AAA assume you will fly in a straight
+line at your present speed.  If the AAA is on your side, and you fly up
+and down, you may lessen the hits.  In the case of high-quality AAA,
+however, the only techniques that work well are the first two.
+
+
+  KLAs are not hard to evade no matter what their quality is, provided
+there is only one of them in the area.  Deathballs are enemy missiles
+that
+always try to fly directly at you.  Since they do not lead their target,
+they will invariably end up chasing you from behind.  When a KLA has a
+lock on you it will flash.  In addition to flashing, it will also turn
+on
+its maximum thrust, and try to come screaming in to finish in a blaze of
+glory against your hapless plane.
+
+
+  Although this death charge can be very effective, it can also be used
+as
+a defense for you. If you wait until the last second before impact, and
+then pull up as hard as you can, the KLA cannot turn fast enough to
+follow
+due to its high speed.  The spitball will then pass under you, enabling
+you to snap your nose down and blow it up with your guns.  If there are
+a
+number of foes forming a train behind you, this technique will lead to
+disaster.  Although you will have evaded the first in the train, his
+friends will surely eat you alive when you punch your nose back down.
+
+The solution is to pull up, but continue the loop in hopes of shaking
+the
+whole train.  In a sky full of missiles, this works for a while, but you
+must eliminate their sites, because eventually you will become toast
+unless you can dwindle their numbers.  Knife fighting like this with
+deathballs is very dangerous in the presence of AAA sites.  Your
+airspeed
+will drop quickly with this much maneuvering, and a fumbling plane in
+the
+air is an easy low-deflection target for even the stupidest AAA.
+
+
+  When your plane has been trashed miles from the nearest friendly
+airstrip, don't despair, plenty of pilots have made back to base with
+planes that were just about as flyable as a big stone.  (Landing a plane
+that has collided with a saucer has even been done, but landing a plane
+that has more than 100 hits depends a lot on luck.)
+
+
+  The two most important factors when you are trying to make it home are
+airspeed and altitude.  The worst possible situation is to be very far
+from your base flying 100 mph at 500 feet.  Usually there will also be
+more KLAs in the area, and evading them with a damaged plane can be
+impossible.
+
+
+  But even in the worst situation all hope is not lost.  The clever
+designers of your modern plane have installed a rocket motor, which can
+give you the altitude and airspeed you need to make it back.  Look at
+your
+turbo boost gauge.  The needle should be green, indicating the rocket is
+charged and ready.  Hit the i button and start climbing.
+
+
+  If your flaps are engaged, tap them off, but only after engaging the
+rocket motor, since it is possible you could stall just by pulling back
+the flaps.
+
+
+  Your rocket motor will burn for 15 seconds.  The turbo boost gauge
+needle will be red during the boost and go to blue when the charge is
+spent.  It will take about 120 seconds to recharge the booster.
+
+
+  Now concentrate on keeping the slowest descent possible while
+maintaining airspeed.  If KLAs are screaming up on your tail, it may be
+best to let them hit you, if you think you will certainly stall.  Don't
+forget to try dropping a bomb when they get very close.  Many times this
+will take them out without having to maneuver.
+
+
+  When the turbo boost gauge needle goes back to green, you may want to
+go
+for another rocket thrust.  Never use the rocket thrust while on the
+landing approach, since you cannot stop it once you have started a burn.
+Unless of course you wish to abort the landing attempt, and need
+airspeed
+quickly to avoid a stall.
+
+
+Running Around - Welcome the Assassin
+
+Part of your job as a pilot involves special forces missions. You may
+have to land in enemy territory and continue on foot. You carry a pistol
+with twenty rounds and one assassin charge; boarding a plane resupplies
+you, including a crashed plane.
+
+Move with WASD and look with the mouse. Space jumps immediately; you can
+steer in the air. Q opens the parachute, even during a jump, and Left
+Ctrl
+lets you drop through a platform. Horizontal force fields, fuel dumps,
+platforms and control towers may support your weight. Watch your
+landing:
+a long fall can still kill you.
+
+Plant a charge with Semicolon and move to safety. B arms the charge and
+lets it fall; contact then detonates it. A charge can be planted in
+midair.
+Mindbenders are vulnerable only to bombs, so some missions require you
+to
+plant a charge inside one and retreat before arming it.
+
+Shopping carts and aliens can capture you. Use your pistol, jump to
+safety, or lure a cart into wreckage. V calls a rescue van. Caps Lock
+switches remote aircraft control; it does not move you back into the
+cockpit. Walk near a parked plane to board it automatically.
+
+
+Scoring and Promotion Rules
+
+Scoring
+  Your score for a mission is determined by a formula outlined below.
+Your raw score (which depends on how much stuff you killed) is
+multiplied
+by 3 factors.  These three factors depend on what happened during your
+mission.  For example say your raw score for a mission was 1,000.
+Further
+suppose that you returned from your mission, and landed your plane
+safely
+at an airstrip.  Then your final mission score would be:
+
+5 * 5 * 1 * 1,000 = 25,000
+
+But say you ejected in combat and had to be rescued by the rescue van.
+
+4 * 1 * + * 1,000 = 2,000
+
+
+  Here you can see that bringing your plane home increased your score by
+10 times.
+
+
+  Now let's say you brought your plane back but didn't have the guts to
+try and land it.
+
+5 * 1 * 1 * 1,000 = 5,000
+
+
+  So you can see it is worth it to learn how to land the plane.  It may
+be
+impossible to get a Stellar Cluster without landing your plane.
+
+
+  If you make multiple flights during your mission, the multiplier
+reflects the worst thing you did.  For example, if you crashland a
+plane,
+but then take another into the air (without quitting the mission) and do
+a
+great job, and even land beautifully, your multiplier will reflect the
+fact that you crashlanded.  The fact that you also landed will not
+affect
+your score.
+
+
+  Therefore you can see that flying against multiple mission objectives
+may raise up your score, but you are jeopardizing the points you have
+already earned by risking a crashlanding or worse. Of course you'll
+never
+top the high score list without taking some chances.
+
+
+  Technical Score Calculation
+  The score is a product of four factors.
+
+
+  score = pmsf * msf * nplf * mobf
+
+
+  pmsf is Present Mission Status Factor  (KIA, MIA, HOME, RESCUE).
+
+
+  msf is Mission Status Factor (unhome-crshlnd,eject
+inflt,crsh-home,land-home).
+
+
+  nplf is number of Planes Lost Factor, which = 1/(number of planes lost
++
+1).
+
+
+  mobf is Mission Objective Factor (number of kills).
+
+Promotions
+  One of the most exciting aspects of Corncob is the possibility of
+promotions and medals. Once you have started a character, he can
+progress
+up the ranks, with the ultimate goal of achieving general.  Making
+general
+with a pure character (i.e. one that has not been killed and
+resurrected) is the ultimate challenge in the game, and will rank you at
+the absolute top in bragging rights.
+
+
+  Promotions in Corncob are based on the number of completed mission
+objectives (MO), and go as follows:
+  2nd Lieutenant:  0  MO.      (You start at this rank.)
+  1st Lieutenant:   1  MO.
+  Captain:         8  MO.
+  Major:          20 MO.
+  Lt. Colonel:     20 MO in at least 2 different Theaters-of-Operation.
+  Colonel:        20 MO in at least 3 different Theaters-of-Operation.
+  General:      ALL MO in ALL required Theaters-of-Operation, plus
+successful completion
+      of the Secret-Mission.
+
+
+  Note: Required Theaters-of-Operation are marked by a Yellow Block in
+the
+list at the upper-right hand side of the Theaters-of-Operations menu.
+
+Medals
+  Medals are based on a variety of criteria.  Medals are listed in the
+pilot summary shown in the roster, and T-of-O menus when a pilot or
+theater is viewed.  In this case, the Medal is listed as a short
+abbreviation, such as BS for Bronze-Star.  If the pilot has more than
+one of the medal, the abbreviation is followed by a suffix indicating
+how
+many such awards the pilot has, such as BS:2 for 2 Bronze-Stars.
+
+
+  A complete list of all the medals and their abbreviations follows:
+
+
+  Purple Heart: PH   Awarded for ending a mission with more than 27
+units
+of damage to
+      your plane, without losing your plane, and without crashing unless
+at home.
+
+  Service Award: SA   Awarded for surviving 10 or more missions.
+
+  Bronze Star: BS   Awarded for achieving a score of 10,000-19,999
+points
+in a mission.
+
+  Silver Star: SS   Awarded for achieving a score of 20,000-49,999
+points
+in a mission.
+
+  Gold Star: GS   Awarded for achieving a score of 50,000-99,999 points
+in
+a mission.
+
+  Stellar Cluster: SC   Awarded for achieving a score of 100,000 points
+or
+more in a
+      mission.  (This is really exceptional!)
+
+
+  Distinguished Service Cross: DSC   Awarded for accomplishing 5 or more
+mission
+       objectives in a single mission.
+
+
+  Theater Combat Medal: TCM   Awarded for completing ALL mission
+objectives in a
+       single Theater-of-Operation.
+
+
+  Distinguished Flying Cross: DFC   Awarded for completing ALL mission
+objectives in a
+     single Theater-of-Operation without losing a plane.  This takes a
+real hot pilot, as well as
+       some consistent luck.
+
+
+  Combat Master: CM  Awarded for completing ALL mission objectives in
+ALL
+of the
+       required theaters.  This is a prerequisite for making General.
+
+
+
+
+Commonly Asked Questions
+
+> Sometimes I can't get back into my plane.  I just go right through it.
+
+  There are two possible reasons for this.  One is that you must walk at
+least a couple plane lengths away before attempting to reenter.  This is
+to avoid popping back into your plane before you had a chance to walk
+away.
+
+  The DOS version could also lock planes after walking far away; that
+renderer-dependent restriction does not apply to Redux. Historically,
+If
+you stray so far from your plane that it has shrunk to a point, then the
+plane will engage the automatic security system, and lock itself up
+tight.
+ In none of the missions is it imperative to walk anywhere near this far
+from your plane.
+
+
+> Sometimes when I eject or crashland, there is a continuous tone that
+never fades.
+
+  Under certain conditions, the stall indicator sound can get stuck on.
+Just tap the s key twice to reset the sound system.
+
+
+> Sometimes the game refuses to take me to a mission via F2, even though
+I
+select it properly, and my plane has no damage.
+
+  Each mission which can be teleported to has a line in the intelligence
+briefing that starts with Sxyth.  When this line lights up, then you
+are ready to teleport to that mission. Sometimes when mission briefings
+are short, two Sxyth lines from different missions can be on the screen
+at
+the same time.  In this case, the top Sxyth line will light up, and it
+is
+this mission which you be teleported to.  If you desire the mission that
+is lower down on the screen, you must move down with the arrow keys
+until
+the mission above is scrolled off the screen.
+
+  By the same token, if the description of the mission is very long, and
+you have scrolled the Sxyth line off the screen while reading the
+description, the teleport will not work.  Teleportation will always
+bring
+you to the mission with the lit-up Sxyth only.
+
+
+> When first lifting off the ground, why does the nose lift for a
+second,
+and then seem to knock back down?
+
+  If you pull back too hard on the stick while lifting off, your tail
+wheel will be slammed back down onto the pavement, and when it bounces
+upward, your nose appears to bounce downward.  It is possible to crash
+and
+burn as a result of this, so pull back on the stick gently.
+
+
+> Why does the stall light go on sometimes when I'm taxiing on the
+runway?
+
+  The stall detector is looking at the airflow over the wings.  It is
+calibrated to detect stalls when the plane is flying.  When on the
+ground,
+the weight of the plane is held by the landing gear, thus making the
+stall
+detector give incorrect readings.  Just ignore it.
+
+
+> Why doesn't the plane steer worth a bean when I'm on the runway?
+
+  Don't try to use the joystick to steer a grounded plane.  The control
+stick left/right controls mostly only the roll (left/right tilt) of the
+plane.  You must use the rudder controls to steer on the ground.  These
+are the x and z keys, or the 7 and 9 keys on the keypad.
+
+
+> Why don't the brakes appear to work?
+
+  In Corncob, the brakes do NOT toggle on/off.  To stop you must hold
+down
+the brake key until the plane comes to a complete stop.  The default
+binding is Period or keypad 0.
+
+
+> Why doesn't the T key accelerate time?
+
+Redux removes accelerated time. Movement and production use a fixed
+simulation clock; rendering speed does not change their timing.
+
+
+
+
+  > Why does using the rudder in flight just make me stall?
+
+  Unlike other flight sims, Corncob's flight model includes the
+capability
+of your plane to slide sideways through the air.  The rudder causes your
+nose to flip to the side, without necessarily changing the direction of
+motion of the plane.  Using too much rudder (by holding the key down too
+long), will cause the plane to turn to the point where it is hurling
+sideways through the air. Note that as soon as you release the rudder,
+the
+sidewind makes the nose tend to flip back into the sidewind, thus
+restoring the original orientation of the plane.  The rudder is useful
+for
+flipping the nose a little to the side for a quick shot at a side target
+without the need of negotiating the slow process of turning the plane.
+
+
+> How do I know when to end the mission?
+
+  A large part of Corncob is bringing your plane back to the base.
+Therefore you must bring your plane to a friendly airstrip, or else when
+you go to fly again, you will have one less plane in that theater.
+
+  To exit without losing a plane, choose End current sortie from the
+pause menu when you
+are flying low over your airfield (with the radar tower flashing white),
+or else land on the air strip.  Landing on the airstrip will give you a
+much higher score multiplier, so it is worth an attempt if you think you
+can do it without crashing.
+
+  To find an airfield, use the map that is brought up with the m key.
+
+
+> How do I zoom down closer when in map mode?
+
+  When in map mode, the KEYPAD 9 key will zoom down, and the KEYPAD 3
+key
+will zoom up.  Use the joystick or keypad arrow keys to move around.  To
+make the map jump back to your present position, hit the KEYPAD 7 key.
+
+
+> Why do I die every time I eject, regardless of altitude?
+
+  Ejecting successfully from a flying plane requires two keys: E to
+eject
+and Q to pull your ripcord.  If you don't pull your ripcord, you
+will die when you strike the ground. If you bail out at 20,000 feet,
+wait
+until you get closer to the ground before pulling your ripcord;
+otherwise
+you will be stuck in the air for a long time.
+
+
+> Why are some generator orbs seemingly indestructible?
+
+  Some orbs have been designed to be invincible to normal weapons, and
+the
+only effective way to take them out is via suiciding the plane into
+them.
+Make sure you bail out before contact, or else you will be killed in the
+ensuing explosion.  If you must bail a good way away from the target,
+hit
+caps lock to control your plane remotely.  The indestructible orbs are a
+light shade of blue/green.
+
+> Why does the complete light refuse to go on even though I know the
+mission is completed?
+
+  The mission objectives have to be given some geometric scope via the
+mission builder when the mission is created.  Almost all mission
+complete
+sensing is done via the generator orbs.  If you have completed a
+mission,
+but the complete light doesn't go, make a flyby of the mission's
+generator
+orb (or it's remains), and many times the complete light will belatedly
+light up.  Note that if your complete light never lights, you will not
+get
+credit for accomplishing an objective.
+
+
+> Sometimes my plane goes into a mode in which my keypad arrow keys stop
+working, and something weird happens.
+
+  Numlock toggles the keypad arrow keys between views and control of the
+plane.  Note that the numlock light on the keyboard will not change.  If
+you would like to use the views without changing the mode of the arrow
+keys, hold down the left ctrl key to temporarily change the function of
+the arrow keys to view, the normal function of the keys returns when you
+release the left ctrl key.
+
+
+> I can't find any way to put down the landing gear!
+
+  The plane has landing gear that comes down automatically.  From a game
+standpoint, it seemed unnecessary to have something that doesn't add to
+the fun of the game and can cause pilots to be killed.  We all get
+punished in life enough for being absent-minded; why be punished when
+playing a computer game?
+
+> Why can this Corsair do a loop directly after take off?
+
+
+  Because the number one priority in this game is to have fun.  That
+meant
+increasing the thrust of the engine by a factor of four.  For those sim
+buffs who will criticize that, how many flight games keep the realistic
+figure of 10-15 minutes just to climb to 10,000 feet?  Who wants to
+spend
+1 hour of his life just sitting there watching your computer plane
+climb?
+
+
+> I have completed all the mission objectives in a theater, but the
+computer insists there is still one more.
+
+  Many times you really have forgotten a mission.  Use the map to make
+sure all the targets are destroyed.  Remember that many missions don't
+show up unless you have zoomed down for a close up with the Pgup key.
+
+  Most things should show up when one grid is about the size of the
+screen.
+
+  Another possibility is that a mission-objective type saucer has
+wandered
+away during the melee, and is now somewhere unexpected, perhaps 10's of
+miles away from the original mission site.  Track it down with the map
+feature.  The new tower screen from the fly mission menu should tell you
+to which airstrip the saucer is closest.
+
+  The DOS Other Worlds manual also describes an F6 in-flight object
+list. That shortcut is not implemented in Redux. Use the map, tower
+briefings and the live object survey (I on the starting-airfield
+screen).
+
+  Many times a secondary mission objective is mentioned in the mission
+briefing.  This secondary mission also must be completed before a
+theater
+is complete.  Often this is a generator orb.  All orbs with a black base
+must be destroyed to finish a theater, whether the mission information
+directs you to do this or not.
+
+
+General strategy and flying hints
+---------------------------------
+
+
+Attack Priorities:
+
+  When attacking an installation protected by both KLA's and AAA,
+first attack the high-quality AAA.  These defenses will chew you up
+the most quickly while undergoing evasive maneuvers.  Then go for
+the top-notch KLA sites.  Once these threats have been dealt with,
+proceed with the rest of the defenses at your leisure.
+
+
+Enemy activity at a distance (Redux):
+
+Enemies, projectiles and production sites continue to update when you
+leave their area. Travelling away no longer freezes their timers or
+repairs their damage. Weapon ranges and local production caps still
+apply; draw distance does not change these rules.
+
+
+Use the half barrel roll to ease blackouts quickly:
+
+  When a high-g turn blacks you out, the quickest way to get that blood
+back into your brain is to do a quick high-negative-g turn.  Simply easy
+up on the stick, and flip your plane around upside down, and push
+forward
+on the stick.  If you managed to flip the plane correctly, you should
+still be turning in the desired direction, and your vision should return
+very quickly.
+
+
+Use dumpy planes to do high-risk platform missions:
+
+  When you have to land on a suspended airstrip and proceed on foot to
+a difficult assignment, it is not unusual to fall off a platform, and
+to leave your plane abandoned up on the airstrip.  You may want to
+ferry your late model planes away from one of the airstrips in the
+theater.
+Then when you fly again from the planeless airstrip, the program will
+ask
+you if you want to pull a dumpy plane from storage.  Take the dumpy
+plane
+to the suspended mission, so you won't lose a good plane if you fall.
+
+
+Avoid bounce-back on suicide missions:
+
+  Some missions involve suiciding your plane into a generator orb.  Be
+aware that your plane will bounce backward upon impact.  It is not
+uncommon
+for the plane to bounce back toward you so that you find yourself back
+in the cockpit after collision, hurtling toward the ground in a ball
+of flaming wreckage.
+  Be ready to eject again in case this occurs.  Take care to time your
+ejection correctly so this doesn't happen.
+  Note also, the hint given above about using dumpy planes for dangerous
+mission applies to suicide missions also.
+
+
+Flying low over craters (Redux):
+
+Bomb explosions and their debris remain dangerous. The lingering crater
+cannot hurt you or your aircraft, so it no longer creates an invisible
+obstacle above the ground. Its blast damage against enemy structures is
+retained.
+
+
+Use rudder to reduce airspeed on runway:
+
+  Sometimes when landing on suspended runways it is imperative to come
+to
+a quick stop.  Hold down the brake key, and simultaneously work the
+rudder
+back and forth.  The swishing of the tail will help you slow down, as
+well as making your path longer to the end of the runway.  Take care not
+to direct the plane off the edge.
+
+
+Use barrel roll to reduce airspeed on approach:
+
+  When making a high-speed landing approach, you sometimes want to drop
+your excess speed.  Dropping the flaps, and cutting back on the throttle
+many times isn't a big enough effect, especially if your angle of
+descent
+is too steep.  In this case, try pulling the stick all the way back, and
+fully to the side.  The plane will travel in a barrel roll and end up in
+approximately in the same flight path, but with the airspeed down
+significantly.
+
+
+Techniques for escaping with your plane intact
+----------------------------------------------
+
+
+Use teleportation to get out of trouble:
+
+  This is a bit of a cheat, since it is an unrealistic way out of
+impending
+doom.  The purists will want to not do this, since it twists a
+convenience
+feature of the game into an irrational combat advantage.
+  If you are in deep doo-doo and are worried that you will not get out
+of this situation alive, simply hit F2, and select a new mission.  If
+you
+are somewhat damaged, you may want to choose a mission which is close
+to your airstrip.  Also, you might want to choose a mission which you
+have
+already completed.
+  Note that to keep this feature from being abused, there is a rule that
+you cannot teleport if your plane has sustained serious damage.
+
+
+Use autopilot when heavily damaged:
+
+  When your plane is a flying scrap, and you are having difficulty
+keeping your plane in the air due to excessive  control damage, try
+turning
+on the autopilot.  This should help you keep the plane reasonably level.
+The autopilot will react faster than you, and can make the difference
+needed
+to make it home safely.
+  Beware that the autopilot will interfere with attempts at evasive
+maneuvers.
+If you are going to try to dodge a KLA, make sure you disengage the
+autopilot
+first.
+
+
+Use the emergency rocket booster to full advantage:
+
+  When you are surrounded by KLA's, and you have taken too many hits to
+risk continuing, hit 'i' to ignite the rocket booster.  If you are at
+low
+altitude, pull the nose up to vertical to get the maximum altitude gain
+from the rocket.  However, be sure to push the nose back to the
+horizontal
+BEFORE the booster runs out.  This is because you will really need the
+airspeed in addition to the altitude.
+  If you already have good altitude ( for instance if you are in a high
+altitude mission ), then use the rocket booster for pure speed.
+Disengage
+the flaps to maximize airspeed, put yourself in level flight, and let
+her rip.  You can outrun almost any of the KLA's with the booster.
+  Note that it is generally a good idea to get the plane headed towards
+your airstrip before engaging the rocket.  Tight turns with the booster
+running will hurt your gained airspeed by quite a large amount.
+
+
+Hints for defeating KLA and AAA
+-------------------------------
+
+Blast distant airborne KLA's:
+
+  When approaching a mission from afar, many times there will be KLA's
+already airborne and approaching from the front.  Frequently, these
+pre-launched KLA's will be of higher quality than any of the nearby
+KLA sites.  Therefore, it is usually a good idea to blow these
+approachers
+out of the sky with missiles and guns.  Since they are advancing upon
+you head-on, it is an easy zero-deflection shot.
+
+
+When NOT to shoot KLA's:
+
+  Keep in mind that KLA sites will only produce KLA's when the number of
+active KLA's presently flying is less than the number of sites.
+Therefore
+if you shoot them, the sites will make more.  The key here is to only
+shoot
+the high-quality deathballs.  There is a good chance that the next site
+to create a replacement will be a lower quality site.  Thus by shooting
+the
+high quality KLA, you have traded it for a low quality model.
+  Of course, for the same reason, you should NEVER shoot a poor quality
+KLA if there is a variety of sites around.  A high quality site may make
+its replacement.
+  Remember that the lower quality models pose almost no threat to the
+seasoned pilot.
+
+
+Shoot at KLA sites at every chance:
+
+  When a KLA site takes some damage, it is prevented from production for
+a period of time.  Therefore, even if you haven't enough time to get in
+enough hits to destroy the site, even one hit with a bullet is enough to
+keep it out of commission for tens of seconds.
+  When you see a clump of KLA sites, always spray a hail of bullets and
+missiles over them just to stunt their output for a while.
+
+
+KLA production and time (Redux):
+
+Production follows fixed simulation time, rather than displayed frames.
+Low frame rates or different rendering resolutions do not slow a site's
+countdown. The T-key time-advance exploit has been removed. Damaging
+sites
+still delays production, and the local population cap still applies.
+
+
+Get KLA's to fly into enemy structures
+
+  Corncob was designed so that enemy objects can collide with each
+other.
+A useful technique for dealing with a long string of tailing KLA's is to
+simply trick them into flying into their own structures.
+  For example, it is possible even to blow up a generator orb by leading
+deathballs into it.
+  For best results you will need to keep your airspeed up, and make your
+180 degree turns be gentle to avoid dispersing the stream.
+
+
+Destroying strings of KLA's with your runway:
+
+  If you have used all your bombs, and there is a long string of KLA's
+about to hit you on your landing approach, there is no need to worry.
+The materials used in the runway will cause the KLA's to detonate
+prematurely if they get close.
+  Even if you have no intention of landing, a low flyby over the runway
+will cause the trail to explode as they follow your lead over the
+runway.
+
+Get rid of a KLA stream by dropping a low bomb:
+
+  Certainly you can take out a single KLA which is very close to your
+tail
+simply by dropping a bomb.  You aren't required to do any maneuver, just
+drop the bomb.  However, you will frequently find that you have a long
+string of them behind you, and only three bombs.  By flying low, and
+dropping a bomb, the debris flying up from the explosion can take out
+almost the whole string as they attempt to fly through the explosion.
+
+
+Keep your airspeed up around AAA:
+
+  The higher quality AAA will attempt to lead your plane so that the
+slow moving shells will arrive on target despite the forward motion of
+your plane.  Thus, the higher your airspeed, the more dispersed the
+enemy shells will be.
+  Letting your airspeed drop due to maneuvers is the fastest way to get
+blown out of the sky by AAA.  When you drop your flaps to mix it up with
+the KLA's is when they will get a bead on you.  Eliminate all the top
+notch AAA before getting into knife-fights with the deathballs.
+
+
+Stay low to avoid AAA fire:
+
+  Ground-based AAA batteries cannot fire very low to the ground, for
+fear of taking out their own structures.  It is possible to stay under
+their firing angle by flying extremely close to the ground.  The closer
+you are to the AAA site, the lower you must be to avoid fire.
+
+
+Stay level with suspended AAA:
+
+  AAA shells are programmed at firing time to explode at a certain
+altitude.  Since the enemy is attempting to kill you, they program each
+shell to explode when it reaches the altitude of your plane.  The exact
+altitude of detonation is randomly distributed around the target
+altitude.
+  The result is that if you manage to fly level with the AAA, the shells
+are already at their detonation altitude before they even leave the
+AAA muzzle!  Therefore the shells will almost always detonate before
+hitting your plane.
+
+
+Always use bullets and missiles when attacking AAA:
+
+  The bad news is that AAA shells will explode your missiles as you fire
+on an AAA site.  Since the AAA site will be sending a continuous stream
+of
+shells at you, then it is unlikely for your missiles to make it to the
+target.
+  The good news is that bullets will explode approaching AAA shells.
+Therefore the best technique is to let loose a volley of bullets to take
+out the slow-moving approaching AAA shells.  Then send a group of
+missiles
+together with more bullets.  That way the faster-moving bullets will
+take
+out the AAA shells, clearing the way for the powerful missiles.
+
+
+Never fly with your tail to the AAA:
+
+  AAA works best on zero-deflection targets.  If you cannot use your
+weapons to clear the air of approaching shells, then your best bet is
+to be flying fast and perpendicular to the AAA.   You are most
+vulnerable when flying directly away from the AAA site.  Then the AAA
+can shoot directly at you with no target-leading or anticipation, and
+the rate of closure is the slowest to ensure an accurate blast.
+
+
+Avoid bombing AAA unless desperate:
+
+  Many a pilot has been toasted by his own bomb whilst attempting this.
+The AAA shells will detonate your bomb in the air.  For lower quality
+AAA, the pilot can sometimes get lucky when the firing rate of the site
+is fairly low.
+
+
+Tips for downing flying saucers
+-------------------------------
+
+Keep up the airspeed:
+
+  When dealing with saucers with AAA, you must be aware of the fact that
+you will not be able to down the saucer with one pass.  Therefore after
+passing the saucer, it will chew you up as you attempt to fly away in
+order
+to make another pass.  Your only defense is fly as fast as possible, so
+that the time in which your tail is turned toward the saucer is
+minimized.
+  In addition, the faster your airspeed, the faster your missiles will
+reach the target.  The launch speed of your missiles affects the
+acceleration to max velocity in a positive way.  With a moving target
+like
+a saucer, the faster your ordnance travels the better.
+
+
+Keep level with the saucer:
+
+  For the same reason that you should stay level with suspended AAA, you
+should stay level with AAA fitted saucers.   This is especially true
+when
+you are pulling away from the saucer.
+
+
+Try to time the oscillations of the saucers movement:
+
+  You will notice that the saucer's evasive maneuvers are very periodic.
+Therefore if you notice that your missiles are always missing because of
+the saucer's motion, try shooting where you think the saucer will be
+when the missiles arrive.   If that isn't working, just spread your
+missiles
+around the whole area through which the saucer is swinging.
+
+
+Try to get 'behind' the saucer:
+
+  At any moment, all the saucers are traveling in a horizontal
+direction.
+You want to approach in the same direction as the saucer is moving.
+This
+gives you a slower rate of closure, so that you can get more shots in
+before you have to peel off to avoid collision.  It is possible to down
+a
+saucer in one pass using this technique.
+
+
+Do not fight saucers in close:
+
+  Fighting a saucer up close usually ends in disaster.  The evasive
+maneuvers
+which it is constantly executing make it too unpredictable a target at
+close range.  In addition, there is a great risk of collision.  Upon
+collision
+with a saucer, your plane becomes a ball of twisted wreckage.
+  Although collision will take out the saucer, the brass doesn't look at
+it
+as an even trade.  Perhaps for the desperate, it may be worth suiciding
+a
+dumpy plane for a top-ace saucer, though.
+
+
+Hints for vanquishing ground vehicles:
+--------------------------------------
+
+Keep your distance:
+
+  Ground vehicles do much random zipping around.  If you are up close,
+those movements will cause you to go through wild aerodynamic gyrations
+in order to keep those critters in your sights.  This is very likely to
+end in a fatal stall, since when attacking ground targets you are
+probably
+flying too low to recover.
+  From a prudent distance, however, the cart's erratic movements can be
+tracked with minimal difficulty and danger.   Use the plane's rudder to
+spray bullets and missiles into a cloud about the vehicle.  Shopping
+carts are not very tough, and in just a few lucky hits they will fall
+over dead.
+
+
+Lead the top-notch carts into traps:
+
+  The top-notch shopping carts will follow your plane with uncanny
+ability.  It is almost impossible to get a clean shot at them because
+they are always directly underneath your plane.
+  If they are the variety which do NOT have the flashing antenna, then
+your best bet is to fly directly over a fence, tick, or other structure
+in order
+to lead them to their own destruction.
+
+
+Climb and shoot:
+
+  The high-quality flashing antenna carts can be defeated by climbing
+high,
+dropping the flaps, and then come straight down at them with guns
+blazing.
+Make sure to break off before you pile into the ground.
+
+
+Vertical bombing:
+
+  Ordinarily, bombs are not effective against the agile carts.  However,
+in
+the case of the high-quality models, you can use their tenacity against
+them.
+Fly exactly straight up.  Your pitch gauge should show your plane as
+being
+straight up.  Then drop three bombs, and remain vertical until the bombs
+explode.  If you are lucky, the shopping cart will have stayed directly
+below you doing a little dance while the bombs rained down.
+  Note that if you stall and fall out of your straight up climb before
+the
+bombs reach the ground, then the shopping carts will have followed you
+and moved out of the target area by the time the bombs fall.
+
+
+Attack shopping cart sites first:
+
+  As with KLA's, it is a losing battle to try take out all the carts
+first, and then the sites.  Instead, ignore the carts until all the
+sites
+are history.  Then have fun tearing up the panicked vehicles.
+
+
+Tips for survival outside the plane
+-----------------------------------
+
+Get away from the plane after leaving it:
+
+  When you are outside your plane, you are very vulnerable to enemy
+weapons.  Contact with a KLA, or AAA shell results in instant death.
+Since both weapons will attack your plane, not yourself, it is a good
+idea to get far away from your plane very quickly after ejecting.
+
+
+Keep moving at all times if there are shopping carts around:
+
+  The shopping carts are like the KLA's in that they always head
+directly
+toward (despite their erratic motions) you.  IE unlike the AAA, they do
+not lead.  Therefore if you run in a straight direction, they will
+always
+end up chasing behind you.  If you stay put, they will wander in from
+all
+directions until you have no direction which is safe.
+
+
+Look down at your feet when jumping platforms:
+
+  When hopping from platform to platform, tilt your head down 30 to 40
+degrees from the horizontal.  Otherwise when you jump, you will not be
+able to see the platform you are attempting to jump onto.  Jump high
+into
+the air, and hold and release the W key to move forward just the
+right amount to land you on target.
+  Watch the far edge of the platform you are jumping to.  As long as you
+don't pass over that edge, you will make the jump.  Keep that far edge
+within your view, and you should have no troubles.
+
+
+Use proper vertical angle with the handgun:
+
+  Don't always assume that you should aim for the center of an object
+when shooting with the handgun.  Some targets take more hits with the
+game aimed high.  If you see grey spheres appear where the bullets hit,
+then the bullets are striking the ground before damaging the target.
+
+
+Experiment with position if assassin bomb fails:
+
+  The object-object collision algorithms used in Corncob were designed
+for fast-moving objects colliding with stationary targets.  Assassin
+bombs will not always detonate their targets correctly because of the
+design of the game engine.  For instance, if a mind bender is sitting
+on a force field, then a tricky situation can result.  Both the force
+field and the mind bender can detonate a bomb.  Therefore, when the
+detonate command is given, either the force field or the mindbender
+can be the cause of the bomb's detonation.  If by chance the force
+field detonates the bomb first, then the mindbender will remain intact
+through the bomb's detonation.
+  Which object causes detonation is determined by the exact positioning
+of the bomb relative to the target and the person.  Before collision
+processing, all objects are sorted by distance from the observer, then
+objects which are close together in the sorted list are compared for
+collision.
+  So if your bomb fails, try the next bomb in a position closer or
+farther away from the target.  Make sure the center of the force field
+platform is not approximately the same distance as from you to the
+target, etc.
+
+
+Use parachute to get extra hopping distance:
+
+  Your parachute can be used even when jumping into the air.  If you
+are particularly nervous about a jump, you may pull the chute string at
+the apogee of your jump, and then float down slowly.  The disadvantage
+is that you will swing for a bit, which can be disorienting.
+
+
+The Corncob Program Itself
+  Corncob 3D was written by Kevin Stokes, with a lot of additional
+programming by George Welch.  The program documentation was written by
+Kevin Stokes.  Original music was written by Jim Collymore, A.S.C.A.P.
+All music in the game is copyright 1986-1991 James L. Collymore, and the
+use of the three music files for any purposes except for Corncob 3D is
+strictly illegal. The music is contained in the following files:
+VOYAGE.ROL, DAYBREAK.ROL, and HEAVENS.ROL.  These files cannot be
+legally
+copied or distributed without the author's permission.
+
+  The VGA directory (created the first time Corncob 3D is run) contains
+all the digitized artwork in the game.  These photos were extensively
+retouched using the excellent program MVP Paint, by David Johndrow.  You
+can order your own copy of this extremely useful program from MVP
+Software.
+
+  Corncob 3D was written in assembler and C.  The excellent library of
+routines Spontaneous Assembly was used in developing the program.
+
+  This software is based in part on the work of the Independent JPEG
+Group.
+
+
+[Historical DOS documentation - retained for reference]
+
+Contacting MVP Software & the Corncob BBS
+  Call our 24-hour BBS (2400,n,8,1) and download the latest shareware
+version of Corncob on the first call.  This is also the best way to get
+technical help.  Call (919) 489-6900.
+
+
+  To contact MVP Software, call (616) 245-8376 or write us at 1035
+Dallas
+SE, Grand Rapids, MI 49507-1407.  We can be reached on CompuServe at
+70363,15.
+
+
+  Corncob's author can be reached on Prodigy at DWHC72A, through
+Internet
+at kds@phy.duke.edu, and on Genie at K.STOKES1.
+
+
+Instructions on how to use Corncob's mission builder.
+
+Copyright 1992 Pie in the Sky Software
+
+
+Theater files and tower files
+-----------------------------
+Redux integrates the mission builder into the game. Choose Select
+campaign / world group, then Mission builder. Choose a world to edit;
+the editor uses your current pilot's saved copy. F5 saves and returns to
+the menu. A copy of the edited definition and its tower text is exported
+into custom_worlds inside your Redux save directory. There is no need to
+run 3.EXE, copy 3UNIV.DAT, or use DOS batch files.
+
+The following description of DEF and TWR structures and the source
+tables is retained for reference. Internal object names and assembly
+tables are reproduced as written; they are not commands to type into the
+native executable.
+
+    For every .def file in the DEF subdirectory, there is also a
+corresponding
+.twr file.  The .twr file contains intelligence information that the
+user
+will see when he requests it via F2, or at the beginning of the mission.
+The tower files are just normal text files with 9 formfeeds. (Control L)
+The body of text between each formfeed is a block of text that the user
+will see when he starts from that particular airstrip.  The easiest way
+to create your own tower file is to modify an existing tower file,
+rewriting only the actual mission info, and leaving the airstrip names
+and formfeeds alone.
+  Some text editors may not like the formfeeds.  The tower files were
+originally created with MKS vi editor, which handled the formfeeds with
+no problem.
+
+  The start positions for the missions are programmed into the tower
+files.
+Each mission description has a line with the characters Sxyth in it.
+The numbers following these 5 characters contain the x, y, z, and
+yaw angle.
+
+  To program in your own start coordinates, simply use the Map mode
+to position the viewpoint where you want the pilot to begin the mission.
+Hold down the left shift key, and use the keypad arrow keys to change
+the angles of the view point.  When you are satisfied with the position
+and angle, simply copy the x,y,z and yaw angle numbers off the bottom
+of the screen.
+  Then edit the tower file, and insert these numbers after the Sxyth
+characters.  Make sure you leave spaces between the numbers, and don't
+put any extra spaces at the beginning of the line.
+  Note that you can only set the yaw angle (compass heading type) of
+the plane's start.  You can't change the initial pitch or roll.  IE you
+can't make the plane start out flying anything but level at the start
+of a mission.  You can only change the compass heading which the user
+will start out at.
+
+
+The sun position, air pressure and gravity.
+-------------------------------------------
+
+
+  Tower files can start out with a line like the following:
+
+X 6000 300 12 -48 10000 0 1500
+
+The X marks that the numbers on this line specify the sun size, position
+and color.  Also is the gravity, air pressure, star flag, and atmosphere
+extent.
+
+
+X identifier for theater parameter line.
+
+the 6000 is the angle of the sun in the sky.  Range +-32767
+
+300 is the size of the sun                    Range 10-1000
+
+Color 12 is the color of the sun              Color 0-15
+
+-48 is the gravitational attraction           Range 0 to -120
+
+10000 is the air density at sea level   6000 is normal atmosphere  10000
+max
+
+0 is the star flag.  0 means no stars  1 means stars in sky
+
+1500 is the atmosphere height.  6000 is Earth normal.
+
+
+
+
+
+
+How to use the mission builder
+------------------------------
+
+  To start a fresh universe copy default.def to 3univ.def.  Default.def
+is a universe with just airfields in it.
+
+  Put the universe file in a file called 3univ.dat in the current
+directory.
+
+  Start the game with 3 -rs
+
+  When sitting on runway in plane, type m to go into map mode.  Make
+sure
+the joystick is not drifting, use trim if needed.
+
+  Zoom in on the area to be edited with Joystick/Arrow keys, and pg up
+and pg
+down to change height.  When close to surface, hit 'b' to enter the
+mission
+builder mode.  When in MB mode, the gunsight disappears.  IE, you can
+tell
+mission builder apart from map mode by checking for the existence of the
+gunsight on the screen.
+  Close to the surface is a height of about 30000-60000 cm.  The numbers
+on
+the bottom of the screen read X,Y, and Z in cm.  (Z is height)
+
+  When in MB mode, the Joystick/Arrow keys will change the viewing
+direction,
+just as when you are an ejected pilot.  Just like an ejected pilot, the
+numpad keys '5', and 'ins' will move you forward or backward in the
+direction
+which you are facing.  The constraint that you remain on the ground is
+however
+lifted.
+  When slewing around in this method, the non-keypad number keys will
+change
+your walking rate.  IE '1' makes you move slowly, '8' makes you move
+quickly.
+Caps lock will instantly level you out, so you are looking at the
+horizon.
+This is usefully when you want to move in a perfectly level direction.
+
+  Now to select an object for moving/deletion/changing, you must bring
+up
+the 3d cursor.  Do this by tapping the left shift key.  A rotating
+ball of spheres should appear in front of you.  If you move about, the
+cursor
+remains in its position of creation.  Do not move too far away from the
+cursor,
+or the program will become confused because it cannot operate on a
+cursor
+which is in far object memory.  Be careful when using pgdn especially.
+If
+you are going to move a far distance, turn off the cursor with the left
+control key first.
+
+  If you wish to move far away, tap the control key to make the cursor
+disappear.  Also, you may return to the map mode with the cursor either
+lit
+or unlit, and move around in map mode, and then back to builder mode via
+the
+'b' key.
+
+  The cursor can be moved with the Joystick/numpad arrow keys, if the
+alt
+key is held down while doing so.  The pgup and Pgdn will move the cursor
+up and down, however your viewpoint will also change height at the same
+time.
+(IE, when you move the cursor up or down by holding down the left alt,
+and
+pgdn or pgup, the cursor will remain at a fixed position relative to
+you, but
+you AND the cursor will move up or down.)
+
+
+
+  When you turned on the cursor, note that the numbers came back onto
+the bottom of the screen.  These are no longer the viewing coordinates,
+these are the coordinates of the cursor.  The number 21 is the object
+type.  When the cursor is displayed, the number is always 21.  The last
+number in the list is the object quality.  This can be the wickedness of
+an AAA, or in the case of a Headquarters orb, this defines the mission
+objective.  As with many types of objects, the quality of the cursor
+is ignored.
+
+  So anyway, when you are near the ground, and the cursor is on, tap the
+'c' key to create an object.  The default object is a headquarters orb.
+It should create an orb at the cursor position which is big and
+blinking.
+  Each type of object has an object number.  Object number 0 is a
+generator
+orb.   Object number 1 is a mind bender, object number 2 is a plane.  A
+list
+of objects and their type numbers is included with this doc.
+
+  Use the non-keypad += keys to cycle through the available objects.
+The
+current object should be sitting there blinking slowly.  Each time you
+press the non-keypad + key, the object will metamorph to the next object
+type.  IE the HQ orb will turn into a mindbender.  As you cycle through
+all the different objects, they will appear at their default height
+above
+the ground.  This can be a pain sometimes, especially when creating
+missions
+high in the air.
+
+  As long as the object is blinking, you may move it around with the
+arrow
+keys just like the cursor.  To make the keypad arrow keys operate on the
+object instead of moving yourself, just hold down the left ALT key while
+you press the keypad arrow keys.  The number keys will affect the motion
+rate
+just like when moving about.  Be careful not to lose track of where the
+object is.  If the object doesn't appear to moving in the direction you
+are requesting, try tapping the non-keypad '1' key, to set the speed to
+slow.
+  Note that objects will always move in a horizontal plane when moving
+them
+with the arrow keys.  An object's height can only be changed with the
+pgup and pgdn keys.
+
+  A blinking object will be deleted if the 'd' key is pressed.  IE the
+current object which you have just created (or selected) can be removed
+from the universe with the 'd' key.
+
+  To make your blinking object a permanent object, press the left shift
+key.  The currently selected object will stop blinking, and is now a
+permanent object just like any other object in the universe.
+
+  If you wish to make changes to existing objects, then you must first
+make that object become the current object.  (IE make the thing blink)
+  To select your object, move the cursor close to the center of the
+object, then hit the space bar.   The space selects the object which is
+closest to the cursor.   BEWARE:  Do not use the space bar if there are
+no objects even close to the cursor, you may get kicked out of the
+program with a critical error.
+  Make sure the correct object is blinking,  if it is not, then probably
+some other object (which perhaps you can't see from where your looking)
+is selected, and all changes you make will be happening to the poor
+hapless
+object which you have unwittingly selected.
+
+
+
+  Objects can be rotated in place by holding down the 'a' key, and then
+using the arrowkeys/Joystick to rotate the object.  To lock the object
+to the nearest 90 degree plane, press the appropriate key.
+NOTE: All objects can be rotated, but non-circular objects such as
+forcefields should NOT be rotated because the rectangle of collision
+of the forcefield will not be rotated with it's image.
+
+  Some of the objects have a 'special bit' which can be set with the
+mission builder.  For example, if a generator orb has its special bit
+set, then it will be a gravity orb.  If a shopping cart has its special
+bit set, then it can only be destroyed by a human weapon, and will never
+die via collision with another object.
+  This special bit is set with the F9 key.   When an object's special
+bit is set, the object type number on the screen bottom will turn
+purple.
+
+  Like the special bit, the F10 key will set an object's complete bit.
+The complete bit matters in only a few objects.  This is the bit which
+keeps track of whether or not a mission objective has been accomplished.
+If you set the complete bit of an object, then the object type number at
+the bottom of the screen will flash.
+  One use of the complete bit is to make portals which would ordinarily
+count as a mission objective, not count.  IE say you wanted to make a
+mission where you had to fly by a bunch of portals on the way to your
+real
+mission objective.  If you just create the portals, then all of them
+would
+count as mission objectives.  IF you set their complete bits ahead of
+time,
+then they will count has having been already flown through.
+
+Zlocking
+--------
+  Often one wants to make many objects all be created at the same
+height.
+This can be accomplished with zlocking.  Simply put the first of these
+objects at the desired height.  Then while that object is still
+selected,
+press the left alt and the 'h' key.  This records the present z
+coordinate
+into zlock-height register.  Now create your next object.  To force it
+to be the same height as the zlock-height, simply press 'h'.  The
+z coordinate number at the bottom of the screen should turn black, and
+the
+object should be the same height as the last one.
+  The z coordinate number should turn black whenever the present
+selected
+object's z coordinate matches those of the zlock-height register.
+
+
+Notes on where to build
+-----------------------
+  Each theater is made of an 8x8 grid of tiles.  These square tiles each
+can have a maximum of 100 or so objects.  This limitation should never
+be approached, as this will create a critical error, thus propelling you
+swiftly out of the program will all your changes lost.
+  The tile boundaries are mapped out with survey markers which can be
+seen on the ground, and also show up in map mode as a grid of yellow
+or black dots.
+  During game play, only the objects in the nearest 4 tiles will be
+displayed.  Therefore you can see that when the user is flying in the
+middle of a tile is always when one tile is swapped in, and another
+out.  In other words, the computer will have to do some extra work to
+swap out a tile, and read in a new one when you cross the middle of a
+tile.  For this reason, it is a good idea not to put missions in the
+centers of tiles.  If you do, then the game play will be continually
+interrupted for tile swapping during the acrobatics.
+
+
+
+  Note that this applies both the up down, and left right tile centers.
+Picture a square tile with a '+' sign on it, where the plus sign is big
+enough to cover the whole tile.  The imaginary lines of this plus sign
+show the areas where tile swapping will occur.  Therefore, your missions
+should always be closer to the corners of the tile, then the tile
+centers.
+  Notice that the frame rate will suffer dramatically if you try to put
+too much stuff close together on neighboring tiles.  For example, you
+might want to make a mega-mission at the intersection of 4 tiles.
+  You could put up to 100 objects in each tile, and still have it all
+fit together as one mission.  However, in reality, so many objects to
+be calculated and drawn would lead to an absolutely terrible frame
+rate, and an unplayable mission.
+  You must also be aware that even if you don't have 100 objects in
+a tile, you could still end up with a critical error during game play
+  The reason is that passing KLA's, AA shells, and shopping carts
+all count as objects in that tile, even if they were created in one
+tile, and migrated to the other.
+  If you look at the default theaters that came with the game, you
+will notice that most all of the bigger missions are made to be at
+corners of tiles, and well away from the airstrips.  This is simply
+because of the need to keep the frame rate up.  This is especially
+important for those players with machines slower than 25Mhz.
+  You will notice that the frame rate is not so great at Sweetly
+Bending in Flatland because the missions were too close to the airstrip.
+This makes landing there difficult.
+
+
+Notes on what to build
+----------------------
+  Usually start with a generator orb.  Set the quality to corresponding
+to what you want the mission object to be.
+  Keep in mind that the many players will be bored with just a bunch
+of KLA's and deathballs.  What makes a mission fun is not just a
+challenge, but a challenge that takes strategy to lead to victory.
+Examples:  A mission where there are shells beneath an orb, so that
+if the play tries to take down the forcefields first by destroying the
+orb, then the shards that fly off the orb will trigger the shells, thus
+bring a whole slew of enemies upon the unwary player.
+  How about putting shells down on the ground where they wouldn't
+normally
+be in danger of triggering, but then but some high quality vehicles on
+the
+outskirts, where they will follow the plane in, and set off the shells
+even if the flyer doesn't shoot the shells himself.
+  The force fields open up a whole lot of possible structures that the
+pilot must navigate to successfully complete the mission.  Beware of
+overuse of the solid or solid-shimmering fields, as they soak up the
+cpu time to draw.  Use the wire frame versions where possible.
+
+
+
+
+Mission builder: why is it doing that?
+----------------------------------
+>  Why does it seem impossible to get the height of objects right when
+>they are pretty high up?
+   The mission builder makes the pgup and pgdn keys have an effect
+proportional to the height of the object.  When the object is relatively
+high up, the vertical steps are huge.  This can be gotten around via
+the 's' key.  When this key is depressed, the pgup and pgdn keys will
+always move a relatively small distance (1000 cm) regardless of the
+object's height.
+
+>  Why are the objects always the wrong color, and sometimes the wrong
+>shape when I go into the mission builder or map?
+  The way the program is written makes the qualities of objects never
+matter when in the mission builder.  This is because the code which
+makes the object the correct color etc is the same code which makes the
+object move, shoot etc.  Therefore if that part of the code were turned
+on during the mission builder, then the objects would begin to move
+and fire as soon as they were created.  So unfortunately, you will have
+to trust the quality number on the bottom of the screen to see the
+actual
+quality of the object.
+
+>  I worked for two hours on a mission, and when I tried to get out of
+>the mission builder mode when finished, I got critical error 70, and
+>lost all the changes.
+   The mission builder is not perfect, and I typically only make small
+changes, and then exit and back up the 3univ.dat file.  This process
+is relatively quick, and all the default theaters which came with the
+game were created with the same mission builder which is available to
+you.  Occasionally you will lose stuff, but if you never stay too long
+in the MB, and don't keep skipping back and forth between map and MB
+mode, you should never lose too much.
+
+
+>What are the things to avoid doing in the mission builder?
+  At any one during game play or during mission creation, the computer
+can only deal with the objects which are relatively close.  When an
+object
+gets too far away to the observer, it is placed into the 'Far object
+table'.
+  Objects in the 'Far object table' are inactive, and are stored in
+compressed form.
+  The mission builder can operate on near objects only.  Far away
+objects
+cannot be processed by the builder.
+  It is VERY important that you never ask the builder to act on an
+object
+which is out of the near range.  This will cause unpredictable behavior,
+and critical error codes.
+  Some examples of causes of this:
+
+  Say you create an object on the ground, and then zoom your viewpoint
+up
+to 40,000 feet.  Then you start moving the object around on the ground.
+If
+you move that object too far away, you will trap your newly created
+object
+in limbo, and you will be risking a critical error.
+  Try to stay near your current (blinking) object at all times.
+
+  Say you start to build a mission, and then decide to scrap it.
+Deleting
+the last object will get you a critical error, since there are no
+objects
+at all to process.
+
+  Say you are using the keypad + and - keys to cycle through the near
+objects.
+You get impatient, and hit the - key repeatedly very fast.  If you cycle
+through
+all the near objects, then the poor mission build tries to pick up a far
+object
+and trouble ensues.
+
+
+  All these limitations may make the mission builder seem like it isn't
+very
+useful, however with the proper habits, you can use the MB continuously
+for
+days without a mishap.  This very program was used to create all 150 of
+the
+available missions in Corncob.
+
+  Just remember to only make one mission at a time, and make backups of
+the
+theater to another filename after every mission.  Don't flip back and
+forth
+between map and mission builder mode.  Start the program, make your
+changes,
+and exit back to DOS between each change.  Take care not to move too far
+away from the current blinking object, and never travel any great
+distance
+withing the mission builder.  If you want to move somewhere else in the
+theater, exit the program completely, and start it up again.
+
+
+ To exit the mission builder, you can hit escape or 'm' to return to
+map mode, then escape or space bar to return to flying mode.
+
+  Do not fly after returning from the mission builder, just exit,
+then copy 3univ.dat to carl.dat or whatever.  Its a good idea
+to make backups in case of unexpected critical errors.
+
+
+
+
+; The following is taken from the sources of Corncob.  This is the
+; definition tables for the objects.  Use these tables to get the
+; object number of what you would like to create, and what quality
+; you would like to assign that object.
+
+
+                    ; number after the semicolon is
+                    ; the object type number
+
+templatetable   dw  @dataseg:objhq  ;0  Headquarters orb
+    dw  @dataseg:objstet    ;1  mindbender
+    dw  @dataseg:obj5da     ;2  plane  qual2=dumpy  qual3=Stealth
+    dw  @dataseg:objrdr     ;3  radar
+    dw  @dataseg:objtw      ;4  radar base
+    dw  @dataseg:roadpiece  ;5  Runway piece  qual2= no stripes
+    dw  @dataseg:tower      ;6  Control tower
+    dw  @dataseg:objman ;7    Ground crew
+    dw  @dataseg:objshard2  ;8
+    dw  @dataseg:objshard   ;9
+    dw  @dataseg:objincend  ;10
+    dw  @dataseg:objdbst    ;11 KLA site
+    dw  @dataseg:objvech    ;12 Vehicle  spec bit= bullet only
+    dw  @dataseg:objvest    ;13 Vehicle site
+    dw  @dataseg:objwallz1  ;14 Force fields
+    dw  @dataseg:objwallx   ;15        "
+    dw  @dataseg:objwally   ;16
+    dw  @dataseg:objwallz   ;17
+    dw  @dataseg:fltsm1puff ;18
+    dw  @dataseg:fltsm1boom ;19
+    dw  @dataseg:fltsm1bomb ;20
+    dw  @dataseg:fltsm1mis  ;21
+    dw  @dataseg:fltsm1aashell  ;22
+    dw  @dataseg:fltsm1aa   ;23  AAA site
+    dw  @dataseg:fltsm1dball    ;24  KLA
+    dw  @dataseg:fltsm1     ;25
+    dw  @dataseg:fltsm2     ;26
+    dw  @dataseg:gms        ;27   Fuel dump
+    dw  @dataseg:obj5d      ;28   Do not use!
+    dw  @dataseg:objprop    ;29   Propeller
+    dw  @dataseg:bullets    ;30
+    dw  @dataseg:objsurv    ;31   Survey marker
+    dw  @dataseg:crtr       ;32   Crater, qual 1= permanent
+    dw  @dataseg:smgms      ;33   Destroyed tick
+    dw  @dataseg:objhut     ;34   Tower doorway
+    dw  @dataseg:objroadend ;35   runway endpieces
+    dw  @dataseg:objroadend1    ;36
+    dw  @dataseg:objfn1     ;37   Fences
+    dw  @dataseg:objfn1a    ;38
+    dw  @dataseg:objfn1b    ;39
+    dw  @dataseg:objbb      ;40   Barrage Balloon
+    dw  @dataseg:objbbsm    ;41   Bumble Bee
+    dw  @dataseg:objmort    ;42   Mortar
+    dw  @dataseg:objdhq     ;43   Blown up HQ
+    dw  @dataseg:objlwallz1 ;44   Line-type forcefields
+    dw  @dataseg:objlwallx  ;45
+    dw  @dataseg:objlwally  ;46
+    dw  @dataseg:objlwallz  ;47
+    dw  @dataseg:objrv      ;48  Rescue Van
+    dw  @dataseg:objshell   ;49  Shell
+    dw  @dataseg:objbmr     ;50  Saucer
+    dw  @dataseg:objbmrst   ;51  Saucer Site
+    dw  @dataseg:objtet     ;52  Tet
+    dw  @dataseg:objbmrmo   ;53  Saucer that is a mission objective
+    dw  @dataseg:objslwallx ;54  Smaller line-type forcefields
+    dw  @dataseg:objslwally ;55
+    dw  @dataseg:objslwallz ;56
+    dw  @dataseg:objal      ;57  Alien
+    dw  @dataseg:objxp      ;58  Portal
+    dw  @dataseg:objstep    ; 59 Small step forcefield
+    dw  @dataseg:objpstep   ; 60 Small step forcefield Filled
+
+
+    ; the following are the definitions of the different qualities
+    ; of portals.  Ex: qual 3 takes us to base, but damages us.
+
+
+xpqtbl      dw  4
+quality 1   dw  11,11+10h,1,0       ; takes us back to base
+quality 2   dw  3,9+10h,255,0       ; takes us to random place
+quality 3   dw  12,11+10h,1,1       ; takes to base, but damages us
+quality 4   dw  0,11+10h,1,-1       ; kills us instantly
+quality 5   dw  11,11+10h,101h,0    ; takes us to base, fulfils mis
+quality 6   dw  11,11,1,1       ; takes to base, but no flashes
+quality 7   dw  7,11+10h,0,2        ; repairs plane, doesn't xpose
+quality 8   dw  10,3,100h,0     ; doesn't move us, miss obj
+
+    ; the following are the mission objectives of the different
+    ; headquarter orbs.   Example: a quality 1 orb counts as a mission
+        ; objective when you blow it up, a quality 4 orb will count a
+mission
+        ; objective when all the vehicles and vehicle sites are gone.
+
+hqtbl   dw  2
+1)  dw  0,@codeseg:killme
+2)  dw  6,@codeseg:killticks
+3)  dw  7,@codeseg:killdbaa
+4)  dw  3,@codeseg:killvechs
+5)  dw  9,@codeseg:killmetough  ; must suicide plane to destroy
+6)  dw  13,@codeseg:killbmrst
+7)  dw  4,@codeseg:killstets     ; kill all mindbenders
+8)  dw  14,@codeseg:killal       ; kill aliens
+
+; the following shows what qualities of shell will turn into what.
+; I don't think qual=8 works
+
+shellqtbl   dw  3       ; table of qualities for dballsites
+1)      dw  13,0,6      ; vech stite
+2)      dw  42,6,7      ; mortar
+3)      dw  11,7,3      ; dball site
+4)      dw  23,3,9      ; aa site
+5)      dw  40,9,13     ; barrage balloon
+6)      dw  41,13,11        ; bee swarm
+7)      dw  27,11,0     ; a tick
+8)      dw  23,2,2      ; 0= random
+
+
+
+
+
+; The following is a table of various properties of objects.  You cannot
+; change any of these settings, it is just here for reference.
+;  The numbers in the table are sums of attribute bits.  These number
+are
+; powers of two.  Example 512=2^9, so +512 means that this object will
+; capture you if you touch it.
+;
+; Example: object 10  (incendiary from bomb, or mortar)  2^0=1
+; 1=disappears when goes off into the distance, not saved in far tile
+ram
+; 2=Skip over this object when in mission builder, who'd want to create
+this?
+; 4=If you fly through it, object is terminated  4=bit 2  IE 2^2=4
+
+;1  ; bit 0 means do not xfer to medium table
+;2  ; bit 1 means skip over when doing mission builder creates
+;4  ; bit 2 means terminate object if plane hits it
+;8  ; bit 3 means it is forcefield type object
+;16 ; bit 4 means it is a runway type object
+;32 ; bit 5 means object is a portal
+;64 ; bit 6 means object is standonable
+;128    ; bit 7 means object kills you
+;256    ; bit 8 means object walk height is collision + z coord
+;512    ; bit 9 means object captures you
+
+extendedtypetbl dw  0+4 ;0
+    dw  0   ;1
+    dw  0+4     ;2
+    dw  0+4     ;3
+    dw  0+4     ;4
+    dw  0+4+16+64   ;5
+    dw  0+4+64+256      ;6
+    dw  0+4 ;7
+    dw  0+2 ;8
+    dw  0+2 ;9
+    dw  1+2+4   ;10
+    dw  0+4 ;11
+    dw  4+512   ;12
+    dw  0   ;13
+    dw  0+4+8+64    ;14
+    dw  0+4+8   ;15
+    dw  0+4+8   ;16
+    dw  0+4+8+64    ;17
+    dw  1+2 ;18
+    dw  1+2 ;19
+    dw  1+2 ;20
+    dw  1+2 ;21
+    dw  1+2+128 ;22
+    dw  0+4 ;23
+    dw  128 ;24
+    dw  1+2     ;25
+    dw  1+2     ;26
+    dw  0+4+64+256      ;27
+    dw  0+2     ;28 skip over obj5d, so cursor don't dis
+    dw  1   ;29
+    dw  1+2 ;30
+    dw  0   ;31
+    dw  0+128       ;32
+    dw  0       ;33
+
+
+
+    dw  0       ;34
+    dw  0+16+64     ;35
+    dw  0+16+64     ;36
+    dw  0+4     ;37
+    dw  0+4     ;38
+    dw  0+4     ;39
+    dw  0+128       ;40
+    dw  0+128       ;41
+    dw  0+4     ;42
+    dw  0       ;43
+    dw  0+4+8+64    ;44
+    dw  0+4+8   ;45
+    dw  0+4+8   ;46
+    dw  0+4+8+64    ;47
+    dw  1+4     ;48
+    dw  0       ;49
+    dw  4+64+256        ;50
+    dw  0+64+256        ;51
+    dw  0       ;52
+    dw  4+64+256        ;53
+    dw  0+4+8   ;54
+    dw  0+4+8   ;55
+    dw  0+4+8+64    ;56
+    dw  0+512       ;57
+    dw  0+4+20h     ;58
+    dw  0+4+8+64    ;59
+    dw  0+4+8+64    ;60
+
+
+
+
+; Special bit definitions:, hit F9 to set an object's special bit
+; The object's type number will turn purple to indicate that it's
+special
+; bit is set.
+;
+;  1.) Orbs with the special bit set will be gravity-attraction orbs.
+;  2.) Vehicles with the special bit set will be destructible with
+;        bullets or bombs ONLY, objects will last forever.  The antennas
+;        of these vehicles will flash.
+;  3.)  Mindbenders with this bit set will be susceptible to damage only
+from
+;         assassin bombs, and are invulnerable to plane-dropped bombs
+;  4.)  Ground Crew with this special bit set are spies.  They wear
+black and
+;        their mission objectives are complete when you go near them.
+;
+
+
+; Complete bit (F10 toggle), is useful with the following objects
+;  When the complete bit is set, the objects type number blinks
+white/black.
+;
+;  1.) Orbs which you need, but you don't want them to be mission
+objectives
+;        in any way.  If you make one, but preset it's complete bit,
+then
+;        the player will not need to accomplish that orb's objective to
+;        finish a theater.  This is useful when you want an orb to power
+;       the local force fields, but you don't want the pilot to make the
+;       mission to be trivial because he can just blow the orb to drop
+the
+;       force fields.  The solution is to make a kill-me-tough orb with
+it's
+;       complete bit already set.  Then the pilot can't kill it without
+;       sacrificing a plane, but the player doesn't NEED to kill that
+orb
+;       in order to complete the theater.
+;
+;  2.)  Portals which may be desired, but not count as mission
+objectives.
+;       Just preset their complete bits in order to make portals which
+the
+;       the player may use, but do not have to be flown through to
+satisfy
+;       an MO.
+;
+;  3.)  Mission objective-type saucers where you want one to stay put
+like
+;         a mission objective saucer, but you don't want it to count as
+;         an MO.

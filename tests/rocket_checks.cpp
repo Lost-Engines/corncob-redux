@@ -5,8 +5,8 @@
 #include "game/rocket.h"
 #include "game/session.h"
 #include "resources/assets.h"
-#include "world/training.h"
 #include "tests/reference_reader.h"
+#include "world/training.h"
 
 int main(int const argc, char const *const argv[]) {
   /// Verify real BIOS-clock recharge, including native overshoot and signed-storage edge cases
@@ -53,8 +53,8 @@ int main(int const argc, char const *const argv[]) {
   flight.advance({});
   if(flight.craft().rocket) throw std::runtime_error{"partially charged rocket ignited before becoming ready"};
   bool refired{false};
-  for(unsigned int frame{0}; frame != 1000 && !refired; ++frame) {
-    flight.advance({.advance_time{true}});
+  for(unsigned int frame{0}; frame != 4000 && !refired; ++frame) {
+    flight.advance({});
     refired = flight.craft().rocket;
   }
   if(!refired) throw std::runtime_error{"rocket did not become ready and accept its pending ignition request"};

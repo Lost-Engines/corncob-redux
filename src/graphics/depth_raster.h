@@ -1,0 +1,41 @@
+#pragma once
+
+#include <span>
+#include <vector>
+#include "graphics/raster.h"
+#include "vectorstorm/vector/vector3.h"
+
+namespace corncob::graphics {
+
+using view_point = vec3<double>;
+struct perspective_view {
+  clip_rectangle bounds;
+  double focal_x;
+  double focal_y;
+  double centre_x;
+  double centre_y;
+  bool rear;
+};
+
+// Reciprocal depth keeps precision at the horizon without imposing a far plane.
+class depth_raster {
+private:
+  indexed_framebuffer &target;
+  std::vector<float> &depth;
+  perspective_view view;
+  random_source &random;
+  struct projected_point { double x, y, depth; };
+  view_point orient(view_point const &source) const;
+  double plane(view_point const &point, unsigned int index) const;
+  projected_point project(view_point const &point) const;
+  void pixel(int x, int y, double reciprocal_depth, colour_index colour);
+  void triangle(projected_point a, projected_point b, projected_point c, colour_index colour);
+
+public:
+  depth_raster(indexed_framebuffer &target, std::vector<float> &depth, perspective_view view, random_source &random);
+  void polygon(std::span<view_point const> vertices, colour_index colour);
+  void line(view_point a, view_point b, colour_index colour);
+  void disc(view_point centre, double diameter, colour_index colour);
+};
+
+} // namespace corncob::graphics

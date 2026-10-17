@@ -36,11 +36,13 @@ int main(int const argc, char const *const argv[]) {
     auto const observer{position()};
     maths::random_source random{input.dword()};
     graphics::ground_field field;
+    field.density(80);
     field.initialise(observer, random);
     for(auto const &point : field.points()) if(point != position()) throw std::runtime_error{"native initial ground bank " + std::to_string(i)};
     for(auto const &star : field.stars()) if(star != position()) throw std::runtime_error{"native initial star bank " + std::to_string(i)};
     auto const seed{input.dword()};
     if(random.seed() != seed) throw std::runtime_error{"native bank initialisation random continuation " + std::to_string(i)};
+    field.density(80);
     field.initialise(observer, random);
     if(random.seed() != seed) throw std::runtime_error{"repeated initialisation consumed another bank of random numbers"};
   }

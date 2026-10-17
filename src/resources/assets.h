@@ -5,6 +5,7 @@
 
 namespace corncob::resources {
 
+std::span<uint8_t const> documentation_asset() noexcept;
 std::span<uint8_t const> front_end_asset() noexcept;
 std::span<uint8_t const> other_worlds_asset() noexcept;
 std::span<uint8_t const> cockpit_asset() noexcept;

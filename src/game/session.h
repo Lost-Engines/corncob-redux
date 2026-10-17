@@ -74,7 +74,9 @@ struct input_state {
   bool walk_backward{false};
   bool jump{false};
   bool drop_through{false};
-  bool advance_time{false};
+  int16_t strafe{0};
+  int16_t look_yaw{0};
+  int16_t look_pitch{0};
   weapon_controls weapons{};
   view_input view{};
   map_input map{};

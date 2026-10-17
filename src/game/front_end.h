@@ -5,6 +5,7 @@
 #include <string>
 #include "audio/music_cue.h"
 #include "game/campaign.h"
+#include "game/preferences.h"
 #include "game/session.h"
 #include "game/tower_briefing.h"
 #include "graphics/interface.h"
@@ -50,6 +51,7 @@ enum class interface_page {
   training_wickedness,
   training_value,
   control_setup,
+  bindings,
   mission_briefing,
   starting_airfield,
   no_aircraft,
@@ -132,6 +134,10 @@ private:
   std::string mission_report_title;
   world::training_setup training;
   control_setup controls;
+  preferences settings;
+  bool binding_capture{false};
+  void adjust_setting(int direction);
+  void save_settings();
   tower_briefing tower;
   interface_page boss_return{interface_page::flight};
   std::optional<world::mission_start> pending_relocation;
@@ -183,6 +189,7 @@ private:
   void navigate(interface_page destination);
   void sync_pilot();
   void information(unsigned int section);
+  std::string_view document_text(std::string_view name) const;
   void document(std::string_view text, unsigned int section);
   void notice(std::string message);
   void launch_combat();
@@ -193,6 +200,10 @@ private:
 
 public:
   front_end(resources::collection const &assets, campaign_store &campaign, bool skip_intro = false, bool start_in_flight = false, std::optional<control_setup> controls = std::nullopt, std::optional<bool> music_enabled = std::nullopt);
+  preferences &options() noexcept;
+  bool capturing_binding() const noexcept;
+  bool bind_input(int key, int mouse = -1);
+  void wheel(int steps);
   control_setup const &flight_controls() const noexcept;
   audio::music_cue music() const noexcept;
   void advance(double seconds);

@@ -31,6 +31,11 @@ maths::world_position generate_star_point(maths::random_source &random) noexcept
   /// The original stars are world points at a fixed height, rather than a static bitmap or a pregenerated constant bank
   return distant_point(16'384, 0x0800'0000, random);
 }
+void ground_field::density(unsigned int const count) {
+  if(ground.size() == count) return;
+  ground.resize(count);
+  ready = false;
+}
 void ground_field::initialise(maths::world_position const &observer, maths::random_source &random) noexcept {
   /// Initialise all three eighty-point banks, including the unused far bank and final records beyond the drawing loop
   if(ready) return;
