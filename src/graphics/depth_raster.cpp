@@ -90,7 +90,9 @@ void depth_raster::triangle(projected_point a, projected_point b, projected_poin
     for(int x{first}; x <= last; ++x) { pixel(x, y, reciprocal, colour); reciprocal += gradient; }
   }
 }
-void depth_raster::polygon(std::span<view_point const> const vertices, colour_index const colour) {
+void depth_raster::polygon(std::span<view_point const> const vertices, colour_index const colour, std::optional<double> const surface_depth) {
+  double const anchor_depth{surface_depth ? (view.rear ? -*surface_depth : *surface_depth) : 0.0};
+  if(surface_depth && anchor_depth < 1.0) return;
   std::vector<view_point> clipped;
   for(auto const &point : vertices) clipped.push_back(orient(point));
   for(unsigned int i{0}; i != 5 && !clipped.empty(); ++i) {
@@ -104,10 +106,18 @@ void depth_raster::polygon(std::span<view_point const> const vertices, colour_in
     clipped = std::move(next);
   }
   if(clipped.size() < 3) return;
-  auto const a{project(clipped.front())};
-  for(std::size_t i{1}; i + 1 < clipped.size(); ++i) triangle(a, project(clipped[i]), project(clipped[i + 1]), colour);
+  auto vertex{[&](view_point const &point) {
+    auto result{project(point)};
+    if(surface_depth) result.depth = 1.0 / anchor_depth;
+    return result;
+  }};
+  auto const a{vertex(clipped.front())};
+  for(std::size_t i{1}; i + 1 < clipped.size(); ++i) triangle(a, vertex(clipped[i]), vertex(clipped[i + 1]), colour);
 }
-void depth_raster::line(view_point a, view_point b, colour_index const colour) {
+void depth_raster::line(view_point a, view_point b, colour_index const colour, std::optional<double> const surface_depth) {
+  // attached artwork keeps its projection but shares the parent billboard's depth
+  double const anchor_depth{surface_depth ? (view.rear ? -*surface_depth : *surface_depth) : 0.0};
+  if(surface_depth && anchor_depth < 1.0) return;
   a = orient(a); b = orient(b);
   double const margin{std::max(1.0, view.pixel_scale) * 0.5};
   for(unsigned int i{0}; i != 5; ++i) {
@@ -119,6 +129,7 @@ void depth_raster::line(view_point a, view_point b, colour_index const colour) {
     else if(db < 0) b = a + (b - a) * (da / (da - db));
   }
   auto first{project(a)}, last{project(b)};
+  if(surface_depth) first.depth = last.depth = 1.0 / anchor_depth;
   double const maximum_width{std::max(detail_width(first.depth), detail_width(last.depth))};
   if(maximum_width <= 1.0) {
     int const steps{std::max(1, static_cast<int>(std::ceil(std::max(std::abs(last.x - first.x), std::abs(last.y - first.y)))))};
@@ -165,10 +176,13 @@ void depth_raster::line(view_point a, view_point b, colour_index const colour) {
     }
   }
 }
-void depth_raster::disc(view_point centre, double const diameter, colour_index const colour) {
+void depth_raster::disc(view_point centre, double const diameter, colour_index const colour, std::optional<double> const surface_depth) {
+  double const anchor_depth{surface_depth ? (view.rear ? -*surface_depth : *surface_depth) : 0.0};
+  if(surface_depth && anchor_depth < 1.0) return;
   centre = orient(centre);
   if(centre.x < 1.0) return;
-  auto const p{project(centre)};
+  auto p{project(centre)};
+  if(surface_depth) p.depth = 1.0 / anchor_depth;
   double const radius{std::max(0.5, diameter * view.focal_x / centre.x * 0.5)};
   if(p.x + radius < view.bounds.left || p.x - radius >= view.bounds.right || p.y + radius < view.bounds.top || p.y - radius >= view.bounds.bottom) return;
   int const left{static_cast<int>(std::floor(std::max<double>(view.bounds.left, p.x - radius)))};

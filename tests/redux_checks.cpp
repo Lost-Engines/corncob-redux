@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include "game/front_end.h"
 #include "game/preferences.h"
 #include "game/session.h"
@@ -106,6 +107,84 @@ void detail_size_checks() {
   require(pixels(7) > 200, "steep nearby lines lost their thickness");
   clear(); draw.line(position(85, 100, 1000), position(60, 20, 1000), 7);
   require(frame.pixels == ascending, "reversing a steep line changed its coverage");
+}
+
+void billboard_detail_checks() {
+  namespace graphics = corncob::graphics;
+  graphics::indexed_framebuffer frame;
+  frame.width = frame.height = 128;
+  frame.pixels = std::vector<uint8_t>(128 * 128, 14);
+  std::vector<float> depth(frame.pixels.size());
+  corncob::maths::random_source random;
+  graphics::perspective_view view{{0, 0, 128, 128}, 128, 128, 64, 64, false, 2};
+  for(bool const rear : {false, true}) {
+    view.rear = rear;
+    graphics::depth_raster draw{frame, depth, view, random};
+    auto point{[&](double const x, double const y, double const z) {
+      return graphics::view_point{rear ? -x : x, rear ? -y : y, z};
+    }};
+    double const surface{rear ? -100.0 : 100.0};
+    auto face{[&] {
+      std::array<graphics::view_point, 4> const backdrop{{point(95, 30, 30), point(105, -30, 30), point(105, -30, -30), point(95, 30, -30)}};
+      draw.polygon(backdrop, 12, surface);
+      draw.disc(point(100, 0, 0), 40, 7);
+      draw.disc(point(95, 10, 6), 5, 1, surface);
+      draw.disc(point(105, -10, 6), 5, 1, surface);
+      draw.line(point(95, 10, -10), point(105, -10, -10), 0, surface);
+    }};
+    std::ranges::fill(frame.pixels, 14); std::ranges::fill(depth, 0);
+    face();
+    require(frame.pixels[56 * 128 + 50] == 1 && frame.pixels[56 * 128 + 76] == 1, "attached eyes were hidden behind their head billboard");
+    require(frame.pixels[77 * 128 + 56] == 0 && frame.pixels[76 * 128 + 72] == 0, "attached mouth was clipped by its head billboard");
+    auto const visible{frame.pixels};
+    std::array<graphics::view_point, 4> const wall{{point(50, 30, 30), point(50, -30, 30), point(50, -30, -30), point(50, 30, -30)}};
+    for(bool const wall_first : {false, true}) {
+      std::ranges::fill(frame.pixels, 14); std::ranges::fill(depth, 0);
+      if(wall_first) draw.polygon(wall, 4);
+      face();
+      if(!wall_first) draw.polygon(wall, 4);
+      require(std::ranges::all_of(frame.pixels, [](uint8_t const colour){ return colour == 4; }), "billboard artwork leaked through a foreground wall");
+    }
+    std::ranges::fill(frame.pixels, 14); std::ranges::fill(depth, 0);
+    draw.disc(point(100, 0, 0), 40, 7);
+    auto const head{frame.pixels};
+    draw.disc(point(105, -10, 6), 5, 1, -surface);
+    draw.line(point(95, 10, -10), point(105, -10, -10), 0, -surface);
+    require(frame.pixels == head && visible != head, "artwork from a parent behind the camera was drawn");
+  }
+}
+
+void ground_crew_checks() {
+  namespace graphics = corncob::graphics;
+  namespace maths = corncob::maths;
+  namespace world = corncob::world;
+  corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
+  auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
+  graphics::scene_renderer renderer{geometry, cockpit};
+  renderer.configure({.resolution{1280,700}, .ground_points{0}});
+  world::theatre theatre;
+  theatre.objects.push_back({.position{0,0,0}, .attitude{}, .type{world::object_type::ground_crew}, .flags{1}});
+  corncob::render::framebuffer frame;
+  maths::random_source random;
+  for(auto const pose : {world::model_pose::normal, world::model_pose::gesture, world::model_pose::shot}) {
+    theatre.objects.front().pose = pose;
+    for(auto const heading : std::array<maths::angle, 13>{0, 4096, 8192, 12288, 24576, 28672, 32768, 36864, 40960, 45056, 53248, 57344, 61440}) {
+      graphics::camera camera{
+        .position{-maths::multiply(maths::cosine(heading), 800), -maths::multiply(maths::sine(heading), 800), 520},
+        .attitude{.heading{heading}}, .cockpit{false}, .rear_view{false}, .ground_detail{false},
+      };
+      renderer.render(theatre, camera, 0, 0, random, frame);
+      auto const &indexed{renderer.indexed_frame()};
+      unsigned int left_eye{0}, right_eye{0}, left_mouth{0}, right_mouth{0};
+      for(unsigned int y{320}; y < 380; ++y) for(unsigned int x{600}; x < 680; ++x) {
+        auto const colour{indexed.pixels[y * indexed.width + x]};
+        if(colour == 1) (x < 640 ? left_eye : right_eye)++;
+        if(colour == 0) (x < 640 ? left_mouth : right_mouth)++;
+      }
+      if(left_eye == 0 || right_eye == 0) throw std::runtime_error{"real ground crew lost an eye: pose " + std::to_string(std::to_underlying(pose)) + ", heading " + std::to_string(heading) + ", pixels " + std::to_string(left_eye) + "/" + std::to_string(right_eye)};
+      require(left_mouth > 0 && right_mouth > 0, "real ground crew lost half their mouth in an oblique view");
+    }
+  }
 }
 
 void renderer_checks() {
@@ -433,7 +512,7 @@ int main(int argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"scratch directory required"};
   std::filesystem::path const scratch{argv[1]};
   std::filesystem::remove_all(scratch);
-  depth_checks(); detail_size_checks(); renderer_checks(); ground_size_checks(); ground_range_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
+  depth_checks(); detail_size_checks(); billboard_detail_checks(); ground_crew_checks(); renderer_checks(); ground_size_checks(); ground_range_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
   std::filesystem::remove_all(scratch);
   std::cout << "Redux depth, detail sizing, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
 }

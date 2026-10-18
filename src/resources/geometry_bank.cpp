@@ -1,11 +1,11 @@
 #include "geometry_bank.h"
 #include <algorithm>
+#include <optional>
 #include <stdexcept>
 #include <utility>
-#include "resources/source_models.h"
-#include <optional>
 #include "resources/binary_reader.h"
 #include "resources/colour_rules.h"
+#include "resources/source_models.h"
 
 namespace corncob::resources {
 
@@ -187,6 +187,14 @@ geometry_bank::geometry_bank(std::span<uint8_t const> const source, bool const s
   load_model(map_marker_model);
   load_model(sun_model);
   load_model(experimental_model);
+  // the crew's eyes and mouth paint onto a camera-facing head disc in every pose
+  auto &head{std::get<disc_cloud>(primitives.at(primitive_ids.at((6u << 16) | 0x6e19u)))};
+  for(std::size_t i{1}; i < head.discs.size(); ++i) head.discs[i].surface_anchor.emplace(head.discs.front().position);
+  auto &face{std::get<wireframe>(primitives.at(primitive_ids.at((2u << 16) | 0x6ea3u)))};
+  face.lines.front().surface_anchor.emplace(head.discs.front().position);
+  // the injured pose's blood backdrop belongs behind the head, including its billboard edges
+  auto &blood{std::get<polygon>(primitives.at(primitive_ids.at((8u << 16) | 0x6e4fu)))};
+  blood.surface_anchor.emplace(head.discs.front().position);
   // Data-only source branches use a reserved address range, independently of the original executable's resources.
   std::vector<uint8_t> recovered(source_model_base + source_model_bytes.size());
   std::ranges::copy(source_model_bytes, recovered.begin() + source_model_base);

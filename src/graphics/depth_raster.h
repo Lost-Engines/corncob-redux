@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <span>
 #include <vector>
 #include "graphics/raster.h"
@@ -36,10 +37,11 @@ private:
 
 public:
   depth_raster(indexed_framebuffer &target, std::vector<float> &depth, perspective_view view, random_source &random);
-  void polygon(std::span<view_point const> vertices, colour_index colour);
-  void line(view_point a, view_point b, colour_index colour);
+  // surface_depth is the parent billboard's camera-space X, before rear-view orientation
+  void polygon(std::span<view_point const> vertices, colour_index colour, std::optional<double> surface_depth = std::nullopt);
+  void line(view_point a, view_point b, colour_index colour, std::optional<double> surface_depth = std::nullopt);
   void point(view_point const &position, colour_index colour);
-  void disc(view_point centre, double diameter, colour_index colour);
+  void disc(view_point centre, double diameter, colour_index colour, std::optional<double> surface_depth = std::nullopt);
 };
 
 } // namespace corncob::graphics

@@ -178,18 +178,23 @@ void scene_renderer::draw_model(resources::model_address const address, unsigned
         if constexpr(std::is_same_v<shape_type, resources::polygon>) {
           std::vector<view_point> points;
           for(auto const &point : shape.vertices) points.push_back(vertex(point));
-          draw.polygon(points, geometry.colour(shape.colour));
+          auto const surface_depth{shape.surface_anchor ? std::optional{vertex(*shape.surface_anchor).x} : std::nullopt};
+          draw.polygon(points, geometry.colour(shape.colour), surface_depth);
           ++statistics.polygons;
         } else if constexpr(std::is_same_v<shape_type, resources::wireframe>) {
-          for(auto const &line : shape.lines) for(std::size_t i{1}; i < line.vertices.size(); ++i) {
-            draw.line(vertex(line.vertices[i - 1]), vertex(line.vertices[i]), geometry.colour(line.colour));
-            ++statistics.lines;
+          for(auto const &line : shape.lines) {
+            auto const surface_depth{line.surface_anchor ? std::optional{vertex(*line.surface_anchor).x} : std::nullopt};
+            for(std::size_t i{1}; i < line.vertices.size(); ++i) {
+              draw.line(vertex(line.vertices[i - 1]), vertex(line.vertices[i]), geometry.colour(line.colour), surface_depth);
+              ++statistics.lines;
+            }
           }
         } else if constexpr(std::is_same_v<shape_type, resources::point_cloud>) {
           for(auto const &point : shape.points) draw.point(vertex(point.position), geometry.colour(point.colour));
         } else if constexpr(std::is_same_v<shape_type, resources::disc_cloud>) {
           for(auto const &disc : shape.discs) {
-            draw.disc(vertex(disc.position), disc.diameter, geometry.colour(disc.colour));
+            auto const surface_depth{disc.surface_anchor ? std::optional{vertex(*disc.surface_anchor).x} : std::nullopt};
+            draw.disc(vertex(disc.position), disc.diameter, geometry.colour(disc.colour), surface_depth);
             ++statistics.discs;
           }
         }

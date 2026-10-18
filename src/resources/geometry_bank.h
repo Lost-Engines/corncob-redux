@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <unordered_map>
 #include <variant>
@@ -45,10 +46,12 @@ struct object_definition {
 struct polygon {
   std::vector<maths::fixed_vector> vertices;
   colour_reference colour;
+  std::optional<maths::fixed_vector> surface_anchor{};
 };
 struct polyline {
   std::vector<maths::fixed_vector> vertices;
   colour_reference colour;
+  std::optional<maths::fixed_vector> surface_anchor{};
 };
 struct wireframe {
   std::vector<polyline> lines;
@@ -64,6 +67,7 @@ struct coloured_disc {
   maths::fixed_vector position{0, 0, 0};
   uint16_t diameter;
   colour_reference colour;
+  std::optional<maths::fixed_vector> surface_anchor{};
 };
 struct disc_cloud {
   std::vector<coloured_disc> discs;

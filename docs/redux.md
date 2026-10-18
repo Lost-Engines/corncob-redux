@@ -10,6 +10,9 @@ distance. A one-metre footprint controls that taper (one native EGA pixel at
 or stars. Line width and reciprocal depth vary along each segment, including
 viewport clipping and occlusion. The rear view uses its own panel scale.
 Authored discs retain their model diameters and a physical-pixel minimum.
+The ground crew's eyes and mouth share the head disc's depth, keeping the full
+face visible from an angle while still respecting foreground occlusion. The
+injured pose's blood backdrop uses that same layer behind the head.
 Ground-point generation has a separate spread multiplier, defaulting to eight
 rather than the DOS radius of 32 times camera height. The larger field lets
 points shrink before they reach its edge. `--ground-detail-range` and the saved
