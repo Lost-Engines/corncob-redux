@@ -16,9 +16,11 @@ or separate game files are required.
 - Unlimited draw distance by default, with full-detail models and depth testing
   that fixes the tower door showing through walls and other overlapping objects.
 - WASD movement and mouse look outside the aircraft; Space jumps and Q opens the
-  parachute. Keyboard and mouse bindings are configurable in the menu.
-- Adjustable ground detail gives a clearer sense of movement. Nearby dots and
-  lines scale with resolution, becoming fine single-pixel details in the distance.
+  parachute. Stepping out places you just behind the wing. Keyboard and mouse
+  bindings are configurable in the menu.
+- Adjustable ground detail and field range give a clearer sense of movement.
+  Nearby dots and lines scale with resolution, becoming fine single-pixel details
+  in the distance.
 - Hold T for tenfold fast-forward while flying or walking. Enemies, projectiles
   and production keep pace, and distant enemies remain active.
 - Lingering bomb craters no longer damage the player or their aircraft. Explosions
@@ -55,7 +57,8 @@ Tests are off by default; enable `-DBUILD_TESTING=ON` when developing.
 | `--resolution 1920x1080` | Use a fixed 3D rendering resolution. |
 | `--fov 110` | Set horizontal FOV, from 30 to 150 degrees; default 94. |
 | `--draw-distance 0` | Unlimited visibility; a positive number sets a limit in kilometres. |
-| `--ground-detail 8` | Ground-point density relative to DOS; default 8, zero disables it. |
+| `--ground-detail 8` | Ground-point count relative to DOS; default 8, zero disables it. |
+| `--ground-detail-range 8` | Ground-field spread relative to DOS; default 8, use 1 for the original range. |
 | `--mouse-sensitivity 24` | Walking mouse sensitivity, from 1 to 200; default 24. |
 | `--joystick auto\|none\|N` | Automatically select a joystick, use keyboard only, or select a device index. |
 | `--skip-intro` | Open the main menu immediately. |
@@ -64,6 +67,10 @@ Tests are off by default; enable `-DBUILD_TESTING=ON` when developing.
 
 Use `--help` for all options, including world selection and alternate colour
 modes. Command-line options override saved display settings for that run.
+
+A wider ground-detail range spreads the same number of dots over more ground.
+Increase `--ground-detail` too if you want more dots nearby. Both settings are
+available in Options and controls and save automatically when changed there.
 
 Create a named pilot to save your career; the default trainee is temporary.
 Redux uses its own save directory, separate from Corncob C++. Display and binding

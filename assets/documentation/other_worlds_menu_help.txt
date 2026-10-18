@@ -176,7 +176,7 @@ Flying
   Space or left mouse button: machine guns.
   Left Shift: heavy cannon. C or right mouse button: missiles.
   A: autopilot. F: flaps. I: rocket booster. B: drop bomb.
-  E: leave the aircraft or eject.
+  E: step out behind the wing, or eject if airborne.
   R: rear view. L: cockpit. Num Lock: look mode.
   Hold Ctrl with arrow keys to look around.
 
@@ -201,8 +201,8 @@ Modern joysticks do not need the DOS calibration controls.
 Fast-forward advances the whole simulation, including enemies,
 projectiles and production. They do not sleep while you hold T.
 
-Use Left/Right to adjust FOV, draw distance, ground detail, resolution,
-mouse sensitivity and inversion. Enter opens the binding list. Settings
+Use Left/Right to adjust FOV, draw distance, ground point count and
+range, resolution, mouse sensitivity and inversion. Enter opens the binding list. Settings
 are saved automatically in redux.cfg in the Redux save directory.
  Training Missions Menu.
 

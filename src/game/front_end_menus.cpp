@@ -521,7 +521,7 @@ void front_end::render_menus(render::framebuffer &target) const {
     screen.heading("Redux Options and Controls");
     screen.panel(5, 5, 74, 22);
     auto const &s{settings.scene};
-    std::array<std::string, 10> const labels{
+    std::array<std::string, 11> const labels{
       "Configure key and mouse bindings",
       std::string{"Flight input: "} + (controls.joystick_device == -2 ? "Keyboard" : "Joystick (automatic)"),
       std::string{"Flight model: "} + (controls.beginner_flight ? "Beginner" : "Advanced"),
@@ -531,6 +531,7 @@ void front_end::render_menus(render::framebuffer &target) const {
       settings.window_resolution ? "Resolution: Match window" : std::format("Resolution: {} x {}", s.resolution.width, s.resolution.height),
       std::format("Mouse sensitivity: {:.0f}", settings.mouse_sensitivity),
       std::string{"Invert mouse look: "} + (settings.invert_mouse ? "Yes" : "No"),
+      std::format("Ground detail range: {:.2g} x DOS", s.ground_range),
       "Back",
     };
     options(10, 8, labels, selection);

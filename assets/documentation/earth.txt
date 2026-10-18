@@ -121,7 +121,7 @@ Flying
   Left Shift: heavy cannon. C or right mouse button: missiles.
   S: toggle sound effects. A: autopilot. F: flaps. I: rocket booster. B:
 drop bomb.
-  E: leave the aircraft or eject.
+  E: step out behind the wing, or eject if airborne.
   R: rear view. L: cockpit. Num Lock: look mode.
   Hold Ctrl with arrow keys to look around.
 
@@ -196,6 +196,10 @@ Other retained shortcuts
 Mouse sensitivity and inverted look are adjustable in Options and
 controls. Losing focus releases the mouse and pauses the game.
 FOV, draw distance and ground detail do not affect simulation speed.
+Ground-detail range changes how widely the dots are spread. A wider
+range lets them shrink before the field ends. Increase the point count
+as well if you want more nearby dots. The default range is eight times
+the DOS field; choose 1 for the original extent.
 
 
 Keyboard Play

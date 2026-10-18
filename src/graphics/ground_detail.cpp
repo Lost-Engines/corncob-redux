@@ -1,4 +1,6 @@
 #include "ground_detail.h"
+#include <algorithm>
+#include <limits>
 #include "maths/integer.h"
 
 namespace corncob::graphics {
@@ -17,10 +19,12 @@ maths::world_position distant_point(uint16_t const width, int32_t const height, 
 
 } // anonymous namespace
 
-void regenerate_ground_point(maths::world_position &point, maths::world_position const &observer, maths::random_source &random) noexcept {
+void regenerate_ground_point(maths::world_position &point, maths::world_position const &observer, maths::random_source &random, double const range_multiplier) noexcept {
   /// GRNDPT leaves underground points untouched; DRANDR keeps the original wrapping range and signed half-range subtraction
   if(observer.z < 0) return;
-  uint32_t const range{static_cast<uint32_t>(observer.z) * 64u};
+  uint32_t const native_range{static_cast<uint32_t>(observer.z) * 64u};
+  uint32_t const range{range_multiplier == 1.0 ? native_range
+    : static_cast<uint32_t>(std::clamp(native_range * range_multiplier, 0.0, static_cast<double>(std::numeric_limits<int32_t>::max())))};
   auto coordinate{[range, &random](int32_t const centre){
     int64_t const product{static_cast<int64_t>(static_cast<uint64_t>(range) * random.next() >> 16)};
     return maths::dword(static_cast<int64_t>(centre) + product - (maths::dword(range) >> 1));
@@ -36,12 +40,17 @@ void ground_field::density(unsigned int const count) {
   ground.resize(count);
   ready = false;
 }
+void ground_field::range(double const multiplier) {
+  if(range_multiplier == multiplier) return;
+  range_multiplier = multiplier;
+  ready = false;
+}
 void ground_field::initialise(maths::world_position const &observer, maths::random_source &random) noexcept {
   /// Initialise all three eighty-point banks, including the unused far bank and final records beyond the drawing loop
   if(ready) return;
   for(unsigned int i{0}; i != ground.size(); ++i) {
     maths::world_position point{0, 0, 0};
-    regenerate_ground_point(point, observer, random);
+    regenerate_ground_point(point, observer, random, range_multiplier);
     if(i + 1 < ground.size()) ground[i + 1] = maths::world_position{point};
   }
   for(unsigned int i{0}; i != ground.size(); ++i) (void)distant_point(6, 0, random);

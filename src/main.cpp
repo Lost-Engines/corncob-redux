@@ -101,6 +101,7 @@ auto main(int const argc, char const *const argv[])->int {
     ("fov", boost::program_options::value<double>(), "horizontal field of view in degrees, 30..150 (default 94)")
     ("draw-distance", boost::program_options::value<double>(), "maximum visible distance in kilometres; 0 = unlimited (default)")
     ("ground-detail", boost::program_options::value<double>(), "ground point density relative to DOS: 0..250 (default 8)")
+    ("ground-detail-range", boost::program_options::value<double>(), "ground field range multiplier: 0.25..64; 1 = DOS range (default 8)")
     ("mouse-sensitivity", boost::program_options::value<double>(), "walking mouse sensitivity, 1..200 (default 24)")
     ("slalom", "launch the recovered source-only slalom course with player weapons disabled")
     ("skip-intro", "open the main menu without the title and story")
@@ -232,6 +233,7 @@ auto main(int const argc, char const *const argv[])->int {
   double density{preferences.scene.ground_points / 80.0};
   if(!number("ground-detail", density, 0, 250)) return startup_failure("--ground-detail must be between 0 and 250");
   preferences.scene.ground_points = static_cast<unsigned int>(std::lround(density * 80));
+  if(!number("ground-detail-range", preferences.scene.ground_range, scene_settings::minimum_ground_range, scene_settings::maximum_ground_range)) return startup_failure("--ground-detail-range must be between 0.25 and 64");
   renderer->configure(preferences.scene);
   game->set_experimental_clearance(game->world().expansion || (campaign->active_pilot() && campaign->active_pilot()->awards(corncob::game::medal::combat_master) != 0));
   game->set_beginner_flight(front.flight_controls().beginner_flight);

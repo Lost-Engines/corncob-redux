@@ -85,7 +85,7 @@ int main(int const argc, char const *const argv[]) {
   });
   if(arrival.player() != game::player_mode::on_foot) throw std::runtime_error{"returning immediately bypassed the original walk-away requirement"};
   bool walked_clear{false};
-  for(unsigned int frame{0}; frame != 200; ++frame) {
+  for(unsigned int frame{0}; frame != 300; ++frame) {
     auto const distance{game::interaction_range(arrival.craft().position, arrival.pilot().position)};
     if(distance && *distance > game::reentry_departure_distance) { walked_clear = true; break; }
     arrival.advance({
@@ -93,7 +93,7 @@ int main(int const argc, char const *const argv[]) {
     });
   }
   if(!walked_clear || arrival.player() != game::player_mode::on_foot) throw std::runtime_error{"pilot could not walk clear of the retained aircraft"};
-  for(unsigned int frame{0}; frame != 200 && arrival.player() == game::player_mode::on_foot; ++frame) arrival.advance({
+  for(unsigned int frame{0}; frame != 300 && arrival.player() == game::player_mode::on_foot; ++frame) arrival.advance({
     .walk_backward{true},
   });
   if(arrival.player() != game::player_mode::in_aircraft || !arrival.camera().cockpit || arrival.craft().position != parked)

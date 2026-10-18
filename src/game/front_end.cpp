@@ -267,7 +267,7 @@ void front_end::accept() {
       break;
     case interface_page::control_setup:
       if(selection == 0) { return_page = interface_page::control_setup; navigate(interface_page::bindings); }
-      else if(selection == 9) { save_settings(); navigate(interface_page::menu); }
+      else if(selection == 10) { save_settings(); navigate(interface_page::menu); }
       else adjust_setting(1);
       break;
     case interface_page::bindings:
@@ -707,7 +707,7 @@ unsigned int front_end::choice_count() const {
   case interface_page::roster: return 9;
   case interface_page::theatres: return 10;
   case interface_page::training: return 7;
-  case interface_page::control_setup: return 10;
+  case interface_page::control_setup: return 11;
   case interface_page::bindings: return static_cast<unsigned int>(settings.bindings.size()) + 2;
   case interface_page::training_counts: case interface_page::training_wickedness: return 4;
   case interface_page::campaigns: return 9;
@@ -778,6 +778,7 @@ void front_end::adjust_setting(int const direction) {
     break;
   case 7: settings.mouse_sensitivity = std::clamp(settings.mouse_sensitivity + direction * 2, 1.0, 200.0); break;
   case 8: settings.invert_mouse = !settings.invert_mouse; break;
+  case 9: settings.scene.ground_range = std::clamp(settings.scene.ground_range * (direction > 0 ? 2.0 : 0.5), graphics::scene_settings::minimum_ground_range, graphics::scene_settings::maximum_ground_range); break;
   default: return;
   }
   save_settings();

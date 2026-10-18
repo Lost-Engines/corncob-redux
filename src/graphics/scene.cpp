@@ -159,8 +159,8 @@ void scene_renderer::draw_ground_and_stars(world::theatre const &theatre, camera
     return visible;
   }};
   for(auto &point : detail.points()) {
-    if(!draw_point(point, false)) regenerate_ground_point(point, observer.position, random);
-    if(random.next() <= 91) regenerate_ground_point(point, observer.position, random);
+    if(!draw_point(point, false)) regenerate_ground_point(point, observer.position, random, settings.ground_range);
+    if(random.next() <= 91) regenerate_ground_point(point, observer.position, random, settings.ground_range);
   }
   if(theatre.sky.stars) {
     for(auto const &star : detail.stars()) draw_point(star, true);
@@ -201,6 +201,7 @@ void scene_renderer::draw_model(resources::model_address const address, unsigned
 void scene_renderer::configure(scene_settings const &value) {
   settings = value;
   detail.density(settings.ground_points);
+  detail.range(settings.ground_range);
 }
 
 scene_renderer::scene_renderer(resources::geometry_bank &geometry, resources::cockpit_mask const &cockpit, render::video_mode const video) :
@@ -214,6 +215,7 @@ scene_renderer::scene_renderer(resources::geometry_bank &geometry, resources::co
 void scene_renderer::initialise(maths::world_position const &observer, random_source &random) {
   (void)random;
   detail.density(settings.ground_points);
+  detail.range(settings.ground_range);
   detail.initialise(observer, visual_random);
 }
 

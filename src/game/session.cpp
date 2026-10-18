@@ -376,7 +376,12 @@ void session::leave_aircraft() {
   person.jump_charge = 0;
   person.horizontal_damping = 32'000;
   if(person.standing) {
-    person.position.y += 2000;
+    // step just behind the wing on the left, using heading alone to stay on the support surface
+    maths::angles const heading{.heading{aircraft.attitude.heading}};
+    int16_t const aft{aircraft.variant == flight::aircraft_variant::experimental ? experimental_exit_aft : aircraft_exit_aft};
+    auto const offset{maths::transform(maths::make_inverse_rotation(heading), {static_cast<int16_t>(-aft), aircraft_exit_side, 0})};
+    for(unsigned int axis{0}; axis < 2; ++axis)
+      person.position[axis] = maths::dword(static_cast<int64_t>(person.position[axis]) + offset[axis]);
     person.position.z = landing.surface_height + flight::landing_state::aircraft_height;
     person.velocity = maths::fixed_vector{0, 0, 0};
   }

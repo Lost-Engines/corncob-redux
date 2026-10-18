@@ -8,6 +8,7 @@ namespace corncob::game {
 
 inline uint16_t constexpr contact_distance{2000};
 inline uint16_t constexpr reentry_departure_distance{4000};
+inline int16_t constexpr aircraft_exit_aft{1200}, experimental_exit_aft{2000}, aircraft_exit_side{1800};
 
 enum class scenery_event {
   none,

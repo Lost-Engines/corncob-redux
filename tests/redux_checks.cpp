@@ -167,7 +167,7 @@ void ground_size_checks() {
   corncob::world::theatre theatre;
   auto count{[&](int32_t const altitude, unsigned int const scale) {
     graphics::scene_renderer renderer{geometry, cockpit};
-    renderer.configure({.resolution{640 * scale, 350 * scale}, .ground_points{80}});
+    renderer.configure({.resolution{640 * scale, 350 * scale}, .ground_points{80}, .ground_range{1.0}});
     graphics::camera observer{.position{0, 0, altitude}, .attitude{}, .cockpit{false}};
     corncob::maths::random_source random;
     corncob::render::framebuffer frame;
@@ -178,6 +178,64 @@ void ground_size_checks() {
   require(native > 10 && doubled >= native * 3 && quadrupled >= native * 12, "ground dots did not preserve their nearby screen-space weight at higher resolutions");
   auto const distant_native{count(1'000'000, 1)}, distant_quadrupled{count(1'000'000, 4)};
   require(distant_native > 10 && distant_quadrupled < distant_native * 2, "distant ground dots did not remain single-pixel details");
+}
+
+void ground_range_checks() {
+  namespace graphics = corncob::graphics;
+  namespace maths = corncob::maths;
+  maths::world_position const observer{20'000, -30'000, 720};
+  bool extended{false};
+  for(uint32_t seed{0}; seed < 100; ++seed) {
+    maths::random_source near_random{seed}, far_random{seed};
+    maths::world_position near_point{}, far_point{};
+    graphics::regenerate_ground_point(near_point, observer, near_random);
+    graphics::regenerate_ground_point(far_point, observer, far_random, 8.0);
+    for(unsigned int axis{0}; axis < 2; ++axis) {
+      auto const near_delta{near_point[axis] - observer[axis]}, far_delta{far_point[axis] - observer[axis]};
+      require(std::abs(far_delta - near_delta * 8) < 8, "ground field range did not scale its extent");
+      extended = extended || std::abs(far_delta) > 720 * 32;
+    }
+    require(near_random.seed() == far_random.seed(), "changing ground range changed point-generation randomness");
+  }
+  require(extended, "expanded ground points never passed the original cutoff");
+  graphics::ground_field field;
+  maths::random_source random;
+  field.initialise(observer, random);
+  field.range(8.0); field.initialise(observer, random);
+  require(field.points().size() == 80, "ground range changed the point count");
+}
+
+void aircraft_exit_checks() {
+  namespace game = corncob::game;
+  namespace maths = corncob::maths;
+  namespace world = corncob::world;
+  corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
+  for(uint16_t const variant : {uint16_t{0}, uint16_t{0x1000}, uint16_t{0x2000}}) {
+    for(unsigned int heading{0}; heading < 65'536; heading += 8192) {
+      world::theatre theatre;
+      theatre.start.z = 720;
+      theatre.objects.push_back({.position{0, -3000, 720}, .attitude{.heading{static_cast<maths::angle>(heading)}}, .type{world::object_type::aircraft}, .flags{static_cast<uint16_t>(1u | variant)}});
+      game::session sortie{geometry, std::move(theatre)};
+      sortie.advance({});
+      require(sortie.player() == game::player_mode::in_aircraft, "exit fixture did not board its parked aircraft");
+      auto const origin{sortie.craft().position};
+      sortie.press(game::action::eject);
+      require(sortie.player() == game::player_mode::on_foot && sortie.pilot().standing, "grounded exit was treated as airborne ejection");
+      auto const delta{sortie.pilot().position - origin};
+      auto const local{maths::transform(maths::make_rotation({.heading{static_cast<maths::angle>(heading)}}), {static_cast<int16_t>(delta.x), static_cast<int16_t>(delta.y), 0})};
+      require(local.x < (variant == 0x2000 ? -1900 : -1100) && local.y > 1700, "grounded exit did not clear the wing in aircraft-local coordinates");
+      require(sortie.pilot().position.z == 720 && sortie.craft().position == origin, "exiting moved the aircraft or lost its ground height");
+      sortie.advance({});
+      require(sortie.player() == game::player_mode::on_foot, "a grounded exit immediately boarded again");
+    }
+  }
+  world::theatre training; training.training = true;
+  game::session airborne{geometry, std::move(training)};
+  airborne.relocate({.title{"Ejection check"}, .position{0, 0, 200'000}, .heading{16384}});
+  auto const position{airborne.craft().position};
+  auto const velocity{airborne.craft().velocity};
+  airborne.press(game::action::eject);
+  require(!airborne.pilot().standing && airborne.pilot().position == position && airborne.pilot().velocity == velocity, "ground exit offsets changed airborne ejection");
 }
 
 void walking_checks() {
@@ -349,6 +407,12 @@ void menu_checks(std::filesystem::path const &scratch) {
   front.command(game::interface_command::next);
   auto const adjusted{game::preferences::load(scratch / "redux.cfg")};
   require(adjusted.scene.horizontal_fov == old_fov + 2 && adjusted.mouse_sensitivity == old_sensitivity + 2, "live FOV or mouse sensitivity failed to save");
+  front.command(game::interface_command::down); front.command(game::interface_command::down);
+  auto const old_range{front.options().scene.ground_range};
+  front.command(game::interface_command::previous);
+  auto const ranged{game::preferences::load(scratch / "redux.cfg")};
+  require(ranged.scene.ground_range == old_range * 0.5, "ground range menu did not save independently of density");
+  require(ranged.scene.ground_points == adjusted.scene.ground_points, "ground range changed the configured density");
   front.command(game::interface_command::cancel);
   front.character('p');
   for(auto const name : {"earth", "other_worlds", "hints", "mission_builder"}) {
@@ -369,7 +433,7 @@ int main(int argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"scratch directory required"};
   std::filesystem::path const scratch{argv[1]};
   std::filesystem::remove_all(scratch);
-  depth_checks(); detail_size_checks(); renderer_checks(); ground_size_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
+  depth_checks(); detail_size_checks(); renderer_checks(); ground_size_checks(); ground_range_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
   std::filesystem::remove_all(scratch);
   std::cout << "Redux depth, detail sizing, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
 }

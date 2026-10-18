@@ -10,6 +10,11 @@ distance. A one-metre footprint controls that taper (one native EGA pixel at
 or stars. Line width and reciprocal depth vary along each segment, including
 viewport clipping and occlusion. The rear view uses its own panel scale.
 Authored discs retain their model diameters and a physical-pixel minimum.
+Ground-point generation has a separate spread multiplier, defaulting to eight
+rather than the DOS radius of 32 times camera height. The larger field lets
+points shrink before they reach its edge. `--ground-detail-range` and the saved
+menu setting change this spread independently of the point count; a value of
+one restores the DOS field extent. Point sizes have no added random variation.
 Palette indices and authored coplanar markings remain intact. The 3D view has
 configurable horizontal FOV; its horizontal/vertical focal ratio preserves the
 original projection style.
@@ -29,6 +34,10 @@ mission censuses and force-field checks remain local to each installation.
 Weapon targeting ranges remain gameplay rules. Map and menu screens pause the
 sortie. Visual drawing has its own random stream, so resolution, FOV, ground
 point density and display frame rate cannot consume gameplay randomness.
+
+Grounded aircraft exits use a heading-relative position just aft of the left
+wing, with extra aft clearance for the experimental aircraft. Airborne ejection
+still transfers the aircraft's position and velocity without that offset.
 
 Craters retain their original blast volume against enemy structures. They are
 excluded from player contact and abandoned-aircraft collisions. The preceding

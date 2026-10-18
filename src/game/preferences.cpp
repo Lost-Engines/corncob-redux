@@ -86,6 +86,7 @@ preferences preferences::load(std::filesystem::path const &path) {
     else if(name == "fov") { double value{}; if(row >> value && std::isfinite(value)) result.scene.horizontal_fov = std::clamp(value, graphics::scene_settings::minimum_fov, graphics::scene_settings::maximum_fov); }
     else if(name == "draw_distance") { double value{}; if(row >> value && std::isfinite(value) && value >= 0) result.scene.draw_distance = std::min(value, graphics::scene_settings::maximum_draw_distance); }
     else if(name == "ground_points") { unsigned int value{}; if(row >> value) result.scene.ground_points = std::min(value, graphics::scene_settings::maximum_ground_points); }
+    else if(name == "ground_range") { double value{}; if(row >> value && std::isfinite(value)) result.scene.ground_range = std::clamp(value, graphics::scene_settings::minimum_ground_range, graphics::scene_settings::maximum_ground_range); }
     else if(name == "mouse_sensitivity") { double value{}; if(row >> value && std::isfinite(value)) result.mouse_sensitivity = std::clamp(value, minimum_mouse_sensitivity, maximum_mouse_sensitivity); }
     else if(name == "invert_mouse") { int value{}; if(row >> value) result.invert_mouse = value != 0; }
     else if(name == "bind") {
@@ -101,7 +102,7 @@ void preferences::save(std::filesystem::path const &path) const {
   std::ostringstream text;
   text << "# Corncob Redux settings; key codes follow GLFW.\nresolution " << scene.resolution.width << ' ' << scene.resolution.height
     << "\nwindow_resolution " << window_resolution << "\nfov " << scene.horizontal_fov << "\ndraw_distance " << scene.draw_distance
-    << "\nground_points " << scene.ground_points << "\nmouse_sensitivity " << mouse_sensitivity << "\ninvert_mouse " << invert_mouse << '\n';
+    << "\nground_points " << scene.ground_points << "\nground_range " << scene.ground_range << "\nmouse_sensitivity " << mouse_sensitivity << "\ninvert_mouse " << invert_mouse << '\n';
   for(std::size_t i{0}; i < bindings.size(); ++i) {
     auto const &b{bindings[i]}; text << "bind " << i << ' ' << b.key << ' ' << b.alternate << ' ' << b.mouse << '\n';
   }
