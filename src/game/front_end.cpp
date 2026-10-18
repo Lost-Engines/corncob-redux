@@ -740,7 +740,7 @@ bool front_end::capturing_binding() const noexcept {
   return binding_capture;
 }
 bool front_end::bind_input(int const key, int const mouse) {
-  if(!binding_capture) return false;
+  if(!binding_capture || (key < 0 && mouse < 0)) return false;
   binding_capture = false;
   if(key >= 290 && key <= 293) { notice("F1-F4 are reserved for boss, intelligence, score and control help."); return true; }
   if(key == 256) return true; // Escape cancels capture.

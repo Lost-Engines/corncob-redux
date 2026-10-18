@@ -21,6 +21,10 @@ struct control_binding {
   int key;
   int alternate{-1};
   int mouse{-1};
+
+  bool matches_key(int const code) const noexcept {
+    return code >= 0 && (key == code || alternate == code);
+  }
 };
 std::vector<control_binding> default_bindings();
 std::string binding_name(control_binding const &binding);

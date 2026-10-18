@@ -306,6 +306,11 @@ void menu_checks(std::filesystem::path const &scratch) {
   corncob::resources::collection assets{corncob::resources::front_end_asset()};
   game::campaign_store career{scratch};
   game::front_end front{assets, career, true};
+  for(auto const &binding : front.options().bindings) {
+    require(!binding.matches_key(-1) && !binding.matches_key(-2), "unknown keyboard events matched an unassigned control");
+    if(binding.key >= 0) require(binding.matches_key(binding.key), "primary keyboard binding did not match");
+    if(binding.alternate >= 0) require(binding.matches_key(binding.alternate), "alternate keyboard binding did not match");
+  }
   front.character('o');
   require(front.current_page() == game::interface_page::control_setup, "options shortcut did not open the new menu");
   front.command(game::interface_command::accept);
@@ -313,6 +318,9 @@ void menu_checks(std::filesystem::path const &scratch) {
   front.options().bindings.front().mouse = 1;
   front.command(game::interface_command::accept);
   require(front.capturing_binding(), "binding capture did not start");
+  auto const original_key{front.options().bindings.front().key};
+  require(!front.bind_input(-1) && front.capturing_binding(), "an unknown multimedia key ended binding capture");
+  require(front.options().bindings.front().key == original_key && front.options().bindings.front().mouse == 1, "an unknown key changed the captured binding");
   require(front.bind_input('K'), "key capture failed");
   require(front.options().bindings.front().key == 'K' && front.options().bindings.front().mouse == 1, "keyboard rebind removed the mouse binding");
   front.command(game::interface_command::accept);

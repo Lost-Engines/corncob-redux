@@ -329,6 +329,8 @@ auto main(int const argc, char const *const argv[])->int {
   window_state state{game, front, sound_enabled, frame};
   glfwSetWindowUserPointer(window.get(), &state);
   glfwSetKeyCallback(window.get(), [](GLFWwindow *const window, int const key, int const /*scancode*/, int const action, int const modifiers){
+    // media keys can be unknown; -1 is also our unassigned-binding sentinel
+    if(key == GLFW_KEY_UNKNOWN) return;
     auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
     auto &game{state.game};
     auto &front{state.front};
@@ -430,7 +432,7 @@ auto main(int const argc, char const *const argv[])->int {
       return;
     }
     if(game->in_map()) {
-      for(auto const &binding : front.options().bindings) if(binding.id == corncob::game::control_id::map && (binding.key == key || binding.alternate == key)) { game->press(corncob::game::action::toggle_map); return; }
+      for(auto const &binding : front.options().bindings) if(binding.id == corncob::game::control_id::map && binding.matches_key(key)) { game->press(corncob::game::action::toggle_map); return; }
       if(key == GLFW_KEY_ESCAPE || key == GLFW_KEY_M || key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER || key == GLFW_KEY_SPACE) game->press(corncob::game::action::toggle_map);
       return;
     }
@@ -442,7 +444,7 @@ auto main(int const argc, char const *const argv[])->int {
     if(key == GLFW_KEY_F3) { front.show_current_score(game->results(), game->world().training); return; }
     if(key == GLFW_KEY_F4) { front.show_flight_help(); return; }
     bool const walking{game->player() == corncob::game::player_mode::on_foot && !game->remote_control()};
-    for(auto const &binding : front.options().bindings) if(applies(binding, walking) && (binding.key == key || binding.alternate == key)) activate_control(state, binding.id);
+    for(auto const &binding : front.options().bindings) if(applies(binding, walking) && binding.matches_key(key)) activate_control(state, binding.id);
   });
   glfwSetMouseButtonCallback(window.get(), [](GLFWwindow *window, int button, int action, int){
     auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
