@@ -1,5 +1,6 @@
 #include "ground_detail.h"
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include "maths/integer.h"
 
@@ -38,12 +39,18 @@ maths::world_position generate_star_point(maths::random_source &random) noexcept
 void ground_field::density(unsigned int const count) {
   if(ground.size() == count) return;
   ground.resize(count);
-  ready = false;
+  ready = tracking = false;
 }
 void ground_field::range(double const multiplier) {
   if(range_multiplier == multiplier) return;
   range_multiplier = multiplier;
-  ready = false;
+  range_exponent = std::log2(multiplier / std::min(multiplier, 0.25));
+  ready = tracking = false;
+}
+double ground_field::point_range(unsigned int const index) const noexcept {
+  // Share the point budget across distance scales; stagger their edges to avoid a common cutoff.
+  double const fraction{std::min(1.0, index / static_cast<double>(std::max<std::size_t>(2, ground.size()) - 1))};
+  return std::min(range_multiplier, 0.25) * std::exp2(range_exponent * fraction);
 }
 void ground_field::initialise(maths::world_position const &observer, maths::random_source &random) noexcept {
   /// Initialise all three eighty-point banks, including the unused far bank and final records beyond the drawing loop
@@ -60,8 +67,25 @@ void ground_field::initialise(maths::world_position const &observer, maths::rand
   }
   ready = true;
 }
+void ground_field::update(maths::world_position const &observer, maths::random_source &random) noexcept {
+  if(observer.z < 0) return;
+  maths::world_position const centre{observer.x, observer.y, std::max(observer.z, 720)};
+  initialise(centre, random);
+  if(!tracking) {
+    for(unsigned int i{0}; i < ground.size(); ++i) regenerate_ground_point(ground[i], centre, random, point_range(i));
+    tracking = true;
+  }
+  for(unsigned int i{0}; i < ground.size(); ++i) {
+    int64_t const width{static_cast<int64_t>(std::clamp(centre.z * 64.0 * point_range(i), 2.0, static_cast<double>(std::numeric_limits<int32_t>::max())))};
+    for(unsigned int axis{0}; axis < 2; ++axis) {
+      int64_t const relative{maths::dword(static_cast<int64_t>(ground[i][axis]) - centre[axis])};
+      int64_t const wrapped{((relative + width / 2) % width + width) % width - width / 2};
+      ground[i][axis] = maths::dword(static_cast<int64_t>(centre[axis]) + wrapped);
+    }
+  }
+}
 std::span<maths::world_position> ground_field::points() noexcept {
-  /// Off-screen ground dots are regenerated in place during the original frame pass
+  /// Redux tracks these world points by position, independently of visibility.
   return ground;
 }
 std::span<maths::world_position const> ground_field::stars() const noexcept {

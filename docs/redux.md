@@ -17,7 +17,12 @@ Ground-point generation has a separate spread multiplier, defaulting to eight
 rather than the DOS radius of 32 times camera height. The larger field lets
 points shrink before they reach its edge. `--ground-detail-range` and the saved
 menu setting change this spread independently of the point count; a value of
-one restores the DOS field extent. Point sizes have no added random variation.
+one restores the DOS field extent. The point budget is distributed across
+logarithmically spaced patch sizes, from a quarter of the native range up to
+the configured limit, retaining nearby coverage with staggered far edges.
+Points stay world anchored and wrap at patch boundaries around the camera; looking away no longer replaces them or favours distant survivors.
+Climbs, descents and travel recenter the patches independently of visibility.
+Point sizes have no added random variation.
 Palette indices and authored coplanar markings remain intact. The 3D view has
 configurable horizontal FOV; its horizontal/vertical focal ratio preserves the
 original projection style.

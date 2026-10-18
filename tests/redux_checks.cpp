@@ -284,6 +284,58 @@ void ground_range_checks() {
   require(field.points().size() == 80, "ground range changed the point count");
 }
 
+
+void ground_tracking_checks() {
+  namespace graphics = corncob::graphics;
+  namespace maths = corncob::maths;
+  graphics::ground_field field;
+  field.density(640); field.range(8.0);
+  maths::random_source random;
+  maths::world_position observer{100'000, -200'000, 720};
+  field.update(observer, random);
+  auto const initial{std::vector<maths::world_position>{field.points().begin(), field.points().end()}};
+  auto const seed{random.seed()};
+  for(unsigned int i{0}; i < 20; ++i) field.update(observer, random);
+  require(std::ranges::equal(initial, field.points()) && random.seed() == seed, "stationary ground detail changed or consumed per-frame randomness");
+  observer.x += 1;
+  field.update(observer, random);
+  require(std::ranges::equal(initial, field.points()), "nearby ground dots slid with the camera instead of staying world anchored");
+  for(int32_t const altitude : {720, 72000, 720}) for(unsigned int i{0}; i < 80; ++i) {
+    observer = maths::world_position{static_cast<int32_t>(i * 50000), -static_cast<int32_t>(i * 30000), altitude};
+    field.update(observer, random);
+    unsigned int nearby{0};
+    for(auto const &point : field.points()) {
+      int64_t const dx{std::abs(static_cast<int64_t>(point.x) - observer.x)}, dy{std::abs(static_cast<int64_t>(point.y) - observer.y)};
+      require(point.z == 0 && dx <= altitude * 256LL && dy <= altitude * 256LL, "ground field failed to follow a moving or descending observer");
+      if(dx <= altitude * 32LL && dy <= altitude * 32LL) ++nearby;
+    }
+    require(nearby > 100, "extending the ground range exhausted the nearby point budget");
+  }
+  corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
+  auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
+  graphics::scene_renderer renderer{geometry, cockpit};
+  renderer.configure({.resolution{640,350}});
+  corncob::world::theatre theatre;
+  graphics::camera view{.position{0,0,720}, .attitude{}, .cockpit{false}};
+  corncob::render::framebuffer frame;
+  renderer.render(theatre, view, 0, 0, random, frame);
+  auto const forward{renderer.indexed_frame().pixels};
+  view.attitude.heading = 32768;
+  renderer.render(theatre, view, 0, 0, random, frame);
+  view.attitude.heading = 0;
+  renderer.render(theatre, view, 0, 0, random, frame);
+  require(renderer.indexed_frame().pixels == forward, "looking away replaced ground dots and biased the field towards visible points");
+  unsigned int near_pixels{0};
+  for(unsigned int i{0}; i < 120; ++i) {
+    view.position.x = static_cast<int32_t>(i * 6000);
+    renderer.render(theatre, view, i, 0, random, frame);
+    if(i < 80) continue;
+    for(unsigned int y{210}; y < 350; ++y) for(unsigned int x{0}; x < 640; ++x)
+      if(renderer.indexed_frame().pixels[y * 640 + x] == 0) ++near_pixels;
+  }
+  require(near_pixels > 200, "sustained flight left ground dots only near the horizon");
+}
+
 void aircraft_exit_checks() {
   namespace game = corncob::game;
   namespace maths = corncob::maths;
@@ -528,7 +580,7 @@ int main(int argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"scratch directory required"};
   std::filesystem::path const scratch{argv[1]};
   std::filesystem::remove_all(scratch);
-  depth_checks(); detail_size_checks(); billboard_detail_checks(); ground_crew_checks(); renderer_checks(); ground_size_checks(); ground_range_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
+  depth_checks(); detail_size_checks(); billboard_detail_checks(); ground_crew_checks(); renderer_checks(); ground_size_checks(); ground_range_checks(); ground_tracking_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
   std::filesystem::remove_all(scratch);
   std::cout << "Redux depth, detail sizing, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
 }

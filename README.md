@@ -68,8 +68,8 @@ Tests are off by default; enable `-DBUILD_TESTING=ON` when developing.
 Use `--help` for all options, including world selection and alternate colour
 modes. Command-line options override saved display settings for that run.
 
-A wider ground-detail range spreads the same number of dots over more ground.
-Increase `--ground-detail` too if you want more dots nearby. Both settings are
+A wider ground-detail range adds more distant coverage while retaining nearby
+dots. Increase `--ground-detail` for a denser field. Both settings are
 available in Options and controls and save automatically when changed there.
 
 Create a named pilot to save your career; the default trainee is temporary.
