@@ -365,6 +365,7 @@ void session::leave_aircraft() {
   if(!controlled_aircraft) return;
   rocket_requested = false;
   weapons.rearm_person();
+  person.walking_remainder = vec2<int32_t>{0, 0};
   person.position = maths::world_position{aircraft.position};
   person.attitude = aircraft.attitude;
   person.ejection_attitude = aircraft.attitude;
@@ -502,10 +503,16 @@ void session::update_person(input_state const &input, flight::time_step const st
   int const sideways{input.strafe};
   if(forward != 0 || sideways != 0) {
     double const normalise{forward != 0 && sideways != 0 ? 0.7071067811865475 : 1.0};
-    maths::angles const heading{.heading{person.attitude.heading}};
-    auto const motion{maths::transform(maths::make_inverse_rotation(heading), {static_cast<int16_t>(forward * 25 * normalise), static_cast<int16_t>(sideways * 25 * normalise), 0})};
-    person.position.x += maths::rounded_divide(static_cast<int32_t>(motion.x) * step.elapsed, step.normal);
-    person.position.y += maths::rounded_divide(static_cast<int32_t>(motion.y) * step.elapsed, step.normal);
+    // spread the original ten-unit recording gait over fixed updates instead of tying speed to render cadence
+    int32_t constexpr gait_units{10}, clock_rate{timing::fast_forward_multiplier}, cadence{gait_units * clock_rate};
+    flight::time_step const reference{static_cast<int16_t>(input.accelerated_walking ? 50 : gait_units), 5};
+    auto const motion{walking_displacement(person.attitude.heading, {static_cast<int16_t>(forward * 800 * normalise), static_cast<int16_t>(sideways * 800 * normalise), 0}, reference)};
+    for(unsigned int axis{0}; axis < 2; ++axis) {
+      // the clock already accelerates tenfold; distribute the original T stride without counting that twice again
+      int32_t const total{motion[axis] * step.elapsed * (input.accelerated_walking ? 1 : clock_rate) + person.walking_remainder[axis]};
+      person.position[axis] += total / cadence;
+      person.walking_remainder[axis] = total % cadence;
+    }
   }
   if(input.jump && person.standing && !person.charging_jump) {
     person.charging_jump = true;

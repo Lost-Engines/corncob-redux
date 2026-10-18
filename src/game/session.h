@@ -72,6 +72,7 @@ struct input_state {
   bool throttle_down{false};
   bool walk_forward{false};
   bool walk_backward{false};
+  bool accelerated_walking{false};
   bool jump{false};
   bool drop_through{false};
   int16_t strafe{0};

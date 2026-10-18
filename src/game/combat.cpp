@@ -121,10 +121,10 @@ void combat::explosion(maths::world_position const &position, uint16_t const dam
 bool combat::shoot(weapon_origin const &origin, bool const cannon, flight::time_step const step) {
   /// BULSTRT alternates wing muzzles; the finite pistol shares the pool and uses the person's orientation
   if(origin.on_foot && !origin.remote) {
-    if(pistol_rounds == 0) return false;
-    --pistol_rounds;
     muzzle_offset = 0;
     gun_average = 33;
+    if(pistol_rounds == 0) return false;
+    --pistol_rounds;
   } else if(muzzle_offset == 0) muzzle_offset = 720;
   auto const index{allocate(true)};
   if(!index) return false;

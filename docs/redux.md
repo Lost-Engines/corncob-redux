@@ -38,6 +38,15 @@ Weapon targeting ranges remain gameplay rules. Map and menu screens pause the
 sortie. Visual drawing has its own random stream, so resolution, FOV, ground
 point density and display frame rate cannot consume gameplay randomness.
 
+Walking uses the original displacement arithmetic at the ten-unit recording
+cadence, spread smoothly over fixed updates. This gives a steady pace of about
+29 metres per second along the axes. T also restores the original fifty-unit
+walking stride, accounting for the tenfold clock acceleration already in force;
+accelerated walking covers about 25 times the normal distance per real second.
+Fractional centimetres carry between updates, including changes in walking speed.
+The DOS game applies time scaling twice to walking and also gates steps by its
+hardware timer, so its real walking speed varies with rendering frame rate.
+
 Grounded aircraft exits use a heading-relative position just aft of the left
 wing, with extra aft clearance for the experimental aircraft. Airborne ejection
 still transfers the aircraft's position and velocity without that offset.

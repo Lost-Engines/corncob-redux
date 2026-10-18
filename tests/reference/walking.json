@@ -1,0 +1,13 @@
+{
+  "reference_sha256": "c411dde7d18e1dc19d718327b70d1e69321448520344d3baa4a0c8e68a71e81e",
+  "fixture_sha256": "605c2ea1b6df8a4503b74a10390e141fd7bd22dec90cd9ef564ece5d40bfcb3d",
+  "generator": "tools/generate_walking_reference.py",
+  "cases": 448,
+  "routines": [
+    "0x4858..0x486b caller WTADJ and stride write",
+    "0x14eb GOODSTEP",
+    "0x1538 MOVEOBS"
+  ],
+  "stubs": [],
+  "scope": "Original forward/backward walking displacement over varied headings and time steps, including T=50; excludes step gate and camera wobble."
+}

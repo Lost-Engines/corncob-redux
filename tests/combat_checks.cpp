@@ -43,6 +43,11 @@ int main() {
     .remote{false},
     .crashed{false},
   };
+  auto pedestrian{origin};
+  pedestrian.on_foot = true;
+  require(combat.ammunition() == 0, "pilot started with ammunition before leaving an aircraft");
+  require(!combat.shoot(pedestrian, false, {}), "unarmed pilot fired a pistol");
+  require(!combat.plant_charge(position), "pilot started with an assassin charge before leaving an aircraft");
   for(unsigned int n{0}; n != 13; ++n) {
     require(combat.shoot(origin, false, {}), "gun failed to allocate a bullet");
     for(unsigned int frame{0}; frame != 6; ++frame) combat.advance(position, {});
@@ -87,6 +92,10 @@ int main() {
   require(!combat.drop_bomb(aircraft, 0, {}), "fourth bomb bypassed the supply limit");
   combat.fire({}, origin, 540 * 64, {});
   require(combat.bomb_supply() == 1, "bomb replacement timer failed");
+  combat.rearm();
+  require(combat.ammunition() == 0 && !combat.plant_charge(position), "boarding supplied the person's weapons");
+  combat.rearm_person();
+  require(combat.ammunition() == 20, "leaving an aircraft did not supply twenty pistol rounds");
   require(combat.plant_charge({0, 0, 720}), "carried charge unavailable");
   require(!combat.plant_charge({0, 0, 720}), "carried charge duplicated");
   combat.arm_charges();

@@ -320,7 +320,20 @@ void aircraft_exit_checks() {
 void walking_checks() {
   namespace game = corncob::game;
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
-  game::session forward{geometry, {}}, diagonal{geometry, {}}, sideways{geometry, {}};
+  corncob::world::theatre ground;
+  ground.start = corncob::maths::world_position{0, 3000, 720};
+  game::session reference{geometry, ground}, accelerated{geometry, ground};
+  auto const start{reference.pilot().position};
+  reference.advance({.walk_forward{true}, .look_yaw{8000}});
+  reference.advance({.walk_forward{true}});
+  require(reference.pilot().position - start == corncob::maths::world_position{198, 0, 0}, "smooth walking did not retain the original ten-unit reference gait");
+  accelerated.advance({.walk_forward{true}, .accelerated_walking{true}, .look_yaw{8000}});
+  for(unsigned int i{1}; i < 20; ++i) accelerated.advance({.walk_forward{true}, .accelerated_walking{true}});
+  require(accelerated.pilot().position - start == corncob::maths::world_position{4990, 0, 0}, "fast walking did not retain the original T stride across twenty accelerated updates");
+  auto const fast_position{accelerated.pilot().position};
+  accelerated.advance({.walk_forward{true}});
+  require(accelerated.pilot().position - fast_position == corncob::maths::world_position{99, 0, 0}, "releasing T did not restore the ordinary walking stride");
+  game::session forward{geometry, ground}, diagonal{geometry, ground}, sideways{geometry, ground};
   auto const origin{forward.pilot().position};
   for(unsigned int n{0}; n < 20; ++n) {
     forward.advance({.walk_forward{true}});
@@ -360,7 +373,10 @@ void fast_forward_checks() {
       while(clock.take_step()) session.advance(input);
     }
   }};
-  game::session walking{geometry, theatre}, fast_walking{geometry, theatre};
+  auto pedestrians{theatre};
+  pedestrians.training = true;
+  game::session walking{geometry, pedestrians}, fast_walking{geometry, pedestrians};
+  walking.press(game::action::eject); fast_walking.press(game::action::eject);
   auto const origin{walking.pilot().position};
   game::input_state const pedestrian{
     .walk_forward{true},

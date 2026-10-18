@@ -43,7 +43,10 @@ The animation word restarts at 128 on reaching 16,384, as in the native loop;
 
 Weapons use the original separate 32-bullet and 320-effect pools: guns/cannon
 mode, finite pistol ammunition, unguided missiles, replenishing bombs and the
-planted assassin charge. Effects include debris, incendiaries, mortar barrages,
+planted assassin charge. A sortie begins with no carried pistol ammunition or
+assassin charge; leaving an aircraft supplies twenty rounds and one charge.
+Boarding or visiting a tower does not grant that equipment. Effects include
+debris, incendiaries, mortar barrages,
 concealed sites, orbiting/swaying enemies, forcefields, generator attraction and
 mindbender palette effects. Aircraft damage retains its separate engine, wing,
 rudder and stability channels rather than generic hit points.

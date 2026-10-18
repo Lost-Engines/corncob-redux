@@ -669,6 +669,7 @@ auto main(int const argc, char const *const argv[])->int {
         }};
         using enum corncob::game::control_id;
         fast_forwarding = down(fast_forward) && !game->in_builder() && !game->in_map() && !game->is_paused();
+        input.accelerated_walking = walking && fast_forwarding;
         input.stick.roll = static_cast<int16_t>((down(roll_right) - down(roll_left)) * 512);
         input.stick.pitch = static_cast<int16_t>((down(pitch_up) - down(pitch_down)) * 512);
         input.stick.rudder = static_cast<int16_t>((down(rudder_left) - down(rudder_right)) * 512);

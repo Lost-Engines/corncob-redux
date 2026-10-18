@@ -14,6 +14,11 @@ int main(int const argc, char const *const argv[]) {
   corncob::game::session game{geometry, corncob::world::decode_theatre(corncob::resources::white_sands_asset())};
   auto const initial{game.camera()};
   if(initial.cockpit || game.player() != corncob::game::player_mode::on_foot) throw std::runtime_error{"READUNIV must begin on foot"};
+  game.press(corncob::game::action::plant_charge);
+  for(unsigned int tick{0}; tick < 10; ++tick) game.advance({.weapons{.gun{true}}});
+  if(game.sounds().gunshots != 0 || std::ranges::any_of(game.world().objects, [](auto const &object){
+    return object.type == corncob::world::object_type::bomb && object.has(corncob::world::object_flag::present) && object.has(corncob::world::object_flag::special);
+  })) throw std::runtime_error{"White Sands pilot received weapons before leaving an aircraft"};
   auto const plane{std::ranges::find_if(game.world().objects, [](auto const &object){
     return object.type == corncob::world::object_type::aircraft && (object.flags & 0x2000u) != 0;
   })};

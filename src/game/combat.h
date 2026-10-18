@@ -54,8 +54,8 @@ private:
   uint32_t missile_ready_tick{0};
   uint32_t bomb_replacement_tick{0};
   unsigned int bombs{3};
-  unsigned int pistol_rounds{20};
-  bool charge_available{true};
+  unsigned int pistol_rounds{0};
+  bool charge_available{false};
   int16_t muzzle_offset{720};
   int16_t missile_offset{240};
   sortie_statistics statistics;

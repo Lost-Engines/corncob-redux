@@ -12,6 +12,7 @@ struct person_state {
   maths::fixed_vector velocity{0, 0, 0};
   int32_t surface_height{0};
   uint16_t jump_charge{0};
+  vec2<int32_t> walking_remainder{0, 0};
   uint16_t last_step_tick{0};
   int16_t step_wobble{100};
   int16_t horizontal_damping{32'000};
@@ -23,6 +24,7 @@ struct person_state {
   uint16_t swing_frames{0};
 };
 
+maths::world_position walking_displacement(maths::angle heading, maths::fixed_vector const &stride, flight::time_step step);
 void damp_fall_velocity(maths::fixed_vector &velocity, int16_t horizontal_damping, int16_t terminal_velocity, flight::time_step step);
 void swing_parachute(person_state &person, flight::control_input const &input);
 
