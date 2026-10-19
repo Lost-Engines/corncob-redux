@@ -144,6 +144,7 @@ add_library(corncob_core STATIC
   src/game/slalom.cpp
   src/game/slalom.h
   src/game/session.cpp
+  src/game/session_elapsed.cpp
   src/game/session.h
   src/game/recorded_flight.cpp
   src/game/mission_builder.cpp
@@ -152,6 +153,7 @@ add_library(corncob_core STATIC
   src/game/pilot_motion.cpp
   src/game/pilot_motion.h
   src/flight/aircraft.cpp
+  src/flight/continuous.cpp
   src/flight/aircraft.h
   src/flight/damage.cpp
   src/flight/damage.h
@@ -282,6 +284,7 @@ if(BUILD_TESTING)
   corncob_check(resource_checks embedded_resources "${PROJECT_SOURCE_DIR}/tests/reference/legacy_world.bin")
   corncob_check(fixed_math_checks native_fixed_math "${PROJECT_SOURCE_DIR}/tests/reference/fixed_math.bin")
   corncob_check(raster_checks native_raster "${PROJECT_SOURCE_DIR}/tests/reference/lines.bin" "${PROJECT_SOURCE_DIR}/tests/reference/line_clipping.bin")
+  corncob_check(timing_checks elapsed_timing)
   corncob_check(redux_checks redux_features "${PROJECT_BINARY_DIR}/redux-checks")
   corncob_check(scene_checks redux_theatre_rendering "${PROJECT_SOURCE_DIR}/tests/reference/scene_order.bin")
   corncob_check(frame_checks simulation_frame_order "${PROJECT_SOURCE_DIR}/tests/reference/frame_clock.bin")
@@ -325,6 +328,7 @@ if(BUILD_TESTING)
   corncob_check(saucer_checks native_saucers "${PROJECT_SOURCE_DIR}/tests/reference/saucers.bin")
   corncob_check(threat_checks native_threats "${PROJECT_SOURCE_DIR}/tests/reference/threats.bin")
   corncob_check(endurance_checks sustained_gameplay)
+  add_test(NAME elapsed_sustained_gameplay COMMAND endurance_checks --elapsed)
   corncob_check(joystick_checks native_joystick "${PROJECT_SOURCE_DIR}/tests/reference/joystick.bin")
   corncob_check(vehicle_checks native_vehicles "${PROJECT_SOURCE_DIR}/tests/reference/vehicles.bin")
   corncob_check(sortie_clock_checks native_sortie_clock "${PROJECT_SOURCE_DIR}/tests/reference/sortie_clock.bin")

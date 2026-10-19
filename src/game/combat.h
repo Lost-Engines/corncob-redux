@@ -60,6 +60,7 @@ private:
   int16_t missile_offset{240};
   sortie_statistics statistics;
   sound_cues cues;
+  std::vector<uint64_t> contact_pairs;
 
   std::optional<unsigned int> allocate(bool bullet = false);
   void detonate(unsigned int index);

@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 #include "maths/fixed.h"
+#include "maths/continuous.h"
 
 namespace corncob::world {
 
@@ -92,6 +93,7 @@ struct placed_object {
   std::optional<uint8_t> shard_colour{};
   uint8_t aircraft_parking_flags{0};
   maths::fixed_vector collision_extents{0, 0, 0};
+  maths::motion_fraction fraction{};
 
   unsigned int quality() const noexcept {
     /// Qualities occupy three stored flag bits and index eight-row tuning tables

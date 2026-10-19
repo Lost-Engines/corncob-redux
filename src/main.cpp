@@ -501,7 +501,6 @@ auto main(int const argc, char const *const argv[])->int {
   bool flight_frame_valid{false};
   unsigned int frame_number{0};
   double previous_time{glfwGetTime()};
-  corncob::game::timing::simulation_clock simulation_time;
   bool clock_was_flying{front.in_flight()};
   while(!glfwWindowShouldClose(window.get())) {
     glfwPollEvents();
@@ -555,7 +554,6 @@ auto main(int const argc, char const *const argv[])->int {
       observer = game->camera();
       flight_frame_valid = false;
       clock_was_flying = true;
-      simulation_time.reset();
     }
     if(front.in_flight()) game->resume_from_tower();
     if(front.take_map()) game->press(corncob::game::action::toggle_map);
@@ -693,12 +691,10 @@ auto main(int const argc, char const *const argv[])->int {
         if(auto const joystick{walking ? std::nullopt : corncob::platform::poll_joystick(front.flight_controls().joystick_device)})
           corncob::game::apply_joystick(input, *joystick, input.view.modifier || game->looking_around());
       }
-      simulation_time.add_time(elapsed, fast_forwarding);
-      while(simulation_time.take_step()) {
-        game->advance(input);
+      double const game_seconds{game->update_frame(now, input, fast_forwarding)};
+      if(game_seconds > 0) {
         input.look_yaw = input.look_pitch = 0;
         state.look_x = state.look_y = 0;
-        update_audio();
       }
       observer = game->camera();
 #ifndef NDEBUG
@@ -743,7 +739,6 @@ auto main(int const argc, char const *const argv[])->int {
     if(!front.in_flight() && !inspect) {
       if(clock_was_flying) game->suspend_clock();
       clock_was_flying = false;
-      simulation_time.reset();
       front.render(frame);
       presenter.present(frame);
       ++frame_number;

@@ -30,21 +30,45 @@ Cockpit instruments render on the original panel, which is scaled with nearest
 neighbour sampling and centred on wider screens. Menus retain their original
 pixel dimensions.
 
-The simulation advances at the original fixed five-unit step, forty PIT ticks
-per update (about 29.13 updates per second), independently of display refreshes.
-Holding T schedules ten times as many complete fixed updates; releasing it
-restores normal speed. It accelerates player travel, enemies, projectiles,
-production, expiry and the sortie clock together, without enlarging physics
-steps. The binding is configurable for both flying and walking. Map inspection,
-the mission builder and paused play do not accelerate.
+The platform calls `session::update_frame(timestamp, input, accelerated)` with
+monotonic seconds. Native GLFW supplies its timestamp; a future browser callback
+can supply the requestAnimationFrame timestamp after converting milliseconds to
+seconds. Live simulation advances immediately by elapsed game time and renders
+its latest state. There is no display interpolation, prediction or buffered frame.
+Each integration step is at most 1/60 second. Long foreground intervals are capped
+at 100 ms of wall time before fast-forward is applied; suspension resets the
+host timestamp, so menus, lost focus and hidden tabs have no catch-up burst.
+
+Flight evaluates the original force and control laws using the current state,
+with elapsed-time integration, exponential inertia and retained fractional
+position, velocity and orientation. Walking, falling, projectiles, model spin,
+KLA/turret steering and saucer rotation advance on each substep. New collision
+contacts react immediately; persistent overlap damage retains its reference-time
+cadence instead of multiplying with frame rate. Map and editor
+movement also use elapsed time. Small numerical integration differences between
+callback cadences are expected; physical speeds and game timings are tested
+across regular and irregular callbacks.
+
+AI random decisions, production countdowns, effect lifetimes and authored
+animation advance on elapsed-game-time clocks at their original reference pace
+(about 29.13 passes per second). This preserves their intended durations without
+limiting continuous motion or collision checks to that frequency. Recorded
+demonstrations retain their original sampled pose cadence. The explicit
+`session::advance` reference-step path remains for native comparison checks;
+normal play uses the timestamp entry point.
+
+Holding T multiplies elapsed game time by ten, using the same bounded integration
+steps. It accelerates enemies, projectiles, production, expiry and the sortie
+clock along with the player. Its binding is configurable for flying and walking.
+Map inspection, the mission builder and paused play do not accelerate.
 Actor movement, production and expiry run across the world. Production caps,
 mission censuses and force-field checks remain local to each installation.
 Weapon targeting ranges remain gameplay rules. Map and menu screens pause the
 sortie. Visual drawing has its own random stream, so resolution, FOV, ground
 point density and display frame rate cannot consume gameplay randomness.
 
-Walking uses the original displacement arithmetic at the ten-unit recording
-cadence, spread smoothly over fixed updates. This gives a steady pace of about
+Walking retains the ten-unit reference gait as a rate, with fractional
+centimetres carried between elapsed-time updates. This gives a steady pace of about
 29 metres per second along the axes. T also restores the original fifty-unit
 walking stride, accounting for the tenfold clock acceleration already in force;
 accelerated walking covers about 25 times the normal distance per real second.

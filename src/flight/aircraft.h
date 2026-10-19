@@ -14,6 +14,8 @@ enum class aircraft_variant {
 struct time_step {
   int16_t elapsed{5};
   int16_t normal{5};
+  double seconds{0}; // Zero selects the preserved native arithmetic.
+  bool clock_tick{true};
 };
 
 struct atmosphere {

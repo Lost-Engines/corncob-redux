@@ -1,4 +1,6 @@
 #include "combat.h"
+#include <cmath>
+#include "game/timing.h"
 #include <algorithm>
 #include <cstdlib>
 #include <utility>
@@ -83,7 +85,10 @@ std::optional<unsigned int> combat::allocate(bool const bullet) {
   for(unsigned int n{0}; n != count; ++n) {
     unsigned int const index{begin + cursor};
     cursor = (cursor + 1) % count;
-    if(theatre.objects[index].flags == 0) return index;
+    if(theatre.objects[index].flags == 0) {
+      std::erase_if(contact_pairs,[index](uint64_t pair){return static_cast<uint32_t>(pair >> 32)==index || static_cast<uint32_t>(pair)==index;});
+      return index;
+    }
   }
   return std::nullopt;
 }
@@ -554,6 +559,7 @@ void combat::update_projectile(unsigned int const index, maths::world_position c
   /// Timed handlers alter live velocity and model state before the next generic movement pass
   auto &object{theatre.objects[index]};
   using enum world::object_type;
+  double const ratio{step.seconds > 0 ? step.seconds / timing::seconds_per_step : 1.0};
   switch(object.type) {
   case explosion:
     if(object.timer <= 3) object.pose = object.timer <= 2 ? world::model_pose::red_explosion : world::model_pose::yellow_explosion;
@@ -564,7 +570,10 @@ void combat::update_projectile(unsigned int const index, maths::world_position c
       return;
     }
     if(object.timer >= 89 && maths::magnitude(object.velocity) <= 3000) {
-      for(unsigned int axis{0}; axis != 3; ++axis) object.velocity[axis] = maths::word(static_cast<int32_t>(object.velocity[axis]) * 1000 / 890);
+      if(step.seconds > 0) {
+        auto const velocity{vec3<double>{object.velocity} + object.fraction.velocity};
+        maths::accelerate(object.velocity, velocity*(std::pow(1000.0/890.0,ratio)-1), object.fraction.velocity);
+      } else for(unsigned int axis{0}; axis != 3; ++axis) object.velocity[axis] = maths::word(static_cast<int32_t>(object.velocity[axis]) * 1000 / 890);
     }
     break;
   case bomb:
@@ -577,13 +586,18 @@ void combat::update_projectile(unsigned int const index, maths::world_position c
       auto const delta{vec3<int64_t>{object.position} - vec3<int64_t>{observer}};
       if(delta.length_sq() >= 12'800ll * 12'800) object.flags |= 0xe8u;
       auto const speed{maths::magnitude(object.velocity)};
-      for(unsigned int axis{0}; axis != 3; ++axis) object.velocity[axis] = maths::word(object.velocity[axis]
+      if(step.seconds > 0) {
+        auto const velocity{vec3<double>{object.velocity} + object.fraction.velocity};
+        auto change{velocity*(1/(1+speed*ratio/4630.0)-1)};
+        change.z -= 54*ratio;
+        maths::accelerate(object.velocity, change, object.fraction.velocity);
+      } else for(unsigned int axis{0}; axis != 3; ++axis) object.velocity[axis] = maths::word(object.velocity[axis]
         - static_cast<int32_t>(object.velocity[axis]) * speed / 4630 - (axis == 2 ? 54 : 0));
     }
     break;
   case crater:
     if(object.has(world::object_flag::special)) {
-      ++object.timer;
+      if(step.clock_tick) ++object.timer;
       object.flags |= 0xe0u;
     } else if(object.timer <= crater_arm_timer) object.flags |= 0xe0u;
     break;
@@ -619,7 +633,7 @@ void combat::move(maths::world_position const &observer, flight::time_step const
       object.flags = 0;
       continue;
     }
-    --object.timer;
+    if(step.clock_tick) --object.timer;
     if(object.type != world::object_type::bomb || (object.flags & 4u) == 0)
       world::advance_motion(object, geometry.definition(object.type).rotate_below_tier != 0, random, step);
     update_projectile(i, observer, step);
@@ -631,11 +645,13 @@ void combat::move(maths::world_position const &observer, flight::time_step const
       object.flags = 0;
       continue;
     }
-    --object.timer;
+    if(step.clock_tick) --object.timer;
     for(unsigned int axis{0}; axis != 3; ++axis) {
-      object.velocity[axis] = maths::word(object.velocity[axis] + random.below(40) - 20);
+      if(step.clock_tick) object.velocity[axis] = maths::word(object.velocity[axis] + random.below(40) - 20);
       int16_t const displacement{maths::word(object.velocity[axis] - (axis == 2 ? 54 : 0))};
-      object.position[axis] = maths::dword(static_cast<int64_t>(object.position[axis])
+      if(step.seconds > 0) object.position[axis] = maths::dword(static_cast<int64_t>(object.position[axis])
+        + maths::accumulate((displacement + object.fraction.velocity[axis])*step.seconds/timing::seconds_per_step, object.fraction.position[axis]));
+      else object.position[axis] = maths::dword(static_cast<int64_t>(object.position[axis])
         + maths::rounded_divide(static_cast<int32_t>(displacement) * step.elapsed, step.normal));
     }
     if(object.position.z < 0) {
@@ -647,17 +663,25 @@ void combat::move(maths::world_position const &observer, flight::time_step const
   }
 }
 void combat::collisions(maths::world_position const &observer) {
-  /// Process contacts after timed actor handlers, using stable pool indices
+  /// Detect new contacts every substep; persistent overlap damage retains its game-time cadence.
+  std::vector<uint64_t> contacts;
   for(unsigned int a{0}; a != theatre.objects.size(); ++a) {
     (void)observer;
     if(!theatre.objects[a].has(world::object_flag::present)) continue;
     for(unsigned int b{a + 1}; b != theatre.objects.size(); ++b) {
       if(!theatre.objects[b].has(world::object_flag::present)) continue;
+      if(tick_step.seconds > 0) {
+        if(!objects_overlap(theatre.objects[a],theatre.objects[b])) continue;
+        uint64_t const pair{static_cast<uint64_t>(a) << 32 | b};
+        contacts.push_back(pair);
+        if(!tick_step.clock_tick && std::binary_search(contact_pairs.begin(),contact_pairs.end(),pair)) continue;
+      }
       if(theatre.objects[b].type == world::object_type::bullets || theatre.objects[b].type == world::object_type::missile) collide(b, a);
       else collide(a, b);
       if(!theatre.objects[a].has(world::object_flag::present)) break;
     }
   }
+  contact_pairs = std::move(contacts);
 }
 void combat::advance(maths::world_position const &observer, flight::time_step const step) {
   /// Standalone weapon checks use the same movement/contact stages as the live session

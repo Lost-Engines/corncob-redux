@@ -19,10 +19,11 @@ class map_view {
 private:
   maths::world_position origin;
   graphics::camera observer;
+  maths::motion_fraction fraction;
 
 public:
   explicit map_view(maths::world_position const &position);
-  void advance(flight::control_input const &stick, map_input const &input);
+  void advance(flight::control_input const &stick, map_input const &input, double ratio = 1.0);
   graphics::camera camera() const;
 };
 

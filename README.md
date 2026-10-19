@@ -12,7 +12,8 @@ or separate game files are required.
 ## What's improved
 
 - The 3D view renders at your window's resolution, with adjustable field of view.
-  Original cockpit artwork stays crisp with nearest-neighbour scaling.
+  Original cockpit artwork stays crisp with nearest-neighbour scaling. Live
+  movement updates on each frame, with consistent game speed across frame rates.
 - Unlimited draw distance by default, with full-detail models and depth testing
   that fixes the tower door showing through walls and other overlapping objects.
 - WASD movement and mouse look outside the aircraft; Space jumps and Q opens the

@@ -4,6 +4,7 @@
 #include <optional>
 #include <string>
 #include "flight/damage.h"
+#include "flight/continuous.h"
 #include "flight/landing.h"
 #include "game/actors.h"
 #include "game/combat.h"
@@ -16,6 +17,7 @@
 #include "game/slalom.h"
 #include "game/sortie_clock.h"
 #include "game/vision.h"
+#include "game/timing.h"
 #include "graphics/scene.h"
 #include "resources/geometry_bank.h"
 #include "resources/radio_messages.h"
@@ -96,6 +98,7 @@ private:
   maths::random_source &random;
   resources::particle_animation particles;
   uint32_t last_wall_damage{0};
+  std::vector<unsigned int> aircraft_contacts;
   uint16_t sortie_flags{0};
   uint16_t aircraft_losses{0};
   world::object_type fatal_contact{world::object_type::count};
@@ -106,6 +109,11 @@ private:
   aircraft_parking parking;
   flight::atmosphere atmosphere;
   person_state person;
+  flight::continuous_state continuous;
+  maths::motion_fraction person_fraction;
+  vec2<double> tumble_fraction{0,0}, head_fraction{0,0};
+  double elapsed_phase{0}, pit_fraction{0}, capture_fraction{0};
+  timing::frame_clock host_clock;
   vision_state vision;
   std::optional<unsigned int> controlled_aircraft;
   player_mode mode{player_mode::on_foot};
@@ -145,6 +153,8 @@ private:
   bool steering_warned{false};
   std::optional<resources::radio_notice> radio;
 
+  void advance_step(input_state const &input, flight::time_step step, std::optional<std::function_ref<void()>> draw_frame);
+  void update_person_elapsed(input_state const &input, flight::time_step step);
   void update_aircraft(input_state const &input, flight::time_step step);
   void update_scenery();
   void update_person(input_state const &input, flight::time_step step);
@@ -165,6 +175,8 @@ public:
   session(session &&) = delete;
   session &operator=(session &&) = delete;
   void advance(input_state const &input, std::optional<std::function_ref<void()>> draw_frame = std::nullopt);
+  void advance_time(input_state const &input, double seconds);
+  double update_frame(double timestamp, input_state const &input, bool accelerated = false);
   maths::random_source &random_stream() noexcept;
   graphics::camera camera() const;
   world::theatre const &world() const noexcept;
