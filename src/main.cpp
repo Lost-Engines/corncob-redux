@@ -22,6 +22,7 @@
 #include "platform/joystick.h"
 #include "platform/key_codes.h"
 #include "platform/storage.h"
+#include "platform/window_mode.h"
 #include "render/framebuffer.h"
 #include "resources/assets.h"
 #include "resources/cockpit_mask.h"
@@ -45,6 +46,7 @@ struct window_state {
   double look_x{0}, look_y{0}, last_x{0}, last_y{0};
   bool mouse_captured{false}, mouse_primed{false};
   double wheel_remainder{0};
+  bool changing_window_mode{false};
 };
 
 void activate_control(window_state &state, corncob::game::control_id const id) {
@@ -98,6 +100,11 @@ auto main(int const argc, char const *const argv[])->int {
     ("no-sound", "start with sound effects disabled")
     ("graphics-mode", boost::program_options::value<std::string>()->default_value("ega"), "flight graphics: ega (640x350), ega-low (320x200), hercules (720x348 monochrome); alternate cockpits are adapted")
     ("resolution", boost::program_options::value<std::string>(), "3D resolution: window (default), or WIDTHxHEIGHT; menus retain their original pixels")
+    ("fullscreen", "start fullscreen on the current display")
+    ("windowed", "start in a window, overriding a saved fullscreen preference")
+    ("gunsight-size", boost::program_options::value<double>(), "gunsight size multiplier, 0.5..3 (default 1, scaled with resolution)")
+    ("music-volume", boost::program_options::value<double>(), "music volume, 0..100 percent (default 100)")
+    ("effects-volume", boost::program_options::value<double>(), "sound effects volume, 0..100 percent (default 100)")
     ("fov", boost::program_options::value<double>(), "horizontal field of view in degrees, 30..150 (default 94)")
     ("draw-distance", boost::program_options::value<double>(), "maximum visible distance in kilometres; 0 = unlimited (default)")
     ("ground-detail", boost::program_options::value<double>(), "ground point density relative to DOS: 0..250 (default 8)")
@@ -203,6 +210,9 @@ auto main(int const argc, char const *const argv[])->int {
     .beginner_flight{arguments["flight-model"].defaulted() ? (!campaign->active_pilot() || campaign->active_pilot()->beginner_flight()) : flight_model == "beginner"},
   }, arguments.contains("no-music") ? std::optional{false} : std::nullopt};
   auto &preferences{front.options()};
+  if(arguments.contains("fullscreen") && arguments.contains("windowed")) return startup_failure("use either --fullscreen or --windowed");
+  if(arguments.contains("fullscreen")) preferences.fullscreen = true;
+  if(arguments.contains("windowed")) preferences.fullscreen = false;
   if(arguments.contains("resolution")) {
     auto const value{arguments["resolution"].as<std::string>()};
     preferences.window_resolution = value == "window";
@@ -227,6 +237,9 @@ auto main(int const argc, char const *const argv[])->int {
     value = requested;
     return true;
   }};
+  if(!number("gunsight-size", preferences.scene.gunsight_size, scene_settings::minimum_gunsight_size, scene_settings::maximum_gunsight_size)) return startup_failure("--gunsight-size must be between 0.5 and 3");
+  if(!number("music-volume", preferences.music_volume, 0, 100)) return startup_failure("--music-volume must be between 0 and 100");
+  if(!number("effects-volume", preferences.effects_volume, 0, 100)) return startup_failure("--effects-volume must be between 0 and 100");
   if(!number("fov", preferences.scene.horizontal_fov, scene_settings::minimum_fov, scene_settings::maximum_fov)) return startup_failure("--fov must be between 30 and 150 degrees");
   if(!number("draw-distance", preferences.scene.draw_distance, 0, scene_settings::maximum_draw_distance)) return startup_failure("--draw-distance must be a finite non-negative number of kilometres");
   if(!number("mouse-sensitivity", preferences.mouse_sensitivity, 1, 200)) return startup_failure("--mouse-sensitivity must be between 1 and 200");
@@ -329,6 +342,7 @@ auto main(int const argc, char const *const argv[])->int {
   glfwSwapInterval(1);
   bool sound_enabled{!arguments.contains("no-sound")};
   window_state state{game, front, sound_enabled, frame};
+  corncob::platform::window_mode display_mode{*window};
   glfwSetWindowUserPointer(window.get(), &state);
   glfwSetKeyCallback(window.get(), [](GLFWwindow *const window, int const key, int const /*scancode*/, int const action, int const modifiers){
     // media keys can be unknown; -1 is also our unassigned-binding sentinel
@@ -336,12 +350,19 @@ auto main(int const argc, char const *const argv[])->int {
     auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
     auto &game{state.game};
     auto &front{state.front};
-    if(front.capturing_binding()) {
-      if(action == GLFW_PRESS) { front.bind_input(key); if(key >= 0) state.consumed_key_releases.set(static_cast<unsigned int>(key)); }
-      return;
-    }
     if(key >= 0 && action == GLFW_RELEASE && state.consumed_key_releases.test(static_cast<unsigned int>(key))) {
       state.consumed_key_releases.reset(static_cast<unsigned int>(key));
+      return;
+    }
+    if((key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER) && (modifiers & GLFW_MOD_ALT) != 0) {
+      if(action == GLFW_PRESS) {
+        front.set_fullscreen(!front.options().fullscreen);
+        state.consumed_key_releases.set(static_cast<unsigned int>(key));
+      }
+      return;
+    }
+    if(front.capturing_binding()) {
+      if(action == GLFW_PRESS) { front.bind_input(key); if(key >= 0) state.consumed_key_releases.set(static_cast<unsigned int>(key)); }
       return;
     }
     if(front.current_page() == corncob::game::interface_page::briefing && action != GLFW_RELEASE) {
@@ -474,7 +495,7 @@ auto main(int const argc, char const *const argv[])->int {
       state.look_x = state.look_y = 0;
       state.mouse_primed = state.mouse_captured = false;
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-      if(state.front.in_flight()) state.front.show_menu();
+      if(state.front.in_flight() && !state.changing_window_mode) state.front.show_menu();
     }
   });
   glfwSetCharCallback(window.get(), [](GLFWwindow *const window, unsigned int const codepoint){
@@ -504,6 +525,17 @@ auto main(int const argc, char const *const argv[])->int {
   bool clock_was_flying{front.in_flight()};
   while(!glfwWindowShouldClose(window.get())) {
     glfwPollEvents();
+    display_mode.remember_windowed();
+    if(preferences.fullscreen != display_mode.fullscreen()) {
+      state.changing_window_mode = true;
+      bool const changed{display_mode.set_fullscreen(preferences.fullscreen)};
+      state.changing_window_mode = false;
+      state.look_x = state.look_y = 0; state.mouse_primed = false;
+      game->suspend_clock();
+      if(!changed) front.set_fullscreen(display_mode.fullscreen());
+    }
+    sound.volume(static_cast<float>(preferences.effects_volume));
+    music.volume(static_cast<float>(preferences.music_volume));
     if(clock_was_flying && !front.in_flight()) game->suspend_clock();
     clock_was_flying = front.in_flight();
     if(front.quitting()) break;

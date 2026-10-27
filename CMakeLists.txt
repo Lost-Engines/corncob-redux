@@ -245,6 +245,8 @@ configure_first_party(corncob_audio)
 target_link_libraries(corncob_audio PUBLIC corncob_core PRIVATE nuked_opl3 corncob_vorbis)
 
 add_library(corncob_platform STATIC
+  src/platform/window_mode.cpp
+  src/platform/window_mode.h
   src/platform/joystick.cpp
   src/platform/joystick.h
   src/platform/audio_output.cpp
@@ -315,6 +317,8 @@ if(BUILD_TESTING)
   corncob_check(training_checks native_training "${PROJECT_SOURCE_DIR}/tests/reference/training.bin")
   corncob_check(debris_checks native_debris "${PROJECT_SOURCE_DIR}/tests/reference/debris.bin")
   corncob_check(autopilot_checks native_autopilot "${PROJECT_SOURCE_DIR}/tests/reference/autopilot.bin")
+  corncob_check(volume_checks audio_volumes)
+  target_link_libraries(volume_checks PRIVATE corncob_audio)
   corncob_check(music_checks embedded_music)
   target_link_libraries(music_checks PRIVATE corncob_audio corncob_vorbis)
   corncob_check(audio_checks native_sound "${PROJECT_SOURCE_DIR}/tests/reference/audio.bin")

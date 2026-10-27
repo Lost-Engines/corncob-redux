@@ -267,7 +267,7 @@ void front_end::accept() {
       break;
     case interface_page::control_setup:
       if(selection == 0) { return_page = interface_page::control_setup; navigate(interface_page::bindings); }
-      else if(selection == 10) { save_settings(); navigate(interface_page::menu); }
+      else if(selection == 14) { save_settings(); navigate(interface_page::menu); }
       else adjust_setting(1);
       break;
     case interface_page::bindings:
@@ -707,7 +707,7 @@ unsigned int front_end::choice_count() const {
   case interface_page::roster: return 9;
   case interface_page::theatres: return 10;
   case interface_page::training: return 7;
-  case interface_page::control_setup: return 11;
+  case interface_page::control_setup: return 15;
   case interface_page::bindings: return static_cast<unsigned int>(settings.bindings.size()) + 2;
   case interface_page::training_counts: case interface_page::training_wickedness: return 4;
   case interface_page::campaigns: return 9;
@@ -732,6 +732,10 @@ audio::music_cue front_end::music() const noexcept {
 }
 preferences &front_end::options() noexcept {
   return settings;
+}
+void front_end::set_fullscreen(bool const enabled) {
+  settings.fullscreen = enabled;
+  try { save_settings(); } catch(std::exception const &error) { notice(error.what()); }
 }
 void front_end::save_settings() {
   settings.save(campaign.save_directory() / "redux.cfg");
@@ -779,6 +783,10 @@ void front_end::adjust_setting(int const direction) {
   case 7: settings.mouse_sensitivity = std::clamp(settings.mouse_sensitivity + direction * 2, 1.0, 200.0); break;
   case 8: settings.invert_mouse = !settings.invert_mouse; break;
   case 9: settings.scene.ground_range = std::clamp(settings.scene.ground_range * (direction > 0 ? 2.0 : 0.5), graphics::scene_settings::minimum_ground_range, graphics::scene_settings::maximum_ground_range); break;
+  case 10: settings.scene.gunsight_size = std::clamp(settings.scene.gunsight_size + direction * 0.25, graphics::scene_settings::minimum_gunsight_size, graphics::scene_settings::maximum_gunsight_size); break;
+  case 11: settings.music_volume = std::clamp(settings.music_volume + direction * 5, 0.0, 100.0); break;
+  case 12: settings.effects_volume = std::clamp(settings.effects_volume + direction * 5, 0.0, 100.0); break;
+  case 13: settings.fullscreen = !settings.fullscreen; break;
   default: return;
   }
   save_settings();

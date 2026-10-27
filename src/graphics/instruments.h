@@ -30,7 +30,7 @@ struct instrument_telemetry {
   unsigned int slalom_progress{0};
 };
 
-void draw_gunsight(indexed_framebuffer &target, random_source &random, clip_rectangle const &bounds, screen_point const &centre);
+void draw_gunsight(indexed_framebuffer &target, random_source &random, clip_rectangle const &bounds, screen_point const &centre, double scale = 1.0);
 
 class instrument_panel {
 private:

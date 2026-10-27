@@ -83,6 +83,9 @@ preferences preferences::load(std::filesystem::path const &path) {
     row >> name;
     if(name == "resolution") { unsigned int w{}, h{}; if(row >> w >> h && w >= render::resolution_limits::minimum_width && h >= render::resolution_limits::minimum_height && w <= render::resolution_limits::maximum_width && h <= render::resolution_limits::maximum_height) result.scene.resolution = {w, h}; }
     else if(name == "window_resolution") { int value{}; if(row >> value) result.window_resolution = value != 0; }
+    else if(name == "fullscreen") { int value{}; if(row >> value) result.fullscreen = value != 0; }
+    else if(name == "gunsight_size") { double value{}; if(row >> value && std::isfinite(value)) result.scene.gunsight_size = std::clamp(value, graphics::scene_settings::minimum_gunsight_size, graphics::scene_settings::maximum_gunsight_size); }
+    else if(name == "music_volume" || name == "effects_volume") { double value{}; if(row >> value && std::isfinite(value)) (name == "music_volume" ? result.music_volume : result.effects_volume) = std::clamp(value, 0.0, 100.0); }
     else if(name == "fov") { double value{}; if(row >> value && std::isfinite(value)) result.scene.horizontal_fov = std::clamp(value, graphics::scene_settings::minimum_fov, graphics::scene_settings::maximum_fov); }
     else if(name == "draw_distance") { double value{}; if(row >> value && std::isfinite(value) && value >= 0) result.scene.draw_distance = std::min(value, graphics::scene_settings::maximum_draw_distance); }
     else if(name == "ground_points") { unsigned int value{}; if(row >> value) result.scene.ground_points = std::min(value, graphics::scene_settings::maximum_ground_points); }
@@ -101,6 +104,7 @@ preferences preferences::load(std::filesystem::path const &path) {
 void preferences::save(std::filesystem::path const &path) const {
   std::ostringstream text;
   text << "# Corncob Redux settings; key codes follow GLFW.\nresolution " << scene.resolution.width << ' ' << scene.resolution.height
+    << "\nfullscreen " << fullscreen << "\ngunsight_size " << scene.gunsight_size << "\nmusic_volume " << music_volume << "\neffects_volume " << effects_volume
     << "\nwindow_resolution " << window_resolution << "\nfov " << scene.horizontal_fov << "\ndraw_distance " << scene.draw_distance
     << "\nground_points " << scene.ground_points << "\nground_range " << scene.ground_range << "\nmouse_sensitivity " << mouse_sensitivity << "\ninvert_mouse " << invert_mouse << '\n';
   for(std::size_t i{0}; i < bindings.size(); ++i) {

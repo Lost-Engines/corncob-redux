@@ -366,7 +366,7 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
   }
   if(observer.gunsight || telemetry) {
     auto const &view{views.front()};
-    draw_gunsight(indexed, random, view.bounds, {static_cast<int>(view.centre_x), static_cast<int>(view.centre_y)});
+    draw_gunsight(indexed, random, view.bounds, {static_cast<int>(view.centre_x), static_cast<int>(view.centre_y)}, available * settings.gunsight_size);
   }
   if(telemetry) {
     if(observer.cockpit) {

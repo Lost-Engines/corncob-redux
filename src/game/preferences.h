@@ -33,6 +33,8 @@ struct preferences {
   static double constexpr minimum_mouse_sensitivity{1}, maximum_mouse_sensitivity{200};
   graphics::scene_settings scene;
   bool window_resolution{true};
+  bool fullscreen{false};
+  double music_volume{100.0}, effects_volume{100.0};
   double mouse_sensitivity{24.0}; // Angle units per physical mouse pixel; full turn = 65536.
   bool invert_mouse{false};
   std::vector<control_binding> bindings{default_bindings()};

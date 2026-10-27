@@ -1,4 +1,5 @@
 #include "effects.h"
+#include "gain.h"
 #include <algorithm>
 #include <array>
 #include <charconv>
@@ -43,6 +44,7 @@ frame_state observe(game::session const &game) {
 }
 
 struct effects::implementation {
+  gain_control gain;
   opl3_chip chip{};
   std::array<std::vector<register_write>, 12> patches;
   std::vector<register_write> queued;
@@ -152,6 +154,7 @@ effects::effects(resources::collection const &resources) : state{std::make_uniqu
   reset();
 }
 effects::~effects() = default;
+void effects::volume(float const percent) noexcept { state->gain.set(percent); }
 void effects::reset(resources::collection const &resources) {
   /// Patch definitions belong to the simulation thread; the PCM thread consumes only queued register writes.
   state->load_patches(resources);
@@ -302,6 +305,7 @@ void effects::render(std::span<float> const samples) noexcept {
   });
   std::ranges::stable_sort(state->scheduled, {}, &implementation::scheduled_write::frame);
   unsigned int event{0};
+  float const target_gain{state->gain.begin()};
   for(size_t sample{0}; sample + 1 < samples.size(); sample += 2) {
     while(event < state->scheduled.size() && state->scheduled[event].frame <= state->rendered_frames) {
       auto const &entry{state->scheduled[event++].write};
@@ -311,8 +315,9 @@ void effects::render(std::span<float> const samples) noexcept {
     std::array<int16_t, 2> frame;
     OPL3_GenerateResampled(&state->chip, frame.data());
     // Keep the chip clock running while muted, without leaking held envelopes into menu music.
-    samples[sample] = audible ? frame[0] / 32768.0f : 0.0f;
-    samples[sample + 1] = audible ? frame[1] / 32768.0f : 0.0f;
+    float const gain{state->gain.next(target_gain)};
+    samples[sample] = audible ? frame[0] / 32768.0f * gain : 0.0f;
+    samples[sample + 1] = audible ? frame[1] / 32768.0f * gain : 0.0f;
   }
   state->scheduled.erase(state->scheduled.begin(), state->scheduled.begin() + event);
 }

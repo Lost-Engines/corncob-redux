@@ -50,6 +50,7 @@ public:
 
   explicit effects(resources::collection const &resources);
   ~effects();
+  void volume(float percent) noexcept;
   effects(effects const&) = delete;
   effects &operator=(effects const&) = delete;
   void reset();

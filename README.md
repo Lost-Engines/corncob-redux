@@ -14,11 +14,14 @@ or separate game files are required.
 - The 3D view renders at your window's resolution, with adjustable field of view.
   Original cockpit artwork stays crisp with nearest-neighbour scaling. Live
   movement updates on each frame, with consistent game speed across frame rates.
+  The gunsight scales with resolution and has an adjustable size.
 - Unlimited draw distance by default, with full-detail models and depth testing
   that fixes the tower door showing through walls and other overlapping objects.
 - WASD movement and mouse look outside the aircraft; Space jumps and Q opens the
   parachute. Stepping out places you just behind the wing. Keyboard and mouse
   bindings are configurable in the menu.
+- Separate, saved music and sound-effects volumes. Alt+Enter switches fullscreen
+  and restores the previous window size when returning.
 - Adjustable ground detail and field range give a clearer sense of movement.
   Nearby dots and lines scale with resolution, becoming fine single-pixel details
   in the distance.
@@ -56,6 +59,10 @@ Tests are off by default; enable `-DBUILD_TESTING=ON` when developing.
 | --- | --- |
 | `--resolution window` | Match the 3D view to the window; the default. |
 | `--resolution 1920x1080` | Use a fixed 3D rendering resolution. |
+| `--fullscreen` / `--windowed` | Choose fullscreen or override a saved fullscreen setting. |
+| `--gunsight-size 1.5` | Gunsight size multiplier, from 0.5 to 3; default 1. |
+| `--music-volume 75` | Music volume, from 0 to 100 percent. |
+| `--effects-volume 75` | Sound-effects volume, from 0 to 100 percent. |
 | `--fov 110` | Set horizontal FOV, from 30 to 150 degrees; default 94. |
 | `--draw-distance 0` | Unlimited visibility; a positive number sets a limit in kilometres. |
 | `--ground-detail 8` | Ground-point count relative to DOS; default 8, zero disables it. |

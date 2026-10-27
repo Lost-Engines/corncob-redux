@@ -201,6 +201,7 @@ private:
 public:
   front_end(resources::collection const &assets, campaign_store &campaign, bool skip_intro = false, bool start_in_flight = false, std::optional<control_setup> controls = std::nullopt, std::optional<bool> music_enabled = std::nullopt);
   preferences &options() noexcept;
+  void set_fullscreen(bool enabled);
   bool capturing_binding() const noexcept;
   bool bind_input(int key, int mouse = -1);
   void wheel(int steps);

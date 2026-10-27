@@ -30,6 +30,25 @@ Cockpit instruments render on the original panel, which is scaled with nearest
 neighbour sampling and centred on wider screens. Menus retain their original
 pixel dimensions.
 
+The gunsight's four solid strokes, gap and thickness scale together from the
+640x350 display, using the smaller of the horizontal and vertical scale factors.
+Its saved size multiplier ranges from 0.5 to 3, with 1 as the default. It remains
+an indexed overlay and retains the original four-stroke artwork.
+
+Options include independent 0..100 percent music and effects sliders. Zero mutes
+that stream while its playback/synthesis continues, so raising the level does not
+restart music or leave stale effects. Gain requests are atomic; the PCM callback
+applies a short ramp on live changes. Existing music and sound on/off controls
+remain available independently of the volume settings.
+
+Alt+Enter and the fullscreen menu option share the saved preference. Fullscreen
+uses the current desktop mode on the monitor containing most of the window;
+Wayland uses the primary monitor because window positions are compositor-owned.
+Returning restores the previous window geometry and maximized state. Switching
+resets the simulation timestamp and mouse deltas. CLI switches `--fullscreen`
+and `--windowed` override the saved choice for that run; the gunsight and volume
+controls also have command-line overrides.
+
 The platform calls `session::update_frame(timestamp, input, accelerated)` with
 monotonic seconds. Native GLFW supplies its timestamp; a future browser callback
 can supply the requestAnimationFrame timestamp after converting milliseconds to

@@ -45,6 +45,8 @@ struct scene_settings {
   double draw_distance{0.0}; // Kilometres; zero has no far plane.
   unsigned int ground_points{640};
   static double constexpr minimum_ground_range{0.25}, maximum_ground_range{64.0};
+  static double constexpr minimum_gunsight_size{0.5}, maximum_gunsight_size{3.0};
+  double gunsight_size{1.0}; // Multiplier after scaling from the original 640x350 display.
   double ground_range{8.0}; // Ground-field spread relative to the original altitude-scaled range.
 };
 using view_parameters = perspective_view;

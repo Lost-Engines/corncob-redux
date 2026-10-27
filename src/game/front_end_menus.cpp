@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <format>
 #include <numeric>
 #include "front_end.h"
@@ -519,9 +520,13 @@ void front_end::render_menus(render::framebuffer &target) const {
   } else if(view == interface_page::control_setup) {
     screen.colours(1, 3, 6);
     screen.heading("Redux Options and Controls");
-    screen.panel(5, 5, 74, 22);
+    screen.panel(5, 4, 74, 24);
     auto const &s{settings.scene};
-    std::array<std::string, 11> const labels{
+    auto volume{[](double const percent){
+      unsigned int const filled{static_cast<unsigned int>(std::lround(percent / 10))};
+      return "[" + std::string(filled, '=') + std::string(10-filled, '-') + std::format("] {:.0f}%", percent);
+    }};
+    std::array<std::string, 15> const labels{
       "Configure key and mouse bindings",
       std::string{"Flight input: "} + (controls.joystick_device == -2 ? "Keyboard" : "Joystick (automatic)"),
       std::string{"Flight model: "} + (controls.beginner_flight ? "Beginner" : "Advanced"),
@@ -532,11 +537,15 @@ void front_end::render_menus(render::framebuffer &target) const {
       std::format("Mouse sensitivity: {:.0f}", settings.mouse_sensitivity),
       std::string{"Invert mouse look: "} + (settings.invert_mouse ? "Yes" : "No"),
       std::format("Ground detail range: {:.2g} x DOS", s.ground_range),
+      std::format("Gunsight size: {:.0f}%", s.gunsight_size * 100),
+      "Music volume: " + volume(settings.music_volume),
+      "Effects volume: " + volume(settings.effects_volume),
+      std::string{"Fullscreen: "} + (settings.fullscreen ? "Yes" : "No"),
       "Back",
     };
-    options(10, 8, labels, selection);
-    screen.text(9, 19, "Left/Right changes values; Enter selects; Escape returns.", 15);
-    screen.text(9, 20, "Settings are saved automatically.", 14);
+    options(10, 6, labels, selection);
+    screen.text(9, 22, "Left/Right changes values; Enter selects; Escape returns.", 15);
+    screen.text(9, 23, "Alt+Enter: fullscreen. Settings save automatically.", 14);
   } else if(view == interface_page::bindings) {
     screen.colours(1, 3, 6);
     screen.heading("Control Bindings");

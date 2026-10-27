@@ -506,6 +506,32 @@ void proximity_and_crater_checks() {
   require(pedestrian.player() == game::player_mode::on_foot, "lingering crater killed a pedestrian");
 }
 
+void gunsight_checks() {
+  namespace graphics = corncob::graphics;
+  corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
+  auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
+  graphics::scene_renderer renderer{geometry,cockpit};
+  corncob::world::theatre world;
+  graphics::camera camera{.attitude{},.cockpit{false},.rear_view{false},.ground_detail{false},.gunsight{true}};
+  corncob::maths::random_source random;
+  corncob::render::framebuffer output;
+  for(unsigned int scale : {1u,2u,3u}) for(double multiplier : {0.5,1.0,2.0}) {
+    graphics::scene_settings settings;
+    settings.resolution={640*scale,350*scale}; settings.ground_points=0; settings.gunsight_size=multiplier;
+    renderer.configure(settings); renderer.render(world,camera,0,0,random,output);
+    auto const &frame{renderer.indexed_frame()};
+    int left{static_cast<int>(frame.width)},right{0},top{static_cast<int>(frame.height)},bottom{0};
+    unsigned int pixels{0};
+    for(unsigned int y{0};y<frame.height;++y) for(unsigned int x{0};x<frame.width;++x) if(frame.pixels[y*frame.width+x]==7) {
+      left=std::min(left,static_cast<int>(x));right=std::max(right,static_cast<int>(x));
+      top=std::min(top,static_cast<int>(y));bottom=std::max(bottom,static_cast<int>(y));++pixels;
+    }
+    require(std::abs(right-left+1-26*scale*multiplier)<=1 && std::abs(bottom-top+1-18*scale*multiplier)<=1,"gunsight footprint failed to scale with resolution or its size setting");
+    require(pixels>0 && frame.pixels[(frame.height/2)*frame.width+frame.width/2]!=7,"scaled gunsight filled the aiming gap");
+    if(multiplier==1) require(pixels==60*scale*scale,"gunsight stroke thickness failed to scale with its footprint");
+  }
+}
+
 void menu_checks(std::filesystem::path const &scratch) {
   namespace game = corncob::game;
   corncob::resources::collection assets{corncob::resources::front_end_asset()};
@@ -560,7 +586,25 @@ void menu_checks(std::filesystem::path const &scratch) {
   auto const ranged{game::preferences::load(scratch / "redux.cfg")};
   require(ranged.scene.ground_range == old_range * 0.5, "ground range menu did not save independently of density");
   require(ranged.scene.ground_points == adjusted.scene.ground_points, "ground range changed the configured density");
-  front.command(game::interface_command::cancel);
+  front.command(game::interface_command::down); front.command(game::interface_command::next);
+  require(front.options().scene.gunsight_size==1.25,"gunsight size menu did not adjust its multiplier");
+  front.command(game::interface_command::down); front.command(game::interface_command::previous);
+  front.command(game::interface_command::down); front.command(game::interface_command::previous);
+  require(front.options().music_volume==95 && front.options().effects_volume==95,"audio sliders did not adjust independently");
+  front.command(game::interface_command::down); front.command(game::interface_command::accept);
+  auto const polished{game::preferences::load(scratch/"redux.cfg")};
+  require(polished.fullscreen && polished.scene.gunsight_size==1.25 && polished.music_volume==95 && polished.effects_volume==95,"new display and audio options were not saved");
+  front.set_fullscreen(false);
+  require(!game::preferences::load(scratch/"redux.cfg").fullscreen,"fullscreen shortcut did not persist the windowed preference");
+  {
+    std::ofstream invalid{scratch/"limits.cfg"};
+    invalid << "gunsight_size 99\nmusic_volume -15\neffects_volume 900\n";
+  }
+  auto const limited{game::preferences::load(scratch/"limits.cfg")};
+  require(limited.scene.gunsight_size==3 && limited.music_volume==0 && limited.effects_volume==100,"out-of-range display/audio settings were not bounded");
+  require(!legacy.fullscreen && legacy.scene.gunsight_size==1 && legacy.music_volume==100 && legacy.effects_volume==100,"old settings files did not retain sensible defaults");
+  front.command(game::interface_command::end); front.command(game::interface_command::accept);
+  require(front.current_page()==game::interface_page::menu,"options Back item did not return to the menu");
   front.character('p');
   for(auto const name : {"earth", "other_worlds", "hints", "mission_builder"}) {
     auto const path{scratch / "documentation" / (std::string{name} + ".pdf")};
@@ -580,7 +624,7 @@ int main(int argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"scratch directory required"};
   std::filesystem::path const scratch{argv[1]};
   std::filesystem::remove_all(scratch);
-  depth_checks(); detail_size_checks(); billboard_detail_checks(); ground_crew_checks(); renderer_checks(); ground_size_checks(); ground_range_checks(); ground_tracking_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); menu_checks(scratch);
+  depth_checks(); detail_size_checks(); billboard_detail_checks(); ground_crew_checks(); renderer_checks(); ground_size_checks(); ground_range_checks(); ground_tracking_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); gunsight_checks(); menu_checks(scratch);
   std::filesystem::remove_all(scratch);
   std::cout << "Redux depth, detail sizing, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
 }
