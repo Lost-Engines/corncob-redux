@@ -195,6 +195,24 @@ geometry_bank::geometry_bank(std::span<uint8_t const> const source, bool const s
   // the injured pose's blood backdrop belongs behind the head, including its billboard edges
   auto &blood{std::get<polygon>(primitives.at(primitive_ids.at((8u << 16) | 0x6e4fu)))};
   blood.surface_anchor.emplace(head.discs.front().position);
+  // The chase-view pilot uses the original standing crew silhouette, seen from
+  // behind. Copy its primitives so the red shirt and blank back of the head
+  // cannot change ordinary crew, the spy or their authored animation states.
+  auto player{models.at(definition(world::object_type::ground_crew).models.near)};
+  std::unordered_map<unsigned int, unsigned int> player_primitives;
+  for(auto &octant : player.octants) for(auto &command : octant) {
+    auto const original{command.primitive_index};
+    if(!player_primitives.contains(original)) {
+      auto shape{primitives.at(original)};
+      if(auto *body{std::get_if<polygon>(&shape)}; body && body->colour == 0x6d15) body->colour = 12;
+      if(auto *discs{std::get_if<disc_cloud>(&shape)}) discs->discs.resize(1); // Head without eyes.
+      if(auto *lines{std::get_if<wireframe>(&shape)}) lines->lines.erase(lines->lines.begin()); // Keep the belt, omit the mouth.
+      player_primitives.emplace(original, static_cast<unsigned int>(primitives.size()));
+      primitives.push_back(std::move(shape));
+    }
+    command.primitive_index = player_primitives.at(original);
+  }
+  models.emplace(player_model, std::move(player));
   // Data-only source branches use a reserved address range, independently of the original executable's resources.
   std::vector<uint8_t> recovered(source_model_base + source_model_bytes.size());
   std::ranges::copy(source_model_bytes, recovered.begin() + source_model_base);

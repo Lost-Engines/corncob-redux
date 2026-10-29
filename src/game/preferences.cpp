@@ -51,6 +51,8 @@ std::vector<control_binding> default_bindings() {
     binding(sound, "Sound effects", flight, 'S'),
     // append new controls to preserve indices in existing saved bindings
     binding(fast_forward, "Fast forward (hold)", both, 'T'),
+    binding(first_person, "Cockpit / first person", both, keys::first_function + 5),
+    binding(third_person, "Third person", both, keys::first_function + 6),
   };
 }
 std::string binding_name(control_binding const &binding) {

@@ -33,6 +33,23 @@ Cockpit instruments render on the original panel, which is scaled with nearest
 neighbour sampling and centred on wider screens. Menus retain their original
 pixel dimensions.
 
+F6 selects the cockpit (or first-person view on foot); F7 selects the chase view.
+F8 remains unassigned. These are ordinary configurable bindings, appended so old
+saved binding indices stay valid. The view choice survives boarding, ejection,
+maps and menus within a sortie. It starts in first person for a new sortie.
+The chase view follows the current pose immediately, without interpolation or
+camera lag. Aircraft banking remains visible against a level horizon; existing
+look controls still work. The camera stays above the ground or the current
+supporting platform. The on-foot figure uses a private copy of the standing
+crew model with a red shirt and no face on the back of its head.
+
+`session::camera()` remains the logical observer for weapons, interactions,
+audio and mission rules. Only `render_camera()` offsets the display and supplies
+a temporary player model; it never changes world objects or saved missions.
+The external gunsight projects a point 300 metres along the weapon's forward
+axis, rather than aiming along the camera centre. It is a direction reference,
+not a prediction of projectile drop or a lock-on indicator.
+
 The gunsight's four solid strokes, gap and thickness scale together from the
 640x350 display, using the smaller of the horizontal and vertical scale factors.
 Its saved size multiplier ranges from 0.5 to 3, with 1 as the default. It remains

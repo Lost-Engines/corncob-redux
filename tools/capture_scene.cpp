@@ -192,6 +192,7 @@ int main(int argc, char **argv) try {
   add("flight", "start in an aircraft instead of on foot");
   add("experimental", "use the experimental aircraft");
   add("external", "show the player's aircraft for an external camera");
+  add("chase", "use the live F7 third-person camera and player model");
   add("cockpit", "include the live cockpit instruments");
   add("gunsight", "include the gunsight in a clear view");
   add("speed", po::value<int>()->default_value(5000), "initial original forward-airflow units");
@@ -321,7 +322,8 @@ int main(int argc, char **argv) try {
       game.press(g::action::rocket);
     g::capture_access::advance(game, input, std::min(1.0 / 60, duration - time), args.contains("hold"));
   }
-  auto display{g::capture_access::display(game, args.contains("external"))};
+  if(args.contains("chase")) game.press(g::action::third_person);
+  auto display{g::capture_access::display(game, args.contains("external") && !args.contains("chase"))};
   if(args.contains("list-objects"))
     for(unsigned int i = 0; i < display.objects.size(); ++i) {
       auto const &o = display.objects[i];
@@ -332,15 +334,17 @@ int main(int argc, char **argv) try {
   auto const tracked_delta{args.contains("track")
                                ? display.objects.at(args["track"].as<unsigned int>()).position - tracked_start
                                : m::world_position{0, 0, 0}};
-  auto eye{game.camera()};
+  auto eye{game.render_camera()};
   if(args.contains("eye"))
     eye.position = position(args["eye"].as<std::string>());
   eye.position += tracked_delta;
   if(args.contains("at"))
     eye.attitude =
         towards(eye.position, position(args["at"].as<std::string>()) + tracked_delta, args["bank"].as<double>());
-  eye.cockpit = args.contains("cockpit");
-  eye.gunsight = eye.cockpit || args.contains("gunsight");
+  if(!args.contains("chase")) {
+    eye.cockpit = args.contains("cockpit");
+    eye.gunsight = eye.cockpit || args.contains("gunsight");
+  }
   auto const mask{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
   gr::scene_renderer renderer{geometry, mask};
   renderer.configure(settings);

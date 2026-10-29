@@ -203,6 +203,7 @@ Shared controls
   M: map. O: toggle radio messages. G: ground detail.
   P / Escape: pause menu. F1: boss screen.
   F2: intelligence. F3: current score. F4: control bindings.
+  F6: cockpit / first person. F7: third-person view.
   Mousewheel: scroll menus, documentation and tower briefings.
 
 Joystick buttons 1 and 2 fire guns and missiles during flight.
@@ -2041,9 +2042,9 @@ feature.  The new tower screen from the fly mission menu should tell you
 to which airstrip the saucer is closest.
 
   The DOS Other Worlds manual also describes an F6 in-flight object
-list. That shortcut is not implemented in Redux. Use the map, tower
-briefings and the live object survey (I on the starting-airfield
-screen).
+list. In Redux, F6 selects the cockpit or first-person view instead.
+For an object list, use the map, tower briefings and the live object
+survey (I on the starting-airfield screen).
 
   Many times a secondary mission objective is mentioned in the mission
 briefing.  This secondary mission also must be completed before a

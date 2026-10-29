@@ -63,6 +63,8 @@ void activate_control(window_state &state, corncob::game::control_id const id) {
   case control_id::remote: game.press(action::toggle_remote); break;
   case control_id::rear: game.press(action::toggle_rear); break;
   case control_id::cockpit: game.press(action::toggle_cockpit); break;
+  case control_id::first_person: game.press(action::first_person); break;
+  case control_id::third_person: game.press(action::third_person); break;
   case control_id::ground: game.press(action::toggle_ground); break;
   case control_id::look: game.press(action::toggle_look); break;
   case control_id::map: game.press(action::toggle_map); break;
@@ -641,7 +643,7 @@ auto main(int const argc, char const *const argv[])->int {
     }
     game->set_beginner_flight(front.flight_controls().beginner_flight);
     auto draw_flight{[&](bool const preview){
-      observer = game->camera();
+      observer = game->render_camera();
 #ifndef NDEBUG
       if(no_cockpit) observer.cockpit = false;
 #endif // NDEBUG

@@ -21,6 +21,8 @@ or separate game files are required.
 - WASD movement and mouse look outside the aircraft; Space jumps and Q opens the
   parachute. Stepping out places you just behind the wing. Keyboard and mouse
   bindings are configurable in the menu.
+- F7 follows behind your aircraft or on-foot character; F6 returns to the cockpit
+  or first-person view. Both keys can be rebound.
 - Separate, saved music and sound-effects volumes. Alt+Enter switches fullscreen
   and restores the previous window size when returning.
 - Adjustable ground detail and field range give a clearer sense of movement,

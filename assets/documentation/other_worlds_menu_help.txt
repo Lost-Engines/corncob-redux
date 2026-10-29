@@ -193,6 +193,7 @@ Shared controls
   M: map. O: toggle radio messages. G: ground detail.
   P / Escape: pause menu. F1: boss screen.
   F2: intelligence. F3: current score. F4: control bindings.
+  F6: cockpit / first person. F7: third-person view.
   Mousewheel: scroll menus, documentation and tower briefings.
 
 Joystick buttons 1 and 2 fire guns and missiles during flight.

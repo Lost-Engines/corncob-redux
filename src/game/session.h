@@ -56,6 +56,8 @@ enum class action {
   plant_charge,
   arm_charges,
   toggle_invulnerability,
+  first_person,
+  third_person,
 };
 
 struct view_input {
@@ -124,6 +126,7 @@ private:
   bool remote{false};
   bool rear{true};
   bool cockpit{true};
+  bool chase_view{false};
   bool ground_detail{true};
   bool paused{false};
   bool look_mode{false};
@@ -181,7 +184,8 @@ public:
   void advance_time(input_state const &input, double seconds);
   double update_frame(double timestamp, input_state const &input, bool accelerated = false);
   maths::random_source &random_stream() noexcept;
-  graphics::camera camera() const;
+  graphics::camera camera() const; // Logical observer used by gameplay.
+  graphics::camera render_camera() const; // Presentation only; may follow behind the player.
   world::theatre const &world() const noexcept;
   player_mode player() const noexcept;
   flight::aircraft_state const &craft() const noexcept;

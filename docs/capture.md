@@ -75,3 +75,6 @@ useful for following a moving saucer. `--seed N` makes a setup repeatable;
 `--fov`, `--detail` and `--range` adjust the view and ground detail. The final
 line on stdout reports resolution and render/combat counts. The only file
 written is the requested PNG; an existing output file is overwritten.
+
+`--chase` uses the live F7 camera and player model, both in flight and on foot.
+It needs no `--eye`, `--at` or `--external` setup; use `--flight` for the aircraft.

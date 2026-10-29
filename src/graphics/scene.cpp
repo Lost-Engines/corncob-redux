@@ -308,6 +308,13 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
     if(settings.draw_distance > 0 && distance > settings.draw_distance * settings.draw_distance * 1e10) continue;
     if(auto item{visibility(object, geometry.definition(object.type), observer.position, geometry.appearance(object))}) visible.push_back(std::move(*item));
   }
+  if(observer.subject) {
+    auto const &subject{*observer.subject};
+    auto appearance{geometry.appearance(subject)};
+    if(subject.type == world::object_type::ground_crew)
+      appearance = {resources::geometry_bank::player_model, resources::geometry_bank::player_model, resources::geometry_bank::player_model};
+    if(auto item{visibility(subject, geometry.definition(subject.type), observer.position, appearance)}) visible.push_back(*item);
+  }
   if(!observer.map_mode) std::ranges::stable_sort(visible, [](visible_object const &lhs, visible_object const &rhs){
     // Paint ground surfaces first; depth testing resolves solid intersections, while authored overlay order survives.
     if(lhs.ground_first != rhs.ground_first) return lhs.ground_first;
@@ -347,7 +354,7 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
       draw_model(address, 0, rotation, rotate(rotation, item->relative), views.first(1), random);
     }
   }
-  if(telemetry && telemetry->aircraft.throttle <= 50) {
+  if(telemetry && !observer.external && telemetry->aircraft.throttle <= 50) {
     auto const &aircraft{telemetry->aircraft};
     auto const offset{maths::transform(maths::make_inverse_rotation(aircraft.attitude), maths::fixed_vector{10, 0, -900})};
     world::placed_object propeller{
@@ -368,9 +375,20 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
       draw_model(item->model, model_octant(item->relative, inverse), matrix, origin, views.first(1), random);
     }
   }
-  if(observer.gunsight || telemetry) {
+  if(observer.gunsight || (telemetry && !observer.external)) {
     auto const &view{views.front()};
-    draw_gunsight(indexed, random, view.bounds, {static_cast<int>(view.centre_x), static_cast<int>(view.centre_y)}, available * settings.gunsight_size);
+    screen_point centre{static_cast<int>(view.centre_x), static_cast<int>(view.centre_y)};
+    bool visible{true};
+    if(observer.aim_point) {
+      auto const aim{rotate(rotation, view_point{*observer.aim_point} - view_point{observer.position})};
+      visible = aim.x > 1.0;
+      if(visible) {
+        double const x{view.centre_x - aim.y * view.focal_x / aim.x}, y{view.centre_y - aim.z * view.focal_y / aim.x};
+        visible = x >= view.bounds.left && x < view.bounds.right && y >= view.bounds.top && y < view.bounds.bottom;
+        if(visible) centre = {static_cast<int>(x), static_cast<int>(y)};
+      }
+    }
+    if(visible) draw_gunsight(indexed, random, view.bounds, centre, available * settings.gunsight_size);
   }
   if(telemetry) {
     if(observer.cockpit) {

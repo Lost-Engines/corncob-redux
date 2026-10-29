@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <optional>
 #include <span>
 #include "graphics/depth_raster.h"
 #include "graphics/instruments.h"
@@ -27,6 +28,10 @@ struct camera {
   vec3<uint16_t> palette_phase{0, 0, 0};
   uint8_t palette_brightness{255};
   resources::particle_animation const *particles{nullptr};
+  // A presentation-only copy: never inserted into the simulation or saved world.
+  bool external{false};
+  std::optional<world::placed_object> subject{};
+  std::optional<maths::world_position> aim_point{};
 };
 
 struct render_statistics {

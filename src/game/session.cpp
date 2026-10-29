@@ -3,6 +3,7 @@
 #include <bit>
 #include <cmath>
 #include <cstdlib>
+#include <numbers>
 #include <utility>
 #include "game/frame_clock.h"
 #include "game/scenery.h"
@@ -97,6 +98,16 @@ void session::press(action const command) {
     return;
   }
   if(map) return;
+  if(command == action::first_person || command == action::third_person) {
+    if(builder) return;
+    chase_view = command == action::third_person;
+    if(!chase_view) {
+      cockpit = true;
+      look_mode = looking = false;
+      head_angles = {};
+    }
+    return;
+  }
   if(command == action::pause) {
     if(!paused) clock.suspend();
     paused = !paused;
@@ -825,6 +836,56 @@ graphics::camera session::camera() const {
     .palette_brightness{vision.intensity()},
     .particles{&particles},
   };
+}
+graphics::camera session::render_camera() const {
+  auto observer{camera()};
+  if(!chase_view || map || builder) return observer;
+  bool const on_foot{mode != player_mode::in_aircraft && (!controlled_aircraft || theatre.objects[*controlled_aircraft].has(world::object_flag::present))};
+  auto const origin{observer.position};
+  // Follow the current pose immediately. Keep the horizon level so aircraft
+  // banking is visible, and use the existing look controls to look around.
+  auto attitude{observer.attitude};
+  attitude.roll = 0;
+  auto const axes{maths::make_inverse_rotation(attitude)};
+  auto const offset{maths::transform(axes, on_foot ? maths::fixed_vector{-1800, 0, 260} : maths::fixed_vector{-11000, 0, 2600})};
+  auto const ahead{maths::transform(axes, on_foot ? maths::fixed_vector{600, 0, 0} : maths::fixed_vector{1800, 0, 0})};
+  auto add{[](maths::world_position const &position, maths::fixed_vector const &delta) {
+    maths::world_position result;
+    for(unsigned int axis{0}; axis != 3; ++axis)
+      result[axis] = maths::dword(static_cast<int64_t>(position[axis]) + delta[axis]);
+    return result;
+  }};
+  observer.position = add(origin, offset);
+  int32_t const surface{on_foot ? person.surface_height : landing.surface_height};
+  int32_t const floor{on_foot ? (person.standing ? surface : 0) : (aircraft.on_ground ? surface : 0)};
+  observer.position.z = std::max(observer.position.z, floor + 200);
+  auto const target{add(origin, ahead)};
+  auto const direction{vec3<double>{target} - vec3<double>{observer.position}};
+  auto angle{[](double const radians) { return static_cast<maths::angle>(static_cast<int32_t>(std::lround(radians * 32768.0 / std::numbers::pi))); }};
+  observer.attitude = {
+    .heading{angle(std::atan2(direction.y, direction.x))},
+    .pitch{angle(std::atan2(-direction.z, std::hypot(direction.x, direction.y)))},
+  };
+  observer.external = true;
+  observer.cockpit = observer.rear_view = false;
+  if(on_foot) {
+    observer.subject = world::placed_object{
+      .position{person.position.x, person.position.y, person.position.z - flight::landing_state::aircraft_height},
+      .attitude{.heading{person.attitude.heading}},
+      .type{world::object_type::ground_crew},
+      .flags{1},
+    };
+  } else if(controlled_aircraft && !airframe_destroyed) {
+    observer.subject = theatre.objects[*controlled_aircraft];
+    observer.subject->position = aircraft.position;
+    observer.subject->attitude = aircraft.attitude;
+    observer.subject->flags |= std::to_underlying(world::object_flag::present);
+  }
+  // Show the weapon's direction, rather than the elevated camera's centre.
+  bool const pistol{on_foot && !remote};
+  auto const aim_axes{maths::make_inverse_rotation(pistol ? person.attitude : aircraft.attitude)};
+  observer.aim_point = add(pistol ? person.position : aircraft.position, maths::transform(aim_axes, {30000, 0, 0}));
+  return observer;
 }
 world::theatre const &session::world() const noexcept {
   /// Expose the current live placements without transferring ownership

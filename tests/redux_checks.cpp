@@ -609,13 +609,13 @@ void menu_checks(std::filesystem::path const &scratch) {
   require(front.options().bindings.front().key == 'K' && front.options().bindings.front().mouse == 3, "mouse rebind removed the keyboard binding");
   auto saved{game::preferences::load(scratch / "redux.cfg")};
   require(saved.bindings.front().key == 'K', "bindings did not persist");
-  require(saved.bindings.back().id == game::control_id::fast_forward && saved.bindings.back().key == 'T' && saved.bindings.back().context == game::control_context::both, "T fast-forward was not available while flying and walking");
+  require(saved.bindings.at(static_cast<unsigned int>(game::control_id::fast_forward)).id == game::control_id::fast_forward && saved.bindings.at(static_cast<unsigned int>(game::control_id::fast_forward)).key == 'T' && saved.bindings.at(static_cast<unsigned int>(game::control_id::fast_forward)).context == game::control_context::both, "T fast-forward was not available while flying and walking");
   {
     std::ofstream legacy{scratch / "legacy.cfg"};
     legacy << "bind 0 75 -1 -1\n";
   }
   auto const legacy{game::preferences::load(scratch / "legacy.cfg")};
-  require(legacy.bindings.front().key == 'K' && legacy.bindings.back().key == 'T', "adding fast-forward broke existing settings");
+  require(legacy.bindings.front().key == 'K' && legacy.bindings.at(static_cast<unsigned int>(game::control_id::fast_forward)).key == 'T', "adding fast-forward broke existing settings");
   front.wheel(1000);
   front.wheel(1000);
   front.command(game::interface_command::accept);
