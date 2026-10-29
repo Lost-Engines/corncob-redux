@@ -272,7 +272,7 @@ target_link_libraries(corncob
 )
 configure_first_party(corncob)
 
-install(TARGETS corncob RUNTIME DESTINATION .)
+install(TARGETS corncob RUNTIME DESTINATION . COMPONENT Runtime)
 
 if(BUILD_TESTING)
   function(corncob_check target test_name)

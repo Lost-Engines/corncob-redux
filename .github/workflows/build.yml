@@ -1,0 +1,276 @@
+name: Build and release
+
+on:
+  push:
+    branches: [master]
+    paths: &build_paths
+      - 'src/**'
+      - 'tests/**'
+      - 'cmake/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
+      - 'assets/**'
+      - 'scripts/**'
+      - 'tools/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths: *build_paths
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Publish release packages after all builds and tests pass
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Preserve each master push; replace obsolete runs on a pull request.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref == 'refs/heads/master' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      release: ${{ steps.classify.outputs.release }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Identify code changes eligible for release
+        id: classify
+        env:
+          BEFORE: ${{ github.event.before }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          release=false
+          if [[ "$EVENT" == push && "$GITHUB_REF" == refs/heads/master ]]; then
+            base="$BEFORE"
+            if [[ "$base" == 0000000000000000000000000000000000000000 ]]; then
+              base=$(git hash-object -t tree /dev/null)
+            fi
+            git cat-file -e "${base}^{tree}"
+            if ! git diff --quiet "$base" "$GITHUB_SHA" -- src assets CMakeLists.txt cmake ':!cmake/package.cmake'; then
+              release=true
+            fi
+          fi
+          echo "release=$release" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: changes
+    name: ${{ matrix.platform }} / ${{ matrix.configuration }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        include:
+          - platform: linux-x86_64
+            runner: ubuntu-24.04
+          - platform: windows-x86_64
+            runner: windows-2025
+          - platform: macos-arm64
+            runner: macos-15
+        # Each platform is crossed with both configurations below.
+        platform: [linux-x86_64, windows-x86_64, macos-arm64]
+    defaults:
+      run:
+        shell: ${{ matrix.platform == 'windows-x86_64' && 'msys2 {0}' || 'bash' }}
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.cache/ccache
+      CCACHE_MAXSIZE: 500M
+      CMAKE_BUILD_PARALLEL_LEVEL: 3
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install Windows toolchain
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-boost
+            mingw-w64-ucrt-x86_64-ccache
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-pkgconf
+            make
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends g++-16 ninja-build ccache \
+            libgl-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev \
+            libwayland-dev libxkbcommon-dev wayland-protocols
+          echo CC=gcc-16 >> "$GITHUB_ENV"
+          echo CXX=g++-16 >> "$GITHUB_ENV"
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install gcc@16 ccache ninja
+          gcc_prefix="$(brew --prefix gcc@16)"
+          gcc_cxx=("$gcc_prefix"/bin/g++-[0-9]*)
+          gcc_version="${gcc_cxx[0]##*g++-}"
+          echo "CC=$gcc_prefix/bin/gcc-$gcc_version" >> "$GITHUB_ENV"
+          echo "CXX=${gcc_cxx[0]}" >> "$GITHUB_ENV"
+          # GLFW's Cocoa integration uses Apple's Objective-C compiler.
+          echo "OBJC=$(xcrun --find clang)" >> "$GITHUB_ENV"
+          echo 'ARCHFLAGS=-arch arm64' >> "$GITHUB_ENV"
+          echo MACOSX_DEPLOYMENT_TARGET=15.0 >> "$GITHUB_ENV"
+
+      - name: Restore compiler cache
+        uses: actions/cache@v5
+        with:
+          path: .cache/ccache
+          key: ccache-${{ matrix.platform }}-${{ matrix.configuration }}-${{ hashFiles('cmake/**', 'CMakeLists.txt') }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ matrix.platform }}-${{ matrix.configuration }}-${{ hashFiles('cmake/**', 'CMakeLists.txt') }}-
+            ccache-${{ matrix.platform }}-${{ matrix.configuration }}-
+
+      - name: Restore Boost
+        if: runner.os != 'Windows'
+        id: boost
+        uses: actions/cache@v5
+        with:
+          path: .cache/boost
+          key: boost-1.90.0-${{ matrix.platform }}-gcc16-static-v1
+      - name: Build Boost
+        if: runner.os != 'Windows' && steps.boost.outputs.cache-hit != 'true'
+        run: |
+          curl --fail --location --retry 3 -o "$RUNNER_TEMP/boost.tar.gz" \
+            https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.gz
+          echo "5e93d582aff26868d581a52ae78c7d8edf3f3064742c6e77901a1f18a437eea9  $RUNNER_TEMP/boost.tar.gz" | shasum -a 256 --check
+          tar -xzf "$RUNNER_TEMP/boost.tar.gz" -C "$RUNNER_TEMP"
+          cd "$RUNNER_TEMP/boost_1_90_0"
+          ./bootstrap.sh --with-libraries=program_options
+          echo "using gcc : : $CXX ;" > "$RUNNER_TEMP/boost-user-config.jam"
+          ./b2 -j3 --user-config="$RUNNER_TEMP/boost-user-config.jam" toolset=gcc cxxstd=23 variant=release link=static \
+            --prefix="$GITHUB_WORKSPACE/.cache/boost" install
+
+      - name: Configure
+        run: |
+          extra=()
+          if [[ "$RUNNER_OS" != Windows ]]; then
+            extra+=("-DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/.cache/boost")
+          fi
+          if [[ "$RUNNER_OS" == macOS ]]; then
+            extra+=(-DCMAKE_OSX_ARCHITECTURES=arm64 "-DCMAKE_OBJC_COMPILER=$OBJC")
+          fi
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} \
+            -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=OFF -DBoost_USE_STATIC_LIBS=ON -DCORNCOB_STATIC_RUNTIME=ON -DCORNCOB_BUILD_CAPTURE=OFF \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            "${extra[@]}"
+      - name: Build
+        run: cmake --build build
+      - name: Test
+        run: ctest --test-dir build --output-on-failure --parallel 3 --timeout 180 --output-junit tests.xml
+      - name: Package and check installed executable
+        run: |
+          cmake --install build --prefix "$PWD/package/corncob" --component Runtime
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            # Verify that the executable needs only Windows system DLLs.
+            PATH="$(cygpath "$WINDIR")/System32:$(cygpath "$WINDIR")" package/corncob/corncob.exe --help
+          else
+            package/corncob/corncob --help
+          fi
+          cmake -DPACKAGE_ROOT="$PWD/package" -DOUTPUT_DIR="$PWD/dist" \
+            -DPLATFORM=${{ matrix.platform }} -P cmake/package.cmake
+      - name: Upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: corncob-redux-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: dist/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tests-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: build/tests.xml
+          if-no-files-found: ignore
+          retention-days: 7
+
+  release:
+    needs: [changes, build]
+    if: github.ref == 'refs/heads/master' && (needs.changes.outputs.release == 'true' || (github.event_name == 'workflow_dispatch' && inputs.release))
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    concurrency:
+      group: publish-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: corncob-redux-*-Release
+          path: dist
+          merge-multiple: true
+      - name: Publish the tested packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag="release-$GITHUB_SHA"
+          # A slower older build must not replace a newer published commit.
+          latest=$(gh api "repos/$GH_REPO/releases" --jq '[.[] | select(.draft == false)][0].tag_name // empty')
+          if [[ "$latest" == release-* && "$latest" != "$tag" ]]; then
+            previous="${latest#release-}"
+            if git merge-base --is-ancestor "$GITHUB_SHA" "$previous"; then
+              echo "A newer commit is already published; keeping $latest."
+              exit 0
+            fi
+          fi
+          shopt -s nullglob
+          packages=(dist/*.tar.gz dist/*.zip)
+          test "${#packages[@]}" -eq 3
+          (cd dist && sha256sum -- *.tar.gz *.zip > SHA256SUMS)
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --draft --target "$GITHUB_SHA" \
+              --title "Corncob Redux ${GITHUB_SHA:0:7}" \
+              --notes 'Automated Release builds for Linux x86-64, Windows x86-64 and macOS Apple Silicon. All six Debug/Release builds passed the automated tests. Includes Corncob 3D and The Other Worlds Campaign, with embedded resources and music; no DOS installation is needed. See the repository README for controls and setup.'
+          fi
+          gh release upload "$tag" "${packages[@]}" dist/SHA256SUMS --clobber
+          gh release edit "$tag" --draft=false --latest
+          # Only prune after publishing the complete replacement. Leave draft releases alone.
+          keep=$(gh api "repos/$GH_REPO/releases/tags/$tag" --jq .id)
+          gh api --paginate "repos/$GH_REPO/releases?per_page=100" \
+            --jq ".[] | select(.draft == false and .id != $keep) | .id" > old-releases.txt
+          while read -r release_id; do
+            gh api --method DELETE "repos/$GH_REPO/releases/$release_id"
+          done < old-releases.txt
+          # Remove obsolete generated tags, including those left by earlier releases.
+          # Preserve tags attached to retained releases/drafts and unrelated tag names.
+          gh api --paginate "repos/$GH_REPO/releases?per_page=100" \
+            --jq '.[].tag_name' > retained-release-tags.txt
+          gh api --paginate "repos/$GH_REPO/git/matching-refs/tags/release-?per_page=100" \
+            --jq '.[].ref' > release-tag-refs.txt
+          while read -r tag_ref; do
+            old_tag="${tag_ref#refs/tags/}"
+            [[ "$old_tag" =~ ^release-[0-9a-f]{40}$ ]] || continue
+            [[ "$old_tag" != "$tag" ]] || continue
+            if grep -Fxq -- "$old_tag" retained-release-tags.txt; then
+              continue
+            fi
+            # An unrelated branch or a newer commit is not an older release.
+            if git merge-base --is-ancestor "${old_tag#release-}" "$GITHUB_SHA"; then
+              gh api --method DELETE "repos/$GH_REPO/git/refs/tags/$old_tag"
+            fi
+          done < release-tag-refs.txt

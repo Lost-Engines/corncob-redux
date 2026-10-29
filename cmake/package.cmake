@@ -1,0 +1,18 @@
+# Package only the Runtime install tree, never build outputs or local game data.
+foreach(required IN ITEMS PACKAGE_ROOT OUTPUT_DIR PLATFORM)
+  if(NOT DEFINED ${required} OR "${${required}}" STREQUAL "")
+    message(FATAL_ERROR "Missing package argument: ${required}")
+  endif()
+endforeach()
+file(MAKE_DIRECTORY "${OUTPUT_DIR}")
+string(REGEX REPLACE "-.*$" "" platform_name "${PLATFORM}")
+set(name "corncob-redux-${platform_name}")
+if(PLATFORM MATCHES "^windows-")
+  set(archive "${OUTPUT_DIR}/${name}.zip")
+  set(arguments cf "${archive}" --format=zip corncob)
+else()
+  set(archive "${OUTPUT_DIR}/${name}.tar.gz")
+  set(arguments czf "${archive}" corncob)
+endif()
+execute_process(COMMAND "${CMAKE_COMMAND}" -E tar ${arguments}
+  WORKING_DIRECTORY "${PACKAGE_ROOT}" COMMAND_ERROR_IS_FATAL ANY)

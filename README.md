@@ -39,6 +39,10 @@ Losing window focus releases the mouse and pauses play.
 
 ## Build and run
 
+[Download the latest builds](https://github.com/Lost-Engines/corncob-redux/releases/latest)
+for Linux x86-64, Windows x86-64 and macOS Apple Silicon. Extract the archive and
+run `corncob` (`corncob.exe` on Windows).
+
 Requires CMake 3.30+, a C++26 compiler, Boost 1.85+ with Program_options, and
 OpenGL and window-system development headers.
 
@@ -102,3 +106,17 @@ Redux's changes above deliberately depart from some DOS behaviour.
 
 For developer-only scene positioning and native-resolution PNG capture, see
 [the screenshot tool](docs/capture.md). It is off by default and is not shipped.
+
+## Development
+
+CI builds and tests Debug and Release on Linux, Windows and macOS. Changes to
+game code, embedded assets or build configuration on `master` publish the three
+Release packages once all six builds pass. The previous published releases and
+their generated tags are removed only after the replacement is complete. Drafts
+and unrelated tags are retained.
+
+Test, tool and workflow changes run the same checks without publishing a release;
+documentation-only changes skip CI. Pull requests never publish. Manual runs can
+optionally publish a release from `master` using the workflow's **release** option.
+Packages contain the game executable with its embedded assets; tests and the
+screenshot tool are excluded.
