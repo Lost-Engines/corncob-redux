@@ -61,6 +61,14 @@ specific weapons. This can catch a particular destruction stage without
 waiting for a lucky collision. No geometry or effects are added by the capture
 renderer itself.
 
+For arranged screenshots, `--place-object=168:-7180,0,0:0,0,0` moves an existing
+actor and optionally sets its heading, pitch and roll. `--copy-object` uses the
+same format to add a copy of an existing actor. Both options can be repeated;
+moves are applied first, then copies, before simulation starts. Original models,
+colours and behaviour are retained. These changes exist only in the capture's
+session; embedded maps and saved games are untouched. Use `--advance=0` to
+capture an arrangement without letting normal object behaviour move it again.
+
 `--list-objects` prints present actor indices, types and positions after the
 simulation. `--track N` shifts the camera and aim with an existing world object,
 useful for following a moving saucer. `--seed N` makes a setup repeatable;

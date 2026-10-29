@@ -140,6 +140,25 @@ m::angles towards(m::world_position const &eye, m::world_position const &target,
           .pitch{angle(-std::atan2(delta.z, std::hypot(delta.x, delta.y)) * degrees)},
           .roll{angle(bank)}};
 }
+void place_object(w::theatre &theatre, std::string const &text, bool copy) {
+  auto const first{text.find(':')};
+  if(first == std::string::npos)
+    throw std::runtime_error{"Object placement requires INDEX:X,Y,Z[:HEADING,PITCH,ROLL]"};
+  unsigned int index{};
+  std::string extra;
+  std::istringstream number{text.substr(0, first)};
+  if(!(number >> index) || number >> extra || index >= theatre.objects.size())
+    throw std::runtime_error{"Object placement index out of range"};
+  auto object{theatre.objects[index]};
+  auto const second{text.find(':', first + 1)};
+  object.position = position(text.substr(first + 1, second == std::string::npos ? second : second - first - 1));
+  if(second != std::string::npos)
+    object.attitude = attitude(text.substr(second + 1));
+  if(copy)
+    theatre.objects.push_back(std::move(object));
+  else
+    theatre.objects[index] = std::move(object);
+}
 void png(std::string const &file, corncob::render::framebuffer const &frame) {
   png_image image{};
   image.version = PNG_IMAGE_VERSION;
@@ -165,6 +184,8 @@ int main(int argc, char **argv) try {
   add("at", po::value<std::string>(), "camera looks at X,Y,Z");
   add("track", po::value<unsigned int>(), "move camera and aim with this object during simulation");
   add("list-objects", "print present actors after simulation for composing another capture");
+  add("place-object", po::value<std::vector<std::string>>()->composing(), "move an actor: INDEX:X,Y,Z[:HEADING,PITCH,ROLL]; repeatable");
+  add("copy-object", po::value<std::vector<std::string>>()->composing(), "copy an actor: INDEX:X,Y,Z[:HEADING,PITCH,ROLL]; repeatable");
   add("pilot", po::value<std::string>(), "player X,Y,Z; defaults to eye or mission start");
   add("attitude", po::value<std::string>()->default_value("0,0,0"), "player/camera heading,pitch,bank");
   add("bank", po::value<double>()->default_value(0), "camera bank when using --at");
@@ -231,6 +252,10 @@ int main(int argc, char **argv) try {
   bool const slalom{args.contains("slalom")};
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset(), slalom};
   auto theatre{slalom ? w::generate_slalom(geometry) : w::load_theatre(args["world"].as<std::string>())};
+  for(auto const &[name, copy] : {std::pair{"place-object", false}, {"copy-object", true}})
+    if(args.contains(name))
+      for(auto const &placement : args[name].as<std::vector<std::string>>())
+        place_object(theatre, placement, copy);
   auto start{theatre.start};
   auto pose{attitude(args["attitude"].as<std::string>())};
   if(args.contains("mission")) {
