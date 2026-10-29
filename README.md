@@ -99,3 +99,6 @@ reference and clearly labelled.
 Visit [Lost Engines](https://lostengines.com) for our other reconstructed games.
 Original reconstruction details are in [the reference notes](docs/reconstruction.md);
 Redux's changes above deliberately depart from some DOS behaviour.
+
+For developer-only scene positioning and native-resolution PNG capture, see
+[the screenshot tool](docs/capture.md). It is off by default and is not shipped.

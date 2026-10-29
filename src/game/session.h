@@ -87,6 +87,9 @@ struct input_state {
 
 
 class session {
+#ifndef NDEBUG
+  friend struct capture_access; // Optional developer capture tool; absent from release builds.
+#endif
 private:
   resources::geometry_bank const &geometry;
   world::theatre theatre;
