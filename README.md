@@ -45,8 +45,8 @@ Losing window focus releases the mouse and pauses play.
 for Linux x86-64, Windows x86-64 and macOS Apple Silicon. Extract the archive and
 run `corncob` (`corncob.exe` on Windows).
 
-Requires CMake 3.30+, a C++26 compiler, Boost 1.85+ with Program_options, and
-OpenGL and window-system development headers.
+Requires CMake 3.30+, a C++26 compiler (such as GCC 16), Boost 1.85+ with
+Program_options, and OpenGL and window-system development headers.
 
 ```sh
 cmake -B build-rel -DCMAKE_BUILD_TYPE=RelWithDebInfo
