@@ -18,7 +18,7 @@ private:
   bool ready{false};
   bool tracking{false};
   double range_multiplier{1.0};
-  double range_exponent{2.0};
+  double range_exponent{4.0};
 
   double point_range(unsigned int index) const noexcept;
 

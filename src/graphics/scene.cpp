@@ -141,6 +141,9 @@ void scene_renderer::draw_ground_and_stars(world::theatre const &theatre, camera
   detail.update(observer.position, random);
   if(!observer.ground_detail) return;
   bool const dark{(palette[11].red >> 2) + (palette[11].green >> 2) + (palette[11].blue >> 2) <= 48};
+  // These are procedural motion cues: their field already expands with altitude.
+  // Grow the ground footprint too, while perspective still reduces the horizon to single pixels.
+  double const ground_footprint{std::max(1.0, observer.position.z / 20'000.0)};
   auto draw_point{[&](maths::world_position const &position, bool const star){
     auto delta{view_point{position} - view_point{observer.position}};
     if(star) delta = delta / 256.0;
@@ -152,7 +155,7 @@ void scene_renderer::draw_ground_and_stars(world::theatre const &theatre, camera
       double const x{view.centre_x - point.y * view.focal_x / point.x}, y{view.centre_y - point.z * view.focal_y / point.x};
       if(x < view.bounds.left || x >= view.bounds.right || y < view.bounds.top || y >= view.bounds.bottom) continue;
       if(star) raster{indexed, view.bounds, random}.point({static_cast<int>(x), static_cast<int>(y)}, 15);
-      else depth_raster{indexed, depth, view, random}.point(transformed, dark ? 14 : 0);
+      else depth_raster{indexed, depth, view, random}.point(transformed, dark ? 14 : 0, ground_footprint);
     }
   }};
   for(auto const &point : detail.points()) draw_point(point, false);

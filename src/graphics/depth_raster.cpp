@@ -37,23 +37,23 @@ double depth_raster::plane(view_point const &p, unsigned int const index) const 
 auto depth_raster::project(view_point const &p) const->projected_point {
   return {view.centre_x - p.y * view.focal_x / p.x, view.centre_y - p.z * view.focal_y / p.x, 1.0 / p.x};
 }
-double depth_raster::detail_width(double const reciprocal_depth) const {
-  return std::clamp(detail_diameter * view.focal_x * reciprocal_depth, 1.0, std::max(1.0, view.pixel_scale));
+double depth_raster::detail_width(double const reciprocal_depth, double const footprint_scale) const {
+  return std::clamp(detail_diameter * footprint_scale * view.focal_x * reciprocal_depth, 1.0, std::max(1.0, view.pixel_scale));
 }
-void depth_raster::detail_point(projected_point const &point, colour_index const colour) {
-  int const size{static_cast<int>(std::lround(detail_width(point.depth)))};
+void depth_raster::detail_point(projected_point const &point, colour_index const colour, double const footprint_scale) {
+  int const size{static_cast<int>(std::lround(detail_width(point.depth, footprint_scale)))};
   // Square footprints preserve the original pixel artwork without filtering the palette.
   int const left{static_cast<int>(std::floor(point.x)) - size / 2}, top{static_cast<int>(std::floor(point.y)) - size / 2};
   for(int y{std::max(top, view.bounds.top)}; y < std::min(top + size, view.bounds.bottom); ++y)
     for(int x{std::max(left, view.bounds.left)}; x < std::min(left + size, view.bounds.right); ++x) pixel(x, y, point.depth, colour);
 }
-void depth_raster::point(view_point const &position, colour_index const colour) {
+void depth_raster::point(view_point const &position, colour_index const colour, double const footprint_scale) {
   auto const centre{orient(position)};
   if(centre.x < 1.0) return;
   auto const p{project(centre)};
   double const margin{std::max(1.0, view.pixel_scale)};
   if(p.x + margin < view.bounds.left || p.x - margin >= view.bounds.right || p.y + margin < view.bounds.top || p.y - margin >= view.bounds.bottom) return;
-  detail_point(p, colour);
+  detail_point(p, colour, footprint_scale);
 }
 void depth_raster::pixel(int const x, int const y, double const reciprocal_depth, colour_index colour) {
   if(x < view.bounds.left || x >= view.bounds.right || y < view.bounds.top || y >= view.bounds.bottom) return;

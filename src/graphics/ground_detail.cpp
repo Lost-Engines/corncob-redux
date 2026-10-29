@@ -44,13 +44,14 @@ void ground_field::density(unsigned int const count) {
 void ground_field::range(double const multiplier) {
   if(range_multiplier == multiplier) return;
   range_multiplier = multiplier;
-  range_exponent = std::log2(multiplier / std::min(multiplier, 0.25));
+  range_exponent = std::log2(multiplier / std::min(multiplier, 0.0625));
   ready = tracking = false;
 }
 double ground_field::point_range(unsigned int const index) const noexcept {
-  // Share the point budget across distance scales; stagger their edges to avoid a common cutoff.
+  // Include the ground beneath the lower viewport, then spread points across distance scales.
+  // Stagger their edges to avoid a common cutoff at the horizon.
   double const fraction{std::min(1.0, index / static_cast<double>(std::max<std::size_t>(2, ground.size()) - 1))};
-  return std::min(range_multiplier, 0.25) * std::exp2(range_exponent * fraction);
+  return std::min(range_multiplier, 0.0625) * std::exp2(range_exponent * fraction);
 }
 void ground_field::initialise(maths::world_position const &observer, maths::random_source &random) noexcept {
   /// Initialise all three eighty-point banks, including the unused far bank and final records beyond the drawing loop
@@ -69,7 +70,7 @@ void ground_field::initialise(maths::world_position const &observer, maths::rand
 }
 void ground_field::update(maths::world_position const &observer, maths::random_source &random) noexcept {
   if(observer.z < 0) return;
-  maths::world_position const centre{observer.x, observer.y, std::max(observer.z, 720)};
+  maths::world_position const centre{observer.x, observer.y, std::max(observer.z, 100)};
   initialise(centre, random);
   if(!tracking) {
     for(unsigned int i{0}; i < ground.size(); ++i) regenerate_ground_point(ground[i], centre, random, point_range(i));

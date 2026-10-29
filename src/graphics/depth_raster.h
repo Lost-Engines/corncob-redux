@@ -30,8 +30,8 @@ private:
   view_point orient(view_point const &source) const;
   double plane(view_point const &point, unsigned int index) const;
   projected_point project(view_point const &point) const;
-  double detail_width(double reciprocal_depth) const;
-  void detail_point(projected_point const &point, colour_index colour);
+  double detail_width(double reciprocal_depth, double footprint_scale = 1.0) const;
+  void detail_point(projected_point const &point, colour_index colour, double footprint_scale = 1.0);
   void pixel(int x, int y, double reciprocal_depth, colour_index colour);
   void triangle(projected_point a, projected_point b, projected_point c, colour_index colour);
 
@@ -40,7 +40,7 @@ public:
   // surface_depth is the parent billboard's camera-space X, before rear-view orientation
   void polygon(std::span<view_point const> vertices, colour_index colour, std::optional<double> surface_depth = std::nullopt);
   void line(view_point a, view_point b, colour_index colour, std::optional<double> surface_depth = std::nullopt);
-  void point(view_point const &position, colour_index colour);
+  void point(view_point const &position, colour_index colour, double footprint_scale = 1.0);
   void disc(view_point centre, double diameter, colour_index colour, std::optional<double> surface_depth = std::nullopt);
 };
 

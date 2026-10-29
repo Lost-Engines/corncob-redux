@@ -22,7 +22,8 @@ or separate game files are required.
   bindings are configurable in the menu.
 - Separate, saved music and sound-effects volumes. Alt+Enter switches fullscreen
   and restores the previous window size when returning.
-- Adjustable ground detail and field range give a clearer sense of movement.
+- Adjustable ground detail and field range give a clearer sense of movement,
+  with coverage close by and detail that stays visible at aircraft altitude.
   Nearby dots and lines scale with resolution, becoming fine single-pixel details
   in the distance.
 - Hold T for tenfold fast-forward while flying or walking. Enemies, projectiles

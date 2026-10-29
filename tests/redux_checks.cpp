@@ -244,19 +244,27 @@ void ground_size_checks() {
   resources::geometry_bank geometry{resources::engine_data_asset()};
   auto const cockpit{resources::decode_cockpit_mask(resources::cockpit_asset())};
   corncob::world::theatre theatre;
-  auto count{[&](int32_t const altitude, unsigned int const scale) {
+  auto count{[&](int32_t const altitude, unsigned int const scale, bool const horizon = false) {
     graphics::scene_renderer renderer{geometry, cockpit};
-    renderer.configure({.resolution{640 * scale, 350 * scale}, .ground_points{80}, .ground_range{1.0}});
+    // The short DOS field does not reach this five-row horizon strip; use Redux's extended field there.
+    renderer.configure({.resolution{640 * scale, 350 * scale}, .ground_points{horizon ? 640u : 80u}, .ground_range{horizon ? 8.0 : 1.0}});
     graphics::camera observer{.position{0, 0, altitude}, .attitude{}, .cockpit{false}};
     corncob::maths::random_source random;
     corncob::render::framebuffer frame;
     renderer.render(theatre, observer, 0, 0, random, frame);
-    return std::ranges::count(renderer.indexed_frame().pixels, uint8_t{0});
+    auto const &pixels{renderer.indexed_frame().pixels};
+    if(horizon) {
+      auto const first{pixels.begin() + (175 * scale) * (640 * scale)};
+      return std::count(first, first + (5 * scale) * (640 * scale), uint8_t{0});
+    }
+    return std::ranges::count(pixels, uint8_t{0});
   }};
   auto const native{count(720, 1)}, doubled{count(720, 2)}, quadrupled{count(720, 4)};
   require(native > 10 && doubled >= native * 3 && quadrupled >= native * 12, "ground dots did not preserve their nearby screen-space weight at higher resolutions");
-  auto const distant_native{count(1'000'000, 1)}, distant_quadrupled{count(1'000'000, 4)};
-  require(distant_native > 10 && distant_quadrupled < distant_native * 2, "distant ground dots did not remain single-pixel details");
+  auto const airborne_native{count(1'000'000, 1)}, airborne_quadrupled{count(1'000'000, 4)};
+  require(airborne_native > 10 && airborne_quadrupled > airborne_native * 2, "ground detail became uniformly single-pixel specks at aircraft altitude");
+  auto const horizon_native{count(1'000'000, 1, true)}, horizon_quadrupled{count(1'000'000, 4, true)};
+  require(horizon_native > 0 && horizon_quadrupled < horizon_native * 2, "horizon ground dots did not remain single-pixel details");
 }
 
 void ground_range_checks() {
@@ -310,6 +318,15 @@ void ground_tracking_checks() {
       if(dx <= altitude * 32LL && dy <= altitude * 32LL) ++nearby;
     }
     require(nearby > 100, "extending the ground range exhausted the nearby point budget");
+  }
+  for(int32_t const altitude : {250, 720, 45'000, 645'000}) {
+    graphics::ground_field fresh;
+    fresh.density(640); fresh.range(8.0);
+    fresh.update({0, 0, altitude}, random);
+    auto const close{std::ranges::count_if(fresh.points(), [altitude](auto const &point) {
+      return std::abs(point.x) <= altitude * 4LL && std::abs(point.y) <= altitude * 4LL;
+    })};
+    require(close > 64, "new ground field left the foreground sparse and concentrated detail in the distance");
   }
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
