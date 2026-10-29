@@ -22,7 +22,8 @@ or separate game files are required.
   parachute. Stepping out places you just behind the wing. Keyboard and mouse
   bindings are configurable in the menu.
 - F7 follows behind your aircraft or on-foot character; F6 returns to the cockpit
-  or first-person view. Both keys can be rebound.
+  or first-person view. Both keys can be rebound. The cockpit's rear display
+  now acts as a mirror.
 - Separate, saved music and sound-effects volumes. Alt+Enter switches fullscreen
   and restores the previous window size when returning.
 - Adjustable ground detail and field range give a clearer sense of movement,

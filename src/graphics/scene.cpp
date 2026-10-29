@@ -118,7 +118,8 @@ void scene_renderer::set_palette(world::theatre const &theatre, maths::world_pos
 void scene_renderer::background(view_parameters const &view, maths::rotation const &rotation) {
   // The horizon is a straight line in each scanline. Fill its two spans instead of testing every pixel ray.
   double const direction{view.rear ? -1.0 : 1.0};
-  double const horizontal{-rotation.rows[1].z * view.focal_y * direction};
+  // The mirror reverses depth, but its horizontal axis matches the forward view.
+  double const horizontal{-rotation.rows[1].z * view.focal_y};
   auto fill{[&](int y, int left, int right, uint8_t colour){
     auto first{indexed.pixels.begin() + static_cast<std::ptrdiff_t>(y) * indexed.width + left};
     if(!indexed.monochrome) std::fill_n(first, right - left, colour);
@@ -150,7 +151,7 @@ void scene_renderer::draw_ground_and_stars(world::theatre const &theatre, camera
     auto const transformed{rotate(rotation, delta * 0.5)};
     for(auto const &view : views.first(star ? views.size() : 1)) {
       auto point{transformed};
-      if(view.rear) { point.x = -point.x; point.y = -point.y; }
+      if(view.rear) point.x = -point.x;
       if(point.x < 1.0) continue;
       double const x{view.centre_x - point.y * view.focal_x / point.x}, y{view.centre_y - point.z * view.focal_y / point.x};
       if(x < view.bounds.left || x >= view.bounds.right || y < view.bounds.top || y >= view.bounds.bottom) continue;

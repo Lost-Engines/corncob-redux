@@ -121,7 +121,7 @@ void billboard_detail_checks() {
     view.rear = rear;
     graphics::depth_raster draw{frame, depth, view, random};
     auto point{[&](double const x, double const y, double const z) {
-      return graphics::view_point{rear ? -x : x, rear ? -y : y, z};
+      return graphics::view_point{rear ? -x : x, y, z};
     }};
     double const surface{rear ? -100.0 : 100.0};
     auto face{[&] {

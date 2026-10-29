@@ -21,7 +21,8 @@ depth_raster::depth_raster(indexed_framebuffer &target, std::vector<float> &dept
 }
 view_point depth_raster::orient(view_point const &source) const {
   view_point point{source};
-  if(view.rear) { point.x = -point.x; point.y = -point.y; }
+  // A rear-view mirror reverses depth while keeping aircraft-left on screen-left.
+  if(view.rear) point.x = -point.x;
   return point;
 }
 double depth_raster::plane(view_point const &p, unsigned int const index) const {

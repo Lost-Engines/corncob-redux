@@ -31,7 +31,9 @@ Authored model dimensions are unchanged; the ground crew's outstretched arms
 really are wider than their height.
 Cockpit instruments render on the original panel, which is scaled with nearest
 neighbour sampling and centred on wider screens. Menus retain their original
-pixel dimensions.
+pixel dimensions. The cockpit's rear display is a mirror: objects behind the
+left wing appear on its left. The DOS game instead used a rear-facing camera.
+The reflection applies to scenery, the sun, stars and the banked horizon.
 
 F6 selects the cockpit (or first-person view on foot); F7 selects the chase view.
 F8 remains unassigned. These are ordinary configurable bindings, appended so old
