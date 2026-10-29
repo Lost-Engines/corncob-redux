@@ -842,10 +842,10 @@ graphics::camera session::render_camera() const {
   if(!chase_view || map || builder) return observer;
   bool const on_foot{mode != player_mode::in_aircraft && (!controlled_aircraft || theatre.objects[*controlled_aircraft].has(world::object_flag::present))};
   auto const origin{observer.position};
-  // Follow the current pose immediately. Keep the horizon level so aircraft
-  // banking is visible, and use the existing look controls to look around.
+  // Keep the chase position and its up direction attached to the aircraft's
+  // full attitude. Walking stays upright; existing look controls still work.
   auto attitude{observer.attitude};
-  attitude.roll = 0;
+  if(on_foot) attitude.roll = 0;
   auto const axes{maths::make_inverse_rotation(attitude)};
   auto const offset{maths::transform(axes, on_foot ? maths::fixed_vector{-1800, 0, 260} : maths::fixed_vector{-11000, 0, 2600})};
   auto const ahead{maths::transform(axes, on_foot ? maths::fixed_vector{600, 0, 0} : maths::fixed_vector{1800, 0, 0})};
@@ -866,6 +866,14 @@ graphics::camera session::render_camera() const {
     .heading{angle(std::atan2(direction.y, direction.x))},
     .pitch{angle(std::atan2(-direction.z, std::hypot(direction.x, direction.y)))},
   };
+  if(!on_foot) {
+    // Project the aircraft's up axis onto the camera's viewing plane. Copying
+    // its Euler roll alone would misalign the view during combined turns and
+    // loops, since the chase camera also tilts towards a point ahead of it.
+    vec3<double> const up{maths::fixed_vector{axes.rows[0].z, axes.rows[1].z, axes.rows[2].z}};
+    auto const level{maths::make_rotation(observer.attitude)};
+    observer.attitude.roll = angle(std::atan2(-up.dot(vec3<double>{level.rows[1]}), up.dot(vec3<double>{level.rows[2]})));
+  }
   observer.external = true;
   observer.cockpit = observer.rear_view = false;
   if(on_foot) {

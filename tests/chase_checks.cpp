@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <array>
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include "game/preferences.h"
@@ -75,6 +77,39 @@ void simulation_checks(r::geometry_bank const &geometry) {
   require(!cockpit.render_camera().external && !cockpit.render_camera().subject, "F7 interfered with the mission builder");
 }
 
+void attitude_checks(r::geometry_bank const &geometry) {
+  // At altitude the aircraft should stay in the same place and orientation on
+  // screen through banks and loops: rotate the entire camera rig with it.
+  for(auto const &pose : std::array<m::angles, 8>{{
+    {0,0,0}, {8192,5000,8192}, {30000,16000,16384}, {30000,16384,32768},
+    {40000,20000,49152}, {50000,32768,40000}, {10000,60000,65535}, {0,0,32768},
+  }}) {
+    w::theatre theatre;
+    theatre.start.z = 720;
+    theatre.objects.push_back({.position{0,-3000,720}, .attitude{pose}, .type{w::object_type::aircraft}, .flags{1}});
+    g::session game{geometry, theatre};
+    game.advance({});
+    require(game.player() == g::player_mode::in_aircraft, "attitude fixture failed to board");
+    game.relocate({.title{"Chase attitude check"}, .position{0,0,200000}, .heading{pose.heading}});
+    game.press(g::action::third_person);
+    auto const view{game.render_camera()};
+    auto const body{m::rotation_real(m::real_angles(game.craft().attitude))};
+    auto const local_eye{body.inverse(vec3<double>{view.position} - vec3<double>{game.craft().position})};
+    require((local_eye - vec3<double>{-11000,0,2600}).length() < 8,
+      "chase position did not rotate with the aircraft's full attitude");
+    auto const camera{m::rotation_real(m::real_angles(view.attitude))};
+    auto const right{camera.inverse(body.apply({0,-700,0}))};
+    auto const left{camera.inverse(body.apply({0,700,0}))};
+    require(std::abs(left.z - right.z) < 2 && left.y > right.y,
+      "camera bank did not keep the aircraft's wings level in the chase view");
+    auto const forward{camera.inverse(body.apply({1000,0,0}))};
+    require(forward.x > 970 && forward.z > 190 && forward.z < 210 && std::abs(forward.y) < 2,
+      "chase aim changed relative to the aircraft during a turn or loop");
+    game.press(g::action::eject);
+    require(game.render_camera().attitude.roll == 0, "on-foot camera inherited the aircraft's bank");
+  }
+}
+
 void boarding_checks(r::geometry_bank const &geometry) {
   for(uint16_t const variant : {uint16_t{0}, uint16_t{0x1000}, uint16_t{0x2000}}) {
     w::theatre theatre;
@@ -139,6 +174,7 @@ void rendering_checks(r::geometry_bank &geometry) {
 int main() {
   r::geometry_bank geometry{r::engine_data_asset()};
   simulation_checks(geometry);
+  attitude_checks(geometry);
   boarding_checks(geometry);
   rendering_checks(geometry);
   auto const bindings{g::default_bindings()};

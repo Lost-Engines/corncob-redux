@@ -38,7 +38,8 @@ F8 remains unassigned. These are ordinary configurable bindings, appended so old
 saved binding indices stay valid. The view choice survives boarding, ejection,
 maps and menus within a sortie. It starts in first person for a new sortie.
 The chase view follows the current pose immediately, without interpolation or
-camera lag. Aircraft banking remains visible against a level horizon; existing
+camera lag. Its position and orientation follow the aircraft's full pitch, yaw
+and bank, including inverted flight; the on-foot camera stays upright. Existing
 look controls still work. The camera stays above the ground or the current
 supporting platform. The on-foot figure uses a private copy of the standing
 crew model with a red shirt and no face on the back of its head.
