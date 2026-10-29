@@ -24,8 +24,11 @@ Points stay world anchored and wrap at patch boundaries around the camera; looki
 Climbs, descents and travel recenter the patches independently of visibility.
 Point sizes have no added random variation.
 Palette indices and authored coplanar markings remain intact. The 3D view has
-configurable horizontal FOV; its horizontal/vertical focal ratio preserves the
-original projection style.
+configurable horizontal FOV and equal horizontal/vertical focal lengths for
+square pixels, including the rear-view inset. Keeping the DOS focal ratio here
+compressed model geometry vertically while billboard discs remained circular.
+Authored model dimensions are unchanged; the ground crew's outstretched arms
+really are wider than their height.
 Cockpit instruments render on the original panel, which is scaled with nearest
 neighbour sampling and centred on wider screens. Menus retain their original
 pixel dimensions.

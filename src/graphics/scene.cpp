@@ -264,7 +264,8 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
   view_storage[0].bounds = {0, 0, static_cast<int>(size.width), observer.cockpit ? cockpit_top : static_cast<int>(size.height)};
   double const focal{size.width * 0.5 / std::tan(settings.horizontal_fov * 3.141592653589793 / 360.0)};
   view_storage[0].focal_x = focal;
-  view_storage[0].focal_y = focal * (2.0 / 3.0);
+  // The render target uses square pixels; DOS's unequal focal lengths compensated for its display.
+  view_storage[0].focal_y = focal;
   view_storage[0].centre_x = size.width * 0.5;
   view_storage[0].centre_y = view_storage[0].bounds.bottom * 0.5;
   double const native_width{static_cast<double>(render::dimensions(video).width)};
@@ -272,7 +273,7 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
   view_storage[1] = {
     .bounds{std::max(0, scaled_x(168)), scaled_y(254), std::min(static_cast<int>(size.width), scaled_x(472)), scaled_y(345)},
     .focal_x{150 * scale},
-    .focal_y{100 * scale},
+    .focal_y{150 * scale},
     .centre_x{panel_left + 320 * scale},
     .centre_y{panel_top + 299 * scale},
     .rear{true},

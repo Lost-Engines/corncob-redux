@@ -238,6 +238,39 @@ void renderer_checks() {
 
 }
 
+void projection_proportion_checks() {
+  namespace graphics = corncob::graphics;
+  namespace world = corncob::world;
+  corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
+  auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
+  graphics::scene_renderer renderer{geometry, cockpit};
+  corncob::render::framebuffer frame;
+  corncob::maths::random_source random;
+  // The original tower is eight times as tall as it is wide. Compare actual
+  // rendered geometry, including the rear-view inset, against that model ratio.
+  for(auto const size : {corncob::render::video_size{640,350}, {800,600}, {1280,720}, {1280,350}}) {
+    renderer.configure({.resolution{size}, .horizontal_fov{90}, .ground_points{0}});
+    for(bool const rear : {false, true}) {
+      world::theatre theatre;
+      graphics::camera observer{.position{0,0,16000}, .attitude{}, .cockpit{rear}, .rear_view{rear}, .ground_detail{false}};
+      renderer.render(theatre, observer, 0, 0, random, frame);
+      auto const background{renderer.indexed_frame().pixels};
+      theatre.objects.push_back({.position{rear ? -80000 : 80000,0,16000}, .attitude{}, .type{world::object_type::control_tower}, .flags{1}});
+      renderer.render(theatre, observer, 0, 0, random, frame);
+      auto const &pixels{renderer.indexed_frame().pixels};
+      int left{static_cast<int>(size.width)}, top{static_cast<int>(size.height)}, right{-1}, bottom{-1};
+      for(unsigned int y{0}; y < size.height; ++y) for(unsigned int x{0}; x < size.width; ++x) {
+        auto const offset{static_cast<std::size_t>(y) * size.width + x};
+        if(pixels[offset] == background[offset]) continue;
+        left = std::min(left, static_cast<int>(x)); right = std::max(right, static_cast<int>(x));
+        top = std::min(top, static_cast<int>(y)); bottom = std::max(bottom, static_cast<int>(y));
+      }
+      require(right >= left && bottom >= top, "projection proportion fixture did not render");
+      require(std::abs((bottom - top + 1) - 8 * (right - left + 1)) <= 9, "square-pixel view distorted the tower's authored proportions");
+    }
+  }
+}
+
 void ground_size_checks() {
   namespace graphics = corncob::graphics;
   namespace resources = corncob::resources;
@@ -641,7 +674,7 @@ int main(int argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"scratch directory required"};
   std::filesystem::path const scratch{argv[1]};
   std::filesystem::remove_all(scratch);
-  depth_checks(); detail_size_checks(); billboard_detail_checks(); ground_crew_checks(); renderer_checks(); ground_size_checks(); ground_range_checks(); ground_tracking_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); gunsight_checks(); menu_checks(scratch);
+  depth_checks(); detail_size_checks(); billboard_detail_checks(); ground_crew_checks(); renderer_checks(); projection_proportion_checks(); ground_size_checks(); ground_range_checks(); ground_tracking_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); gunsight_checks(); menu_checks(scratch);
   std::filesystem::remove_all(scratch);
   std::cout << "Redux depth, detail sizing, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
 }

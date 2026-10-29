@@ -12,6 +12,7 @@ or separate game files are required.
 ## What's improved
 
 - The 3D view renders at your window's resolution, with adjustable field of view.
+  Model proportions stay consistent on modern displays.
   Original cockpit artwork stays crisp with nearest-neighbour scaling. Live
   movement updates on each frame, with consistent game speed across frame rates.
   The gunsight scales with resolution and has an adjustable size.
