@@ -26,8 +26,9 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build GLFW examples")
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "Build GLFW tests")
 set(GLFW_INSTALL OFF CACHE BOOL "Install GLFW")
 FetchContent_Declare(glfw
-  URL https://codeload.github.com/glfw/glfw/tar.gz/a74efa0d5628b74adc0426af4c5710e287fa7c2c
-  URL_HASH SHA256=7e85e39ade1efdda00734d323a0230b5c938074e9fb2ddbe453bdbb281064d2c
+  GIT_REPOSITORY https://github.com/glfw/glfw.git
+  GIT_TAG master
+  GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(glfw)
 if(APPLE)
