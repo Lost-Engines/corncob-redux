@@ -18,15 +18,17 @@ int main(int const argc, char const *const argv[]) try {
   unsigned int end_ms{0};
   std::string_view const end_text{argv[2]};
   auto const parsed{std::from_chars(end_text.begin(), end_text.end(), end_ms)};
-  if(parsed.ec != std::errc{} || parsed.ptr != end_text.end() || end_ms == 0 || end_ms > 600'000)
+  if(parsed.ec != std::errc{} || parsed.ptr != end_text.end() || end_ms == 0 || end_ms > 600'000) {
     throw std::invalid_argument{"invalid native song boundary"};
+  }
   std::ifstream file{argv[1], std::ios::binary};
   std::vector<uint8_t> const bytes{std::istreambuf_iterator<char>{file}, {}};
   auto const word{[&](unsigned int const offset){return bytes.at(offset) | bytes.at(offset + 1) << 8;}};
   if(bytes.size() < 26 || std::string_view{reinterpret_cast<char const*>(bytes.data()), 8} != "DBRAWOPL"
     || word(8) != 2 || word(10) != 0 || bytes[20] != 0 || bytes[21] != 0 || bytes[22] != 0
-    || bytes[25] > 127 || bytes.size() < 26u + bytes[25] || ((bytes.size() - 26 - bytes[25]) & 1u) != 0)
+    || bytes[25] > 127 || bytes.size() < 26u + bytes[25] || ((bytes.size() - 26 - bytes[25]) & 1u) != 0) {
     throw std::invalid_argument{"expected an uncompressed DOSBox DRO v2 OPL2 capture"};
+  }
   opl3_chip chip{};
   unsigned int constexpr sample_rate{48'000};
   OPL3_Reset(&chip, sample_rate);

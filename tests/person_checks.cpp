@@ -41,8 +41,9 @@ int main(int const argc, char const *const argv[]) {
       .pitch{data.signed_word(offset + 20)},
     });
     if(person.attitude.heading != data.word(offset + 22) || person.attitude.pitch != data.word(offset + 24) || person.attitude.roll != data.word(offset + 26)
-      || person.tumble.x != data.signed_word(offset + 28) || person.tumble.y != data.signed_word(offset + 30) || person.swing_frames != data.word(offset + 32))
+      || person.tumble.x != data.signed_word(offset + 28) || person.tumble.y != data.signed_word(offset + 30) || person.swing_frames != data.word(offset + 32)) {
       throw std::runtime_error{"native parachute swing mismatch at case " + std::to_string(i)};
+    }
     offset += 34;
   }
   std::ifstream walking_input{argv[2], std::ios::binary};
@@ -53,8 +54,9 @@ int main(int const argc, char const *const argv[]) {
   for(unsigned int i{0}; i < walking.dword(8); ++i) {
     unsigned int const offset{16 + i * 14};
     auto const delta{corncob::game::walking_displacement(walking.word(offset), {walking.signed_word(offset + 2), 0, 0}, {walking.signed_word(offset + 4), 5})};
-    if(delta.x != walking.signed_dword(offset + 6) || delta.y != walking.signed_dword(offset + 10) || delta.z != 0)
+    if(delta.x != walking.signed_dword(offset + 6) || delta.y != walking.signed_dword(offset + 10) || delta.z != 0) {
       throw std::runtime_error{"native walking displacement mismatch at case " + std::to_string(i)};
+    }
   }
   std::cout << "512 original fall-damping, 512 parachute-swing and " << walking.dword(8) << " walking passes match" << std::endl;
   return EXIT_SUCCESS;

@@ -3,8 +3,8 @@
 #include <array>
 #include <bit>
 #include <cstdlib>
-#include "graphics/disc_tables.h"
 #include "maths/fixed.h"
+#include "graphics/disc_tables.h"
 
 namespace corncob::graphics {
 

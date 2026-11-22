@@ -3,10 +3,10 @@
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
-#include "game/campaign.h"
-#include "resources/assets.h"
-#include "game/session.h"
 #include "platform/storage.h"
+#include "game/campaign.h"
+#include "game/session.h"
+#include "resources/assets.h"
 #include "resources/binary_reader.h"
 
 namespace {

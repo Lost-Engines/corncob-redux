@@ -7,8 +7,8 @@
 #include <string_view>
 #include <vector>
 #include "game/statistics.h"
-#include "world/training.h"
 #include "world/theatre_catalog.h"
+#include "world/training.h"
 
 namespace corncob::game {
 

@@ -7,8 +7,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <opl3.h>
-#include "maths/random.h"
 #include "maths/fixed.h"
+#include "maths/random.h"
 #include "game/session.h"
 
 namespace corncob::audio {

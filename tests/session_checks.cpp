@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <bit>
 #include <cstdlib>
-#include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include "game/session.h"
 #include "resources/assets.h"

@@ -29,8 +29,9 @@ int main(int const argc, char const *const argv[]) {
     auto const height{input.signed_dword()};
     auto const previous{input.signed_word()};
     if(response.pitch != expected_pitch || response.autopilot.engaged != engaged || response.autopilot.height_locked != locked
-      || response.autopilot.height != height || response.autopilot.previous_vertical_airflow != previous)
+      || response.autopilot.height != height || response.autopilot.previous_vertical_airflow != previous) {
       throw std::runtime_error{"autopilot mismatch in native case " + std::to_string(i)};
+    }
   }
   std::cout << count << " original autopilot feedback passes match" << std::endl;
   return EXIT_SUCCESS;

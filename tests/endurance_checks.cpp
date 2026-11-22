@@ -4,9 +4,9 @@
 #include <iostream>
 #include <stdexcept>
 #include <string_view>
+#include "maths/random.h"
 #include "game/session.h"
 #include "graphics/scene.h"
-#include "maths/random.h"
 #include "resources/assets.h"
 
 int main(int const argc, char const *const argv[]) {
@@ -30,8 +30,9 @@ int main(int const argc, char const *const argv[]) {
   for(auto const source : worlds) for(unsigned int start{0}; start != 8; ++start) {
     auto theatre{world::decode_theatre(source)};
     std::vector<maths::world_position> locations;
-    for(auto const &object : theatre.objects) if(object.type == world::object_type::generator_orb || object.type == world::object_type::objective_saucer)
+    for(auto const &object : theatre.objects) if(object.type == world::object_type::generator_orb || object.type == world::object_type::objective_saucer) {
       locations.emplace_back(object.position);
+    }
     auto const plane{std::ranges::find_if(theatre.objects, [](auto const &object){return object.type == world::object_type::aircraft;})};
     if(plane == theatre.objects.end() || locations.empty()) throw std::runtime_error{"endurance theatre lacks an aircraft or objective"};
     theatre.start = maths::world_position{plane->position};
@@ -90,8 +91,8 @@ int main(int const argc, char const *const argv[]) {
     }
     auto const retained{flight.snapshot()};
     auto const encoded{world::encode_theatre(retained)};
-    (void)world::decode_theatre(encoded);
-    (void)game::sortie_statistics::decode(flight.results().encode());
+    static_cast<void>(world::decode_theatre(encoded));
+    static_cast<void>(game::sortie_statistics::decode(flight.results().encode()));
   }
   if(updates < 25'000 || frames < 200) throw std::runtime_error{"endurance runs ended before providing sustained coverage"};
   std::cout << updates << " simulation updates and " << frames << " rendered frames across 32 original-theatre starts" << std::endl;

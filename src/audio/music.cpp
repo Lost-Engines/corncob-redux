@@ -40,8 +40,9 @@ struct music::implementation {
       tracks[i].reset(stb_vorbis_open_memory(files[i].data(), static_cast<int>(files[i].size()), &error, nullptr));
       if(!tracks[i]) throw std::invalid_argument{"cannot decode embedded music: " + std::to_string(error)};
       auto const info{stb_vorbis_get_info(tracks[i].get())};
-      if(info.sample_rate != 48'000 || info.channels != 1 || stb_vorbis_stream_length_in_samples(tracks[i].get()) == 0)
+      if(info.sample_rate != 48'000 || info.channels != 1 || stb_vorbis_stream_length_in_samples(tracks[i].get()) == 0) {
         throw std::invalid_argument{"embedded music must be nonempty 48 kHz mono Vorbis"};
+      }
     }
   }
 };

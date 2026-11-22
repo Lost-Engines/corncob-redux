@@ -21,8 +21,9 @@ int main(int const argc, char const *const argv[]) {
     particles.advance(random);
     if(particles.colour() != input.byte()) throw std::runtime_error{"native particle colour " + std::to_string(i)};
     for(auto const &disc : particles.discs()) {
-      for(unsigned int axis{0}; axis != 3; ++axis) if(disc.position[axis] != input.signed_word())
+      for(unsigned int axis{0}; axis != 3; ++axis) if(disc.position[axis] != input.signed_word()) {
         throw std::runtime_error{"native particle coordinate " + std::to_string(i)};
+      }
       if(disc.diameter != input.word()) throw std::runtime_error{"native particle diameter " + std::to_string(i)};
     }
     if(random.seed() != input.dword()) throw std::runtime_error{"native particle random continuation " + std::to_string(i)};
@@ -49,8 +50,9 @@ int main(int const argc, char const *const argv[]) {
               if(auto const binding{resources::particle_animation::binding(static_cast<uint16_t>(address))}) {
                 auto const &expected{particles.discs()[*binding]};
                 auto const &actual{shape.discs[disc]};
-                if(actual.position != expected.position || actual.diameter != expected.diameter || actual.colour != source.word(address + 8))
+                if(actual.position != expected.position || actual.diameter != expected.diameter || actual.colour != source.word(address + 8)) {
                   throw std::runtime_error{"animated particle resource binding changed its shape or colour reference"};
+                }
                 ++checked;
               }
             }

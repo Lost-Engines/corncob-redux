@@ -1,7 +1,7 @@
 #pragma once
 
-#include "graphics/raster.h"
 #include "maths/fixed.h"
+#include "graphics/raster.h"
 
 namespace corncob::graphics {
 

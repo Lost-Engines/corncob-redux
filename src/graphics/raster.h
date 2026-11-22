@@ -4,9 +4,9 @@
 #include <span>
 #include <vector>
 #include "vectorstorm/vector/vector2.h"
+#include "maths/random.h"
 #include "render/framebuffer.h"
 #include "render/video_mode.h"
-#include "maths/random.h"
 
 namespace corncob::graphics {
 

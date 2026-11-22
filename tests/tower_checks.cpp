@@ -21,7 +21,7 @@ int main(int const argc, char const *const argv[]) {
   game::campaign_store career{scratch};
   auto const storage{std::make_unique<game::front_end>(assets, career, true)};
   auto &front{*storage};
-  auto key{[&](std::string_view const name) {
+  auto key{[&](std::string_view const name){
     if(name == "Up") front.command(up);
     else if(name == "Down") front.command(down);
     else if(name == "Left") front.command(previous);

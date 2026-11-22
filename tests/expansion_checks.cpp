@@ -133,7 +133,7 @@ int main(int const argc, char const *const argv[]) {
   auto editor_session{std::make_unique<game::session>(geometry, world::load_theatre("other_worlds/default"))};
   editor_session->begin_builder();
   unsigned int rendered{0};
-  auto draw_editor{[&](){++rendered;}};
+  auto draw_editor{[&]{++rendered;}};
   editor_session->advance({}, std::function_ref<void()>{draw_editor});
   require(rendered == 1, "builder failed to refresh the native flight frame");
   corncob::graphics::title_sequence expansion_title{expansion, true};

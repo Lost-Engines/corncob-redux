@@ -59,8 +59,9 @@ std::string pilot_record::name() const {
 }
 void pilot_record::rename(std::string_view const name) {
   /// Keep DOS-compatible names bounded and terminated inside their original field
-  if(name.empty() || name.size() > maximum_name_length || name.find_first_of("\r\n\t") != std::string_view::npos || name.find('\0') != std::string_view::npos)
+  if(name.empty() || name.size() > maximum_name_length || name.find_first_of("\r\n\t") != std::string_view::npos || name.find('\0') != std::string_view::npos) {
     throw std::invalid_argument{"pilot names must contain 1 to 20 characters"};
+  }
   std::copy(name.begin(), name.end(), data.begin());
   data[name.size()] = 0;
 }
@@ -143,17 +144,20 @@ world::training_setup pilot_record::training_settings() const {
 }
 void pilot_record::training_settings(world::training_setup const &settings) {
   /// Preserve the remaining setup bytes and aerodynamic-model bit when storing the original training controls
-  for(auto const &defence : {settings.kla, settings.vehicles, settings.aaa})
-    if(defence.count > world::training_defence::maximum_menu_count || defence.quality < -1 || defence.quality > 7)
+  for(auto const &defence : {settings.kla, settings.vehicles, settings.aaa}) {
+    if(defence.count > world::training_defence::maximum_menu_count || defence.quality < -1 || defence.quality > 7) {
       throw std::invalid_argument{"training settings exceed the original menu limits"};
+  }
+    }
   data[0x234] = static_cast<uint8_t>(settings.kla.count);
   data[0x235] = static_cast<uint8_t>(settings.aaa.count);
   data[0x236] = static_cast<uint8_t>(settings.vehicles.count);
   data[0x237] = static_cast<uint8_t>(settings.kla.quality + 1);
   data[0x238] = static_cast<uint8_t>(settings.aaa.quality + 1);
   data[0x239] = static_cast<uint8_t>(settings.vehicles.quality + 1);
-  if(settings.invincible != ((data[0x23b] & 2u) != 0))
+  if(settings.invincible != ((data[0x23b] & 2u) != 0)) {
     data[0x23b] = static_cast<uint8_t>((data[0x23b] & ~3u) | 4u | (settings.invincible ? 3u : 0u));
+  }
 }
 bool pilot_record::beginner_flight() const {
   /// MOAG's aerodynamic-model toggle stores advanced mode in bit five of the pilot's setup byte
@@ -243,8 +247,9 @@ void pilot_record::finish_sortie(sortie_statistics const &result, score_context 
   dword(latest_score_offset, score);
   dword(career_score_offset, maths::dword(static_cast<int64_t>(career_score()) + score));
   word(sorties_offset, static_cast<uint16_t>(sorties() + 1));
-  if(score > dword(best_statistics_offset + sortie_statistics::native_bytes))
+  if(score > dword(best_statistics_offset + sortie_statistics::native_bytes)) {
     std::copy_n(data.begin() + latest_statistics_offset, statistics_and_score_bytes, data.begin() + best_statistics_offset);
+  }
   auto accumulate_word{[this](unsigned int const offset){
     uint16_t const recent{word(latest_statistics_offset + offset)};
     // MOAG compares individual records as signed words, then adds their raw word bits into the career totals
@@ -253,8 +258,9 @@ void pilot_record::finish_sortie(sortie_statistics const &result, score_context 
   }};
   for(unsigned int const offset : {4u, 6u, 72u, 74u, 76u}) accumulate_word(offset);
   std::array<unsigned int, 5> constexpr kill_count_offsets{8, 24, 40, 56, 114};
-  for(unsigned int const first : kill_count_offsets)
+  for(unsigned int const first : kill_count_offsets) {
     for(unsigned int quality{0}; quality != 8; ++quality) accumulate_word(first + quality * 2);
+  }
   unsigned int constexpr retained_time_offset{110};
   int32_t const recent_time{dword(latest_statistics_offset + retained_time_offset)};
   if(recent_time > dword(peak_statistics_offset + retained_time_offset)) dword(peak_statistics_offset + retained_time_offset, recent_time);

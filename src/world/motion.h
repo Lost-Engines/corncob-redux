@@ -1,7 +1,7 @@
 #pragma once
 
-#include "flight/aircraft.h"
 #include "maths/random.h"
+#include "flight/aircraft.h"
 #include "world/world.h"
 
 namespace corncob::world {

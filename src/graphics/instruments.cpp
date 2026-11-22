@@ -226,9 +226,10 @@ void instrument_panel::draw(indexed_framebuffer &target, random_source &random, 
   }
   bool const low_flash{telemetry.low_altitude && (telemetry.timer & 128u) != 0};
   button(cockpit_button::low_altitude, low_flash ? 14 : 7, telemetry.low_altitude && !low_flash ? 15 : 0);
-  for(unsigned int bomb{0}; bomb != std::min(telemetry.bombs, 3u); ++bomb)
+  for(unsigned int bomb{0}; bomb != std::min(telemetry.bombs, 3u); ++bomb) {
     recolour_button(target, static_cast<cockpit_button>(std::to_underlying(cockpit_button::first_bomb) + bomb), 7, 8);
-  int32_t constexpr centimetres_per_foot{30}; // original coarse scale for the ten/twenty-thousand-foot annunciators
+  }
+  int32_t constexpr centimetres_per_foot{30};                                  // original coarse scale for the ten/twenty-thousand-foot annunciators
   if(aircraft.position.z >= 10'000 * centimetres_per_foot) recolour_button(target, cockpit_button::ten_thousand_feet, 7, 5);
   if(aircraft.position.z >= 20'000 * centimetres_per_foot) recolour_button(target, cockpit_button::twenty_thousand_feet, 7, 5);
   if(telemetry.damage && telemetry.damage->invincible) recolour_button(target, cockpit_button::damage, 0, 7);

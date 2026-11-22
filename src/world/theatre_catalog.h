@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
-#include <string_view>
 #include <span>
+#include <string_view>
 #include "world/world.h"
 
 namespace corncob::world {

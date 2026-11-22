@@ -33,8 +33,9 @@ std::string filename(std::istream &input) {
 
 collection::collection(std::span<uint8_t const> const source, collection const *const fallback) : fallback{fallback} {
   /// Index immutable named assets without unpacking them onto the user's filesystem
-  if(source.size() < 10 || std::string_view{reinterpret_cast<char const*>(source.data()), 8} != "CORNUI01")
+  if(source.size() < 10 || std::string_view{reinterpret_cast<char const*>(source.data()), 8} != "CORNUI01") {
     throw std::invalid_argument{"invalid embedded presentation collection"};
+  }
   binary_reader input{source};
   unsigned int offset{10};
   for(unsigned int n{0}; n != input.word(8); ++n) {
@@ -68,8 +69,9 @@ std::array<uint8_t, 4096> collection::menu_font() const {
   auto const base{file("font16.bin")}, medals{file("medal.fnc")};
   if(base.size() != result.size() || medals.size() % 17 != 0) throw std::invalid_argument{"invalid original menu font"};
   std::ranges::copy(base, result.begin());
-  for(unsigned int offset{0}; offset != medals.size(); offset += 17)
+  for(unsigned int offset{0}; offset != medals.size(); offset += 17) {
     std::copy_n(medals.begin() + offset, 16, result.begin() + medals[offset + 16] * 16);
+  }
   return result;
 }
 indexed_image collection::image(std::string_view const name) const {

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "flight/controls.h"
 #include "vectorstorm/vector/vector2.h"
+#include "flight/controls.h"
 
 namespace corncob::flight {
 

@@ -61,7 +61,7 @@ void ground_field::initialise(maths::world_position const &observer, maths::rand
     regenerate_ground_point(point, observer, random, range_multiplier);
     if(i + 1 < ground.size()) ground[i + 1] = maths::world_position{point};
   }
-  for(unsigned int i{0}; i != ground.size(); ++i) (void)distant_point(6, 0, random);
+  for(unsigned int i{0}; i != ground.size(); ++i) static_cast<void>(distant_point(6, 0, random));
   for(unsigned int i{0}; i != sky.size(); ++i) {
     auto const point{generate_star_point(random)};
     if(i + 1 < sky.size()) sky[i + 1] = maths::world_position{point};

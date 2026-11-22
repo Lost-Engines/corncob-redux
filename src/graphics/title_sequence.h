@@ -1,7 +1,7 @@
 #pragma once
 
-#include "resources/collection.h"
 #include "vectorstorm/vector/vector2.h"
+#include "resources/collection.h"
 
 namespace corncob::graphics {
 

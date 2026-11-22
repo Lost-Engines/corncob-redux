@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
-#include "game/high_scores.h"
 #include "maths/random.h"
 #include "platform/storage.h"
+#include "game/high_scores.h"
 #include "tests/reference_reader.h"
 
 namespace {

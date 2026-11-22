@@ -36,8 +36,9 @@ bool belongs_to_airfield(theatre const &world, placed_object const &object, unsi
 maths::world_position airfield_start(theatre const &world, unsigned int const airfield) {
   /// The original runway start is 128071 cm south and 16000 cm east of its tower, at the normal pilot/aircraft height.
   for(auto const &tower : world.objects) {
-    if(tower.type == object_type::control_tower && tower.has(object_flag::present) && airfield_for(tower.position) == airfield)
+    if(tower.type == object_type::control_tower && tower.has(object_flag::present) && airfield_for(tower.position) == airfield) {
       return {tower.position.x - 128071, tower.position.y - 16000, 720};
+    }
   }
   return maths::world_position{world.start};
 }

@@ -406,8 +406,9 @@ void geometry_bank::prepare_colours(world::placed_object const &object, unsigned
   if(slalom_models) {
     colour_reference constexpr wing_colour_address{0x44ce};
     if(object.type == world::object_type::saucer_site) colours[wing_colour_address] = 0;
-    else if(object.type == world::object_type::aircraft || object.type == world::object_type::internal_aircraft)
+    else if(object.type == world::object_type::aircraft || object.type == world::object_type::internal_aircraft) {
       colours[wing_colour_address] = (object.flags & 0x1000u) != 0 ? 6 : 1;
+    }
   }
   uint64_t const type_bit{uint64_t{1} << std::to_underlying(object.type)};
   for(auto const &rule : colour_rules) {

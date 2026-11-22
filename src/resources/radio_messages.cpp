@@ -15,7 +15,7 @@ radio_message read_radio_message(radio_notice const notice) {
   auto const source{engine_data_asset()};
   binary_reader const data{source};
   unsigned int offset{addresses.at(std::to_underlying(notice))};
-  auto box{[&](){
+  auto box{[&]{
     message_box const result{
       .left{data.word(offset) * 8},
       .top{data.word(offset + 2)},

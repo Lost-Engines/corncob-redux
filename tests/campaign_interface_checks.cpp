@@ -4,10 +4,10 @@
 #include <map>
 #include <memory>
 #include <stdexcept>
+#include "platform/storage.h"
 #include "game/front_end.h"
 #include "game/report_format.h"
 #include "resources/assets.h"
-#include "platform/storage.h"
 
 int main(int const argc, char const *const argv[]) {
   if(argc < 3 || argc > 4) throw std::invalid_argument{"campaign_interface_checks requires references, scratch and optional captures"};

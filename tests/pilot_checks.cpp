@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
+#include "platform/storage.h"
 #include "game/pilots.h"
 #include "tests/reference_reader.h"
-#include "platform/storage.h"
 
 int main(int const argc, char const *const argv[]) {
   /// Check original masking, opaque-byte preservation and both retained native roster layouts
@@ -41,23 +41,26 @@ int main(int const argc, char const *const argv[]) {
       with_music.music_enabled(false);
       auto const reopened{corncob::game::pilot_roster::decode(with_music.encode())};
       if(reopened.music_enabled() || reopened.pilots.size() != roster.pilots.size()) throw std::runtime_error{"music setting overwrote a legacy pilot count"};
-      for(unsigned int pilot{0}; pilot != count; ++pilot)
+      for(unsigned int pilot{0}; pilot != count; ++pilot) {
         if(!std::ranges::equal(reopened.pilots[pilot].native_data(), roster.pilots[pilot].native_data())) throw std::runtime_error{"music setting changed an imported pilot"};
+      }
     }
   }
   auto const directory{std::filesystem::path{argv[1]}.parent_path()};
   auto const keyboard{corncob::game::pilot_roster::decode(corncob::platform::read_binary(directory / "pilot_keyboard.bin"))};
   auto const joystick{corncob::game::pilot_roster::decode(corncob::platform::read_binary(directory / "pilot_joystick.bin"))};
   auto const linked{corncob::game::pilot_roster::decode(corncob::platform::read_binary(directory / "pilot_theatre.bin"))};
-  if(!keyboard.keyboard_control() || joystick.keyboard_control() || !keyboard.pilots[0].beginner_flight() || linked.pilots[0].beginner_flight())
+  if(!keyboard.keyboard_control() || joystick.keyboard_control() || !keyboard.pilots[0].beginner_flight() || linked.pilots[0].beginner_flight()) {
     throw std::runtime_error{"original saved control or aerodynamic-model choice decoded incorrectly"};
+  }
   auto music_off{corncob::game::pilot_roster::decode(corncob::platform::read_binary(directory / "pilot_music_off.bin"))};
   if(!keyboard.music_enabled() || music_off.music_enabled()) throw std::runtime_error{"original saved music choice decoded incorrectly"};
   auto const before_music{music_off.encode()};
   music_off.music_enabled(true);
   auto const after_music{music_off.encode()};
-  for(unsigned int i{0}; i != before_music.size(); ++i)
+  for(unsigned int i{0}; i != before_music.size(); ++i) {
     if(after_music[i] != static_cast<uint8_t>(i == 25 ? before_music[i] ^ 255 : before_music[i])) throw std::runtime_error{"music toggle changed another native roster byte"};
+  }
   corncob::game::pilot_record created{"NativeTest"};
   created.select(true);
   if(!std::ranges::equal(created.native_data(), keyboard.pilots[0].native_data())) throw std::runtime_error{"new pilot defaults differ from original MOAG creation"};
@@ -65,12 +68,14 @@ int main(int const argc, char const *const argv[]) {
   changed.keyboard_control(false);
   auto const old{keyboard.pilots[0].native_data()};
   changed.pilots[0].beginner_flight(false);
-  for(unsigned int i{0}; i != old.size(); ++i)
+  for(unsigned int i{0}; i != old.size(); ++i) {
     if(changed.pilots[0].native_data()[i] != static_cast<uint8_t>(i == 0x23b ? old[i] | 0x20 : old[i])) throw std::runtime_error{"setting flight assistance changed opaque pilot state"};
+  }
   auto const training{keyboard.pilots[0].training_settings()};
   if(training.kla.count != 5 || training.aaa.count != 6 || training.vehicles.count != 2
-    || training.kla.quality != -1 || training.aaa.quality != -1 || training.vehicles.quality != 3 || !training.invincible)
+    || training.kla.quality != -1 || training.aaa.quality != -1 || training.vehicles.quality != 3 || !training.invincible) {
     throw std::runtime_error{"original new-pilot training defaults decoded incorrectly"};
+  }
   auto configured{keyboard.pilots[0]};
   configured.training_settings(training);
   if(!std::ranges::equal(configured.native_data(), keyboard.pilots[0].native_data())) throw std::runtime_error{"unchanged training settings altered native pilot bytes"};
@@ -91,8 +96,9 @@ int main(int const argc, char const *const argv[]) {
       for(auto &byte : expected) byte = careers.byte();
       corncob::game::pilot_record actual{before};
       actual.finish_sortie(corncob::game::sortie_statistics::decode(sortie));
-      for(unsigned int field{24}; field != 564; ++field)
+      for(unsigned int field{24}; field != 564; ++field) {
         if(actual.native_data()[field] != expected[field]) throw std::runtime_error{"native career case " + std::to_string(i) + " byte " + std::to_string(field)};
+      }
     }
   }
   corncob::game::pilot_record pilot{"Native test"};
@@ -101,8 +107,9 @@ int main(int const argc, char const *const argv[]) {
   };
   pilot.finish_sortie(result);
   pilot.review_career({}, 0, 0);
-  if(pilot.rank() != corncob::game::pilot_rank::captain || pilot.career().objectives_completed != 7)
+  if(pilot.rank() != corncob::game::pilot_rank::captain || pilot.career().objectives_completed != 7) {
     throw std::runtime_error{"normal captain promotion or cumulative objectives failed"};
+  }
   if(pilot.awards(corncob::game::medal::distinguished_service_cross) != 1) throw std::runtime_error{"five-objective medal failed"};
   auto const eligible_record{std::vector<uint8_t>{pilot.native_data().begin(), pilot.native_data().end()}};
   for(auto const excluded : {corncob::game::sortie_status::invincible, corncob::game::sortie_status::aborted}) {

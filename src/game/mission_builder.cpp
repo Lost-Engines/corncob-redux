@@ -67,8 +67,7 @@ void mission_builder::command(builder_command const command) {
   auto &position{selected ? world.objects[*selected].position : cursor};
   switch(command) {
   case builder_command::cursor:
-    if(selected) { cursor = maths::world_position{position}; selected.reset(); }
-    else {
+    if(selected) { cursor = maths::world_position{position}; selected.reset(); } else {
       auto const ahead{maths::transform(maths::make_inverse_rotation(observer.attitude), {20'000, 0, 0})};
       cursor = maths::world_position{observer.position + maths::world_position{ahead}};
     }

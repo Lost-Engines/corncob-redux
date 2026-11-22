@@ -2,10 +2,10 @@
 
 #include <filesystem>
 #include <optional>
-#include "game/pilots.h"
 #include "game/high_scores.h"
-#include "world/world.h"
+#include "game/pilots.h"
 #include "world/theatre_catalog.h"
+#include "world/world.h"
 
 namespace corncob::game {
 

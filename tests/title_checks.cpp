@@ -1,7 +1,7 @@
 #include <cstdlib>
-#include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include "graphics/title_sequence.h"
 #include "resources/assets.h"
@@ -71,8 +71,9 @@ int main(int const argc, char const *const argv[]) {
     std::vector<uint8_t> cloud(length), stencil(length);
     for(auto &value : cloud) value = input.byte();
     for(auto &value : stencil) value = input.byte();
-    for(unsigned int j{0}; j != length; ++j)
+    for(unsigned int j{0}; j != length; ++j) {
       if(corncob::graphics::title_letter_colour(cloud[j], stencil[j], threshold) != input.byte()) throw std::runtime_error{"native VGA title mask differs"};
+    }
   }
   corncob::resources::collection assets{corncob::resources::front_end_asset()};
   corncob::graphics::title_sequence title{assets};

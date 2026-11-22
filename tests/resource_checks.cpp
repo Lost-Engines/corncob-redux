@@ -2,8 +2,8 @@
 #include <array>
 #include <cstdint>
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <iterator>
 #include <stdexcept>
 #include "render/framebuffer.h"

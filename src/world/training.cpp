@@ -25,7 +25,7 @@ theatre generate_training(resources::geometry_bank const &geometry, training_set
     " \\(Note:\\)  Training missions are much harder than the combat missions.";
   result.start = maths::world_position{-848'968, 0, 720};
   maths::random_source random{seed};
-  auto add{[&](object_type const type, int32_t const x, int32_t const y, int32_t const z, unsigned int const quality = 0) -> placed_object& {
+  auto add{[&](object_type const type, int32_t const x, int32_t const y, int32_t const z, unsigned int const quality = 0)->placed_object& {
     auto const &definition{geometry.definition(type)};
     result.objects.push_back({
       .position{x, y, z},

@@ -1,11 +1,12 @@
-#include <fstream>
+#include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
 #include "resources/airfield_survey.h"
-#include "resources/binary_reader.h"
 #include "resources/assets.h"
+#include "resources/binary_reader.h"
 
 int main(int const argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"airfield_checks requires its original MOAG fixture"};
@@ -13,7 +14,7 @@ int main(int const argc, char const *const argv[]) {
   std::vector<uint8_t> bytes{std::istreambuf_iterator<char>{input}, {}};
   corncob::resources::binary_reader const data{bytes};
   unsigned int offset{16};
-  auto entry{[&]() {
+  auto entry{[&]{
     corncob::resources::survey_entry result{
       .position{data.signed_dword(offset), data.signed_dword(offset + 4), data.signed_dword(offset + 8)},
       .type{static_cast<corncob::world::object_type>(data.word(offset + 12))},
@@ -63,6 +64,6 @@ int main(int const argc, char const *const argv[]) {
     ++failures;
   }
   if(offset != bytes.size()) throw std::runtime_error{"native airfield fixture has an unread trailer"};
-  if(failures != 0) { std::cerr << failures << " survey differences\n"; return 1; }
+  if(failures != 0) { std::cerr << failures << " survey differences\n"; return EXIT_FAILURE; }
   std::cout << data.dword(8) << " original survey descriptions and " << data.dword(12) << " complete grouping/sort cases match" << std::endl;
 }
