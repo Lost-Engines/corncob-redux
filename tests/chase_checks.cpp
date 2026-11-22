@@ -42,7 +42,7 @@ void simulation_checks(r::geometry_bank const &geometry) {
   require(chase.subject->attitude.heading == first.craft().attitude.heading && chase.subject->attitude.pitch == first.craft().attitude.pitch, "chase aircraft lost its parked attitude");
   require(chase.position.z >= 200, "parked chase camera went underground");
   auto const world_before{w::encode_theatre(third.world())};
-  for(unsigned int i{0}; i < 10; ++i) (void)third.render_camera();
+  for(unsigned int i{0}; i < 10; ++i) static_cast<void>(third.render_camera());
   require(w::encode_theatre(third.world()) == world_before, "render camera inserted its player model into the simulation");
   third.press(g::action::third_person);
   require(third.render_camera().external, "F7 toggled the view off instead of selecting it");
@@ -50,7 +50,7 @@ void simulation_checks(r::geometry_bank const &geometry) {
     g::input_state input{.throttle_up{i < 20}, .weapons{.gun{i % 4 == 0}}};
     if(i > 120) input.stick.roll = 200;
     first.advance_time(input, 1.0 / 60); third.advance_time(input, 1.0 / 60);
-    (void)third.render_camera();
+    static_cast<void>(third.render_camera());
     if(i % 19 == 0) { third.press(g::action::first_person); third.press(g::action::third_person); }
   }
   equivalent(first, third);
@@ -59,7 +59,7 @@ void simulation_checks(r::geometry_bank const &geometry) {
   for(unsigned int i{0}; i < 120; ++i) {
     g::input_state const input{.walk_forward{true}, .look_yaw{20}, .weapons{.gun{i % 9 == 0}}};
     first.advance_time(input, 1.0 / 60); third.advance_time(input, 1.0 / 60);
-    (void)third.render_camera();
+    static_cast<void>(third.render_camera());
   }
   equivalent(first, third);
   third.press(g::action::toggle_remote);

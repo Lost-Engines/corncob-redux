@@ -8,12 +8,11 @@
 #include "tests/reference/native_tower.h"
 #include "tests/reference_reader.h"
 
-int main(int const argc, char const *const argv[]) {
+int main(int const argc, char const *const /*argv*/[]) {
   if(argc != 2) throw std::invalid_argument{"native scene-order fixture required"};
   /// Exercise every theatre across octants, near-plane intersections and cockpit/rear view layouts
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
-  (void)argv;
   corncob::maths::random_source scene_random;
   corncob::graphics::scene_renderer renderer{geometry, cockpit};
   corncob::render::framebuffer output;

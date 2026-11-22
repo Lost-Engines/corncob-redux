@@ -143,27 +143,27 @@ void mission_builder::advance(flight::control_input const &stick, map_input cons
   auto &position{input.move_object && cursor_visible ? (selected ? world.objects[*selected].position : cursor) : observer.position};
   if(input.rotate_object && selected) {
     auto &angles{world.objects[*selected].attitude};
-    maths::turn(angles.heading, -stick.roll*ratio, fraction.angles.x);
-    maths::turn(angles.pitch, -stick.pitch*ratio, fraction.angles.y);
+    maths::turn(angles.heading, -stick.roll * ratio, fraction.angles.x);
+    maths::turn(angles.pitch, -stick.pitch * ratio, fraction.angles.y);
     return;
   }
   if(overhead) {
-    maths::move(position, {-stick.pitch*std::max(1,observer.position.z >> 14)*ratio,
-                           -stick.roll*std::max(1,observer.position.z >> 14)*ratio, 0}, fraction.position);
+    maths::move(position, {-stick.pitch * std::max(1,observer.position.z >> 14) * ratio,
+                           -stick.roll * std::max(1,observer.position.z >> 14) * ratio, 0}, fraction.position);
   } else if(input.move_object && cursor_visible) {
     maths::angles const level{.heading{observer.attitude.heading}};
     auto const movement{maths::transform(maths::make_inverse_rotation(level), {
       maths::word(-static_cast<int32_t>(stick.pitch) * speed / 512), maths::word(-static_cast<int32_t>(stick.roll) * speed / 512), 0})};
-    maths::move(position, vec3<double>{movement}*ratio, fraction.position);
+    maths::move(position, vec3<double>{movement} * ratio, fraction.position);
   } else {
-    maths::turn(observer.attitude.heading, stick.roll*ratio, fraction.angles.x);
-    maths::turn(observer.attitude.pitch, -stick.pitch*ratio, fraction.angles.y);
+    maths::turn(observer.attitude.heading, stick.roll * ratio, fraction.angles.x);
+    maths::turn(observer.attitude.pitch, -stick.pitch * ratio, fraction.angles.y);
     auto const movement{maths::transform(maths::make_inverse_rotation(observer.attitude), {maths::word((forward - backward) * speed), 0, 0})};
-    maths::move(position, vec3<double>{movement}*ratio, fraction.position);
+    maths::move(position, vec3<double>{movement} * ratio, fraction.position);
   }
   int32_t const vertical{(input.higher - input.lower) * speed};
   int32_t const maximum_height{input.move_object && cursor_visible ? maximum_stored_altitude : 210 * 65'536};
-  maths::move(position, {0,0,vertical*ratio}, fraction.position);
+  maths::move(position, {0,0,vertical * ratio}, fraction.position);
   position.z = std::clamp(position.z, 0, maximum_height);
   position.x = std::clamp(position.x, world::theatre::origin, -world::theatre::origin - 1);
   position.y = std::clamp(position.y, world::theatre::origin, -world::theatre::origin - 1);

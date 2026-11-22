@@ -33,10 +33,11 @@ int main(int const argc, char const *const argv[]) {
     auto const &actual{actors.advance({observer, target, velocity, on_foot, 0}, {}).sound};
     if(count == 1 && (actual.orb_distance != data.word(offset) || actual.kla_distance != data.word(offset + 2)
       || actual.kla_quality != data.byte(offset + 4) || actual.saucer_distance != data.word(offset + 5)
-      || actual.saucer_frequency != data.byte(offset + 7)))
+      || actual.saucer_frequency != data.byte(offset + 7))) {
       throw std::runtime_error{"native actor-proximity case " + std::to_string(i) + ": orb=" + std::to_string(actual.orb_distance)
         + ", KLA=" + std::to_string(actual.kla_distance) + ", saucer=" + std::to_string(actual.saucer_distance)
         + ", frequency=" + std::to_string(actual.saucer_frequency)};
+    }
     offset += 8;
   }
   if(offset != bytes.size()) throw std::runtime_error{"actor-proximity fixture length mismatch"};

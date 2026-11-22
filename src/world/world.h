@@ -7,8 +7,8 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "maths/fixed.h"
 #include "maths/continuous.h"
+#include "maths/fixed.h"
 
 namespace corncob::world {
 

@@ -2,10 +2,10 @@
 #include <cmath>
 #include <format>
 #include <numeric>
+#include "maths/integer.h"
 #include "front_end.h"
 #include "game/report_format.h"
 #include "graphics/menu_canvas.h"
-#include "maths/integer.h"
 #include "resources/airfield_survey.h"
 #include "resources/assets.h"
 #include "world/airfields.h"
@@ -506,8 +506,9 @@ void front_end::render_menus(render::framebuffer &target) const {
           else if(marker == ')') highlighted = false;
         }
       }
-      for(unsigned int i{0}; i < 15 && i + scroll < document_lines.size(); ++i)
+      for(unsigned int i{0}; i < 15 && i + scroll < document_lines.size(); ++i) {
         screen.rich_text(3, 6 + static_cast<int>(i), document_lines[i + scroll], 7, 73, highlighted);
+      }
       if(document_lines.size() > 15) {
         for(int row{6}; row < 21; ++row) screen.text(76, row, "\xb1", 7);
         unsigned int const height{std::max(1u, (225u + static_cast<unsigned int>(document_lines.size()) - 1) / static_cast<unsigned int>(document_lines.size()))};
@@ -524,7 +525,7 @@ void front_end::render_menus(render::framebuffer &target) const {
     auto const &s{settings.scene};
     auto volume{[](double const percent){
       unsigned int const filled{static_cast<unsigned int>(std::lround(percent / 10))};
-      return "[" + std::string(filled, '=') + std::string(10-filled, '-') + std::format("] {:.0f}%", percent);
+      return "[" + std::string(filled, '=') + std::string(10 - filled, '-') + std::format("] {:.0f}%", percent);
     }};
     std::array<std::string, 15> const labels{
       "Configure key and mouse bindings",
@@ -647,8 +648,9 @@ void front_end::render_menus(render::framebuffer &target) const {
     } else canvas.clear();
     screen.panel(left, top, right, bottom, 16, false, context);
     unsigned int const visible{static_cast<unsigned int>(bottom - top - 2)};
-    for(unsigned int i{0}; i != visible && i + scroll < document_lines.size(); ++i)
+    for(unsigned int i{0}; i != visible && i + scroll < document_lines.size(); ++i) {
       screen.rich_text(left + 1, top + 1 + static_cast<int>(i), document_lines[i + scroll], 7, static_cast<unsigned int>(right - left - 3));
+    }
     if(document_lines.size() > visible) {
       for(int y{top + 1}; y < bottom - 1; ++y) screen.text(right - 1, y, "\xb1", 7);
       unsigned int const thumb_height{std::max(1u, (visible * visible + static_cast<unsigned int>(document_lines.size()) - 1) / static_cast<unsigned int>(document_lines.size()))};

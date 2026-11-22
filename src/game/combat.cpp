@@ -1,10 +1,10 @@
 #include "combat.h"
-#include <cmath>
-#include "game/timing.h"
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <utility>
 #include "maths/integer.h"
+#include "game/timing.h"
 #include "resources/actor_tables.h"
 #include "world/motion.h"
 
@@ -42,15 +42,17 @@ bool objects_overlap(world::placed_object const &a, world::placed_object const &
   /// Retain box contacts and the original asymmetric spherical and fast-projectile predicates
   if((a.type == world::object_type::crater && b.type == world::object_type::aircraft) || (b.type == world::object_type::crater && a.type == world::object_type::aircraft)) return false;
   if(a.collision_group == b.collision_group || !a.has(world::object_flag::present) || !b.has(world::object_flag::present)) return false;
-  if(((a.flags | b.flags) & flag(world::object_flag::box_collision)) != 0)
+  if(((a.flags | b.flags) & flag(world::object_flag::box_collision)) != 0) {
     return world::boxes_overlap(a.position, a.collision_extents, b.position, b.collision_extents);
+  }
   if(((a.flags | b.flags) & flag(world::object_flag::collision_callback)) == 0) return false;
   auto const delta{separation(a.position, b.position)};
   if(!delta) return false;
   uint32_t const distance{maths::magnitude(*delta)};
   uint32_t const ar{static_cast<uint16_t>(a.collision_extents.x)}, br{static_cast<uint16_t>(b.collision_extents.x)};
-  if(a.type != world::object_type::bullets && a.type != world::object_type::missile)
+  if(a.type != world::object_type::bullets && a.type != world::object_type::missile) {
     return ar != 0 && br != 0 && distance < (br >= ar ? br : br + ar);
+  }
   if(!b.has(world::object_flag::collision_callback)) return false;
   if(std::max(ar, br) >= distance) return true;
   uint32_t const speed{maths::magnitude(a.velocity)};
@@ -86,7 +88,7 @@ std::optional<unsigned int> combat::allocate(bool const bullet) {
     unsigned int const index{begin + cursor};
     cursor = (cursor + 1) % count;
     if(theatre.objects[index].flags == 0) {
-      std::erase_if(contact_pairs,[index](uint64_t pair){return static_cast<uint32_t>(pair >> 32)==index || static_cast<uint32_t>(pair)==index;});
+      std::erase_if(contact_pairs,[index](uint64_t pair){return static_cast<uint32_t>(pair >> 32) == index || static_cast<uint32_t>(pair) == index;});
       return index;
     }
   }
@@ -261,7 +263,7 @@ unsigned int combat::scatter(world::placed_object const &source, unsigned int co
     world::object_type type{world::object_type::incendiary_fragment};
     if(!incendiary) {
       // the native routine randomizes a template velocity before overwriting it; consume that draw too
-      (void)random.below(4000);
+      static_cast<void>(random.below(4000));
       type = mortar || (random.next() & 0x8000u) == 0 ? world::object_type::flotsam_2 : world::object_type::flotsam_1;
     }
     ++attempted;
@@ -572,7 +574,7 @@ void combat::update_projectile(unsigned int const index, maths::world_position c
     if(object.timer >= 89 && maths::magnitude(object.velocity) <= 3000) {
       if(step.seconds > 0) {
         auto const velocity{vec3<double>{object.velocity} + object.fraction.velocity};
-        maths::accelerate(object.velocity, velocity*(std::pow(1000.0/890.0,ratio)-1), object.fraction.velocity);
+        maths::accelerate(object.velocity, velocity * (std::pow(1000.0 / 890.0,ratio) - 1), object.fraction.velocity);
       } else for(unsigned int axis{0}; axis != 3; ++axis) object.velocity[axis] = maths::word(static_cast<int32_t>(object.velocity[axis]) * 1000 / 890);
     }
     break;
@@ -588,8 +590,8 @@ void combat::update_projectile(unsigned int const index, maths::world_position c
       auto const speed{maths::magnitude(object.velocity)};
       if(step.seconds > 0) {
         auto const velocity{vec3<double>{object.velocity} + object.fraction.velocity};
-        auto change{velocity*(1/(1+speed*ratio/4630.0)-1)};
-        change.z -= 54*ratio;
+        auto change{velocity * (1 / (1 + speed * ratio / 4630.0) - 1)};
+        change.z -= 54 * ratio;
         maths::accelerate(object.velocity, change, object.fraction.velocity);
       } else for(unsigned int axis{0}; axis != 3; ++axis) object.velocity[axis] = maths::word(object.velocity[axis]
         - static_cast<int32_t>(object.velocity[axis]) * speed / 4630 - (axis == 2 ? 54 : 0));
@@ -616,7 +618,7 @@ void combat::update_projectile(unsigned int const index, maths::world_position c
   default:
     break;
   }
-  (void)step;
+  static_cast<void>(step);
 }
 void combat::move(maths::world_position const &observer, flight::time_step const step, bool const on_foot, uint32_t const fast_ticks) {
   /// Advance independent effect/bullet lifetimes and retain fixed pool indices for collisions and later saves
@@ -634,8 +636,9 @@ void combat::move(maths::world_position const &observer, flight::time_step const
       continue;
     }
     if(step.clock_tick) --object.timer;
-    if(object.type != world::object_type::bomb || (object.flags & 4u) == 0)
+    if(object.type != world::object_type::bomb || (object.flags & 4u) == 0) {
       world::advance_motion(object, geometry.definition(object.type).rotate_below_tier != 0, random, step);
+    }
     update_projectile(i, observer, step);
   }
   for(unsigned int i{scenery_count + effect_capacity}; i != theatre.objects.size(); ++i) {
@@ -650,7 +653,7 @@ void combat::move(maths::world_position const &observer, flight::time_step const
       if(step.clock_tick) object.velocity[axis] = maths::word(object.velocity[axis] + random.below(40) - 20);
       int16_t const displacement{maths::word(object.velocity[axis] - (axis == 2 ? 54 : 0))};
       if(step.seconds > 0) object.position[axis] = maths::dword(static_cast<int64_t>(object.position[axis])
-        + maths::accumulate((displacement + object.fraction.velocity[axis])*step.seconds/timing::seconds_per_step, object.fraction.position[axis]));
+        + maths::accumulate((displacement + object.fraction.velocity[axis]) * step.seconds / timing::seconds_per_step, object.fraction.position[axis]));
       else object.position[axis] = maths::dword(static_cast<int64_t>(object.position[axis])
         + maths::rounded_divide(static_cast<int32_t>(displacement) * step.elapsed, step.normal));
     }
@@ -662,11 +665,10 @@ void combat::move(maths::world_position const &observer, flight::time_step const
     }
   }
 }
-void combat::collisions(maths::world_position const &observer) {
+void combat::collisions(maths::world_position const &/*observer*/) {
   /// Detect new contacts every substep; persistent overlap damage retains its game-time cadence.
   std::vector<uint64_t> contacts;
   for(unsigned int a{0}; a != theatre.objects.size(); ++a) {
-    (void)observer;
     if(!theatre.objects[a].has(world::object_flag::present)) continue;
     for(unsigned int b{a + 1}; b != theatre.objects.size(); ++b) {
       if(!theatre.objects[b].has(world::object_flag::present)) continue;

@@ -3,8 +3,8 @@
 #include <functional>
 #include <optional>
 #include <string>
-#include "flight/damage.h"
 #include "flight/continuous.h"
+#include "flight/damage.h"
 #include "flight/landing.h"
 #include "game/actors.h"
 #include "game/combat.h"
@@ -16,8 +16,8 @@
 #include "game/rocket.h"
 #include "game/slalom.h"
 #include "game/sortie_clock.h"
-#include "game/vision.h"
 #include "game/timing.h"
+#include "game/vision.h"
 #include "graphics/scene.h"
 #include "resources/geometry_bank.h"
 #include "resources/radio_messages.h"
@@ -90,8 +90,8 @@ struct input_state {
 
 class session {
 #ifndef NDEBUG
-  friend struct capture_access; // Optional developer capture tool; absent from release builds.
-#endif
+  friend struct capture_access;                                                // Optional developer capture tool; absent from release builds.
+#endif // NDEBUG
 private:
   resources::geometry_bank const &geometry;
   world::theatre theatre;
@@ -184,8 +184,8 @@ public:
   void advance_time(input_state const &input, double seconds);
   double update_frame(double timestamp, input_state const &input, bool accelerated = false);
   maths::random_source &random_stream() noexcept;
-  graphics::camera camera() const; // Logical observer used by gameplay.
-  graphics::camera render_camera() const; // Presentation only; may follow behind the player.
+  graphics::camera camera() const;                                             // Logical observer used by gameplay.
+  graphics::camera render_camera() const;                                      // Presentation only; may follow behind the player.
   world::theatre const &world() const noexcept;
   player_mode player() const noexcept;
   flight::aircraft_state const &craft() const noexcept;

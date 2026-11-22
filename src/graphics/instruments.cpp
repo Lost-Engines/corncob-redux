@@ -25,12 +25,13 @@ void draw_gunsight(indexed_framebuffer &target, random_source &random, clip_rect
   if(scale != 1.0) {
     // Scale the four authored solid strokes, including their thickness and central gap.
     for(auto const &stroke : std::array<clip_rectangle,4>{{{-12,0,-3,2},{5,0,14,2},{0,-8,2,-2},{0,4,2,10}}}) {
-      int const left{x + static_cast<int>(std::lround(stroke.left*scale))};
-      int const top{y + static_cast<int>(std::lround(stroke.top*scale))};
-      int const right{std::max(left+1,x + static_cast<int>(std::lround(stroke.right*scale)))};
-      int const bottom{std::max(top+1,y + static_cast<int>(std::lround(stroke.bottom*scale)))};
-      for(int row{std::max(top,bounds.top)}; row < std::min(bottom,bounds.bottom); ++row)
-        sight.line({left,row},{right-1,row},7);
+      int const left{x + static_cast<int>(std::lround(stroke.left * scale))};
+      int const top{y + static_cast<int>(std::lround(stroke.top * scale))};
+      int const right{std::max(left + 1,x + static_cast<int>(std::lround(stroke.right * scale)))};
+      int const bottom{std::max(top + 1,y + static_cast<int>(std::lround(stroke.bottom * scale)))};
+      for(int row{std::max(top,bounds.top)}; row < std::min(bottom,bounds.bottom); ++row) {
+        sight.line({left,row},{right - 1,row},7);
+      }
     }
     return;
   }

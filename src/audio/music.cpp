@@ -1,10 +1,10 @@
 #include "music.h"
-#include "gain.h"
 #include <algorithm>
 #include <array>
 #include <atomic>
 #include <limits>
 #include <stdexcept>
+#include "gain.h"
 #include "resources/assets.h"
 
 extern "C" {
@@ -51,7 +51,9 @@ music::music() : state{std::make_unique<implementation>()} {
   /// Lossless original-driver masters are encoded offline; the game only streams their compact Vorbis copies
 }
 music::~music() = default;
-void music::volume(float const percent) noexcept { state->gain.set(percent); }
+void music::volume(float const percent) noexcept {
+  state->gain.set(percent);
+}
 void music::select(music_cue const cue) noexcept {
   /// Only the requested programme crosses threads; the callback exclusively owns decoder cursors
   state->requested.store(cue, std::memory_order_relaxed);
@@ -83,7 +85,7 @@ void music::mix(std::span<float> const samples) noexcept {
     for(unsigned int sample{0}; sample != static_cast<unsigned int>(frames) * 2; sample += 2) {
       float const gain{state->gain.next(target_gain)};
       for(unsigned int channel{0}; channel < 2; ++channel) {
-        samples[offset] = std::clamp(samples[offset] + decoded[sample+channel]*gain, -1.0f, 1.0f);
+        samples[offset] = std::clamp(samples[offset] + decoded[sample + channel] * gain, -1.0f, 1.0f);
         ++offset;
       }
     }

@@ -1,8 +1,8 @@
 #include "motion.h"
-#include <cstdlib>
 #include <cmath>
-#include "game/timing.h"
+#include <cstdlib>
 #include "maths/integer.h"
+#include "game/timing.h"
 
 namespace corncob::world {
 
@@ -11,20 +11,20 @@ bool advance_motion(placed_object &object, bool const rotates, maths::random_sou
   if(step.seconds > 0) {
     double const ratio{step.seconds / game::timing::seconds_per_step};
     if(rotates) {
-      maths::turn(object.attitude.heading, object.motion.spin.x*ratio, object.fraction.angles.x);
-      maths::turn(object.attitude.pitch, object.motion.spin.y*ratio, object.fraction.angles.y);
-      maths::turn(object.attitude.roll, object.motion.spin.z*ratio, object.fraction.angles.z);
+      maths::turn(object.attitude.heading, object.motion.spin.x * ratio, object.fraction.angles.x);
+      maths::turn(object.attitude.pitch, object.motion.spin.y * ratio, object.fraction.angles.y);
+      maths::turn(object.attitude.roll, object.motion.spin.z * ratio, object.fraction.angles.z);
     }
     vec3<double> velocity{vec3<double>{object.velocity} + object.fraction.velocity};
     vec3<double> distance{0,0,0};
     for(unsigned int axis{0}; axis < 3; ++axis) {
       auto const dispersion{static_cast<uint16_t>(object.motion.dispersion)};
-      if(step.clock_tick && dispersion != 0) velocity[axis] += maths::word(random.below(dispersion) - (dispersion+1)/2);
+      if(step.clock_tick && dispersion != 0) velocity[axis] += maths::word(random.below(dispersion) - (dispersion + 1) / 2);
       double const before{velocity[axis]};
-      if(object.motion.drag_divisor != 0) velocity[axis] /= 1 + std::abs(velocity[axis])*ratio/static_cast<uint16_t>(object.motion.drag_divisor);
-      unsigned int const gravity{axis == 2 ? static_cast<uint16_t>(object.motion.gravity)&255u : 0u};
-      if(gravity != 55) velocity[axis] -= gravity*ratio;
-      distance[axis] = ((before+velocity[axis])*0.5 - (gravity == 55 ? 55 : 0))*ratio;
+      if(object.motion.drag_divisor != 0) velocity[axis] /= 1 + std::abs(velocity[axis]) * ratio / static_cast<uint16_t>(object.motion.drag_divisor);
+      unsigned int const gravity{axis == 2 ? static_cast<uint16_t>(object.motion.gravity) & 255u : 0u};
+      if(gravity != 55) velocity[axis] -= gravity * ratio;
+      distance[axis] = ((before + velocity[axis]) * 0.5 - (gravity == 55 ? 55 : 0)) * ratio;
       object.velocity[axis] = maths::word(maths::dword(static_cast<int64_t>(std::trunc(velocity[axis]))));
       object.fraction.velocity[axis] = velocity[axis] - std::trunc(velocity[axis]);
     }

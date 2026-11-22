@@ -7,8 +7,8 @@
 #include <sstream>
 #include <utility>
 #include <vector>
-#include "game/report_format.h"
 #include "platform/storage.h"
+#include "game/report_format.h"
 #include "render/palette.h"
 #include "resources/airfield_survey.h"
 #include "resources/assets.h"
@@ -205,17 +205,14 @@ void front_end::accept() {
       }
       break;
     case interface_page::roster:
-      if(selection == 0) { renaming = false; entered_name.clear(); navigate(interface_page::pilot_name); }
-      else if(selection == 2) { campaign.deactivate(); sync_pilot(); }
-      else if(selection == 7) information(2);
+      if(selection == 0) { renaming = false; entered_name.clear(); navigate(interface_page::pilot_name); } else if(selection == 2) { campaign.deactivate(); sync_pilot(); } else if(selection == 7) information(2);
       else if(selection == 8) navigate(interface_page::menu);
       else if(campaign.pilots().empty()) notice("There are no pilots in the list.\nYou will have to create one first.");
       else {
         pilot_action = selection == 1 ? roster_action::activate : selection == 3 ? roster_action::remove
           : selection == 4 ? roster_action::resurrect : selection == 5 ? roster_action::rename : roster_action::records;
         pilot_index = 0;
-        if(pilot_action == roster_action::records) { detailed_records = false; navigate(interface_page::records); }
-        else { navigate(interface_page::pilots); selection = 0; }
+        if(pilot_action == roster_action::records) { detailed_records = false; navigate(interface_page::records); } else { navigate(interface_page::pilots); selection = 0; }
       }
       break;
     case interface_page::pilots:
@@ -242,11 +239,11 @@ void front_end::accept() {
     case interface_page::unavailable_pilot: navigate(interface_page::roster); break;
     case interface_page::resurrect_activate: navigate(interface_page::roster); break;
     case interface_page::pilot_name:
-      if(renaming) { campaign.rename_pilot(pilot_index, entered_name); navigate(interface_page::roster); }
-      else {
+      if(renaming) { campaign.rename_pilot(pilot_index, entered_name); navigate(interface_page::roster); } else {
         pilot_record const validated{entered_name};
-        if(std::ranges::any_of(campaign.pilots(), [&](auto const &pilot){return pilot.name() == validated.name();}))
+        if(std::ranges::any_of(campaign.pilots(), [&](auto const &pilot){return pilot.name() == validated.name();})) {
           throw std::invalid_argument{"Sorry, that pilot already exists."};
+        }
         navigate(interface_page::pilot_activate); selection = 0;
       }
       break;
@@ -266,14 +263,11 @@ void front_end::accept() {
       if(++announcement_index == announcements.size()) navigate(interface_page::post_mission_report);
       break;
     case interface_page::control_setup:
-      if(selection == 0) { return_page = interface_page::control_setup; navigate(interface_page::bindings); }
-      else if(selection == 14) { save_settings(); navigate(interface_page::menu); }
-      else adjust_setting(1);
+      if(selection == 0) { return_page = interface_page::control_setup; navigate(interface_page::bindings); } else if(selection == 14) { save_settings(); navigate(interface_page::menu); } else adjust_setting(1);
       break;
     case interface_page::bindings:
       if(selection < settings.bindings.size()) binding_capture = true;
-      else if(selection == settings.bindings.size()) { settings.bindings = default_bindings(); save_settings(); }
-      else navigate(return_page);
+      else if(selection == settings.bindings.size()) { settings.bindings = default_bindings(); save_settings(); } else navigate(return_page);
       break;
     case interface_page::training:
       switch(selection) {
@@ -342,8 +336,7 @@ void front_end::accept() {
       campaign.delete_theatre(selection); saved_theatres = campaign.theatres(); navigate(interface_page::theatres); break;
     case interface_page::no_objectives: navigate(interface_page::starting_airfield); break;
     case interface_page::theatre_records:
-      if(detailed_records) { detailed_records = false; navigate(interface_page::theatres); }
-      else detailed_records = true;
+      if(detailed_records) { detailed_records = false; navigate(interface_page::theatres); } else detailed_records = true;
       break;
     case interface_page::starting_airfield:
       if(prepared_world && world::multiple_airfields(*prepared_world)) {
@@ -363,14 +356,12 @@ void front_end::accept() {
       page = interface_page::flight;
       break;
     case interface_page::high_score_menu:
-      if(selection < 3) { score_list = selection; navigate(interface_page::high_scores); }
-      else if(selection == 3) navigate(interface_page::score_delete);
+      if(selection < 3) { score_list = selection; navigate(interface_page::high_scores); } else if(selection == 3) navigate(interface_page::score_delete);
       else if(selection == 4) information(7);
       else navigate(interface_page::menu);
       break;
     case interface_page::score_delete:
-      if(selection < 3) { score_list = selection; navigate(interface_page::score_delete_confirmation); }
-      else if(selection == 3) information(8);
+      if(selection < 3) { score_list = selection; navigate(interface_page::score_delete_confirmation); } else if(selection == 3) information(8);
       else navigate(interface_page::high_score_menu);
       break;
     case interface_page::score_delete_confirmation: campaign.clear_scores(score_list); navigate(interface_page::score_delete); break;
@@ -495,8 +486,7 @@ void front_end::command(interface_command const command) {
     case interface_page::score_delete_confirmation: navigate(interface_page::score_delete); break;
     case interface_page::menu_information: navigate(information_return); break;
     case interface_page::documentation:
-      if(document_chapter != 0) { document_chapter = 0; document(document_text("corncob.doc"), 0); }
-      else navigate(interface_page::menu);
+      if(document_chapter != 0) { document_chapter = 0; document(document_text("corncob.doc"), 0); } else navigate(interface_page::menu);
       break;
     case interface_page::unavailable_pilot: case interface_page::resurrect_activate: navigate(interface_page::roster); break;
     case interface_page::campaign_victory: case interface_page::post_mission_report: case interface_page::career_announcement: case interface_page::sortie_summary: accept(); break;
@@ -725,8 +715,9 @@ unsigned int front_end::choice_count() const {
 }
 audio::music_cue front_end::music() const noexcept {
   /// The DOS launcher plays music; flight, its helper pages and the original outcome/ending sequences do not
-  if(!music_on || session_running || page == interface_page::ending || page == interface_page::outcome || page == interface_page::story)
+  if(!music_on || session_running || page == interface_page::ending || page == interface_page::outcome || page == interface_page::story) {
     return audio::music_cue::silent;
+  }
   if(campaign.current_campaign() == world::campaign_id::other_worlds) return page == interface_page::title ? audio::music_cue::other_title : audio::music_cue::other_menus;
   return page == interface_page::title ? audio::music_cue::title : audio::music_cue::menus;
 }
@@ -747,7 +738,7 @@ bool front_end::bind_input(int const key, int const mouse) {
   if(!binding_capture || (key < 0 && mouse < 0)) return false;
   binding_capture = false;
   if(key >= 290 && key <= 293) { notice("F1-F4 are reserved for boss, intelligence, score and control help."); return true; }
-  if(key == 256) return true; // Escape cancels capture.
+  if(key == 256) return true;                                                  // Escape cancels capture.
   auto &binding{settings.bindings.at(selection)};
   bool const clear{key == 259 || key == 261};
   if(!clear) for(auto &other : settings.bindings) {
@@ -755,8 +746,7 @@ bool front_end::bind_input(int const key, int const mouse) {
     if(key >= 0) { if(other.key == key) other.key = -1; if(other.alternate == key) other.alternate = -1; }
     if(mouse >= 0 && other.mouse == mouse) other.mouse = -1;
   }
-  if(clear) { binding.key = binding.alternate = binding.mouse = -1; }
-  else if(mouse >= 0) binding.mouse = mouse;
+  if(clear) { binding.key = binding.alternate = binding.mouse = -1; } else if(mouse >= 0) binding.mouse = mouse;
   else { binding.key = key; binding.alternate = -1; }
   try { save_settings(); } catch(std::exception const &error) { notice(error.what()); }
   return true;

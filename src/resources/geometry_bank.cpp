@@ -189,7 +189,7 @@ geometry_bank::geometry_bank(std::span<uint8_t const> const source, bool const s
   load_model(experimental_model);
   // the crew's eyes and mouth paint onto a camera-facing head disc in every pose
   auto &head{std::get<disc_cloud>(primitives.at(primitive_ids.at((6u << 16) | 0x6e19u)))};
-  for(std::size_t i{1}; i < head.discs.size(); ++i) head.discs[i].surface_anchor.emplace(head.discs.front().position);
+  for(size_t i{1}; i < head.discs.size(); ++i) head.discs[i].surface_anchor.emplace(head.discs.front().position);
   auto &face{std::get<wireframe>(primitives.at(primitive_ids.at((2u << 16) | 0x6ea3u)))};
   face.lines.front().surface_anchor.emplace(head.discs.front().position);
   // the injured pose's blood backdrop belongs behind the head, including its billboard edges

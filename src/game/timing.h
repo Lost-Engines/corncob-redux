@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <optional>
 
 namespace corncob::game::timing {
@@ -27,7 +27,9 @@ public:
     if(!last || timestamp < *last) return 0;
     return std::min(timestamp - *last, maximum_frame_time) * (accelerated ? fast_forward_multiplier : 1);
   }
-  void reset() noexcept { previous.reset(); }
+  void reset() noexcept {
+    previous.reset();
+  }
 };
 
 // Kept for native reference/check callers that explicitly request original five-unit passes.

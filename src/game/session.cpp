@@ -5,10 +5,10 @@
 #include <cstdlib>
 #include <numbers>
 #include <utility>
+#include "maths/integer.h"
 #include "game/frame_clock.h"
 #include "game/scenery.h"
 #include "game/timing.h"
-#include "maths/integer.h"
 #include "resources/actor_tables.h"
 #include "world/airfields.h"
 
@@ -22,7 +22,7 @@ bool has(resources::object_definition const &definition, world::object_property 
 }
 int16_t timed_word(int16_t const value, flight::time_step const step) noexcept {
   /// WTADJ truncates a signed product/division, unlike the force routine's rounded dword helper
-  if(step.seconds > 0) return maths::word(static_cast<int32_t>(value*step.seconds/timing::seconds_per_step));
+  if(step.seconds > 0) return maths::word(static_cast<int32_t>(value * step.seconds / timing::seconds_per_step));
   return maths::word(static_cast<int32_t>(value) * step.elapsed / step.normal);
 }
 
@@ -405,8 +405,9 @@ void session::leave_aircraft() {
     maths::angles const heading{.heading{aircraft.attitude.heading}};
     int16_t const aft{aircraft.variant == flight::aircraft_variant::experimental ? experimental_exit_aft : aircraft_exit_aft};
     auto const offset{maths::transform(maths::make_inverse_rotation(heading), {static_cast<int16_t>(-aft), aircraft_exit_side, 0})};
-    for(unsigned int axis{0}; axis < 2; ++axis)
+    for(unsigned int axis{0}; axis < 2; ++axis) {
       person.position[axis] = maths::dword(static_cast<int64_t>(person.position[axis]) + offset[axis]);
+    }
     person.position.z = landing.surface_height + flight::landing_state::aircraft_height;
     person.velocity = maths::fixed_vector{0, 0, 0};
   }
@@ -430,12 +431,12 @@ void session::update_aircraft(input_state const &input, flight::time_step const 
   if(!controlled_aircraft || airframe_destroyed) return;
   if(recording && mode == player_mode::in_aircraft) return;
   unsigned int const pressure_target{static_cast<unsigned int>(aircraft.throttle) * 32'768 / 200 * aircraft.power_factor >> 16};
-  double const ratio{step.seconds > 0 ? step.seconds/timing::seconds_per_step : 1.0};
-  if(step.seconds > 0) aircraft.oil_pressure = static_cast<uint16_t>(aircraft.oil_pressure + maths::accumulate((static_cast<int>(pressure_target)-aircraft.oil_pressure)*(1-maths::decay(39.0/40.0,ratio)), continuous.pressure_fraction));
+  double const ratio{step.seconds > 0 ? step.seconds / timing::seconds_per_step : 1.0};
+  if(step.seconds > 0) aircraft.oil_pressure = static_cast<uint16_t>(aircraft.oil_pressure + maths::accumulate((static_cast<int>(pressure_target) - aircraft.oil_pressure) * (1 - maths::decay(39.0 / 40.0,ratio)), continuous.pressure_fraction));
   else aircraft.oil_pressure = static_cast<uint16_t>(aircraft.oil_pressure + (static_cast<int>(pressure_target) - aircraft.oil_pressure) / 40);
   if(landing.stopped) return;
   unsigned int const temperature_target{static_cast<unsigned int>(aircraft.throttle) * 32'768 / 200};
-  if(step.seconds > 0) aircraft.engine_temperature = static_cast<uint16_t>(aircraft.engine_temperature + maths::accumulate((static_cast<int>(temperature_target)-aircraft.engine_temperature)*(1-maths::decay(179.0/180.0,ratio)), continuous.temperature_fraction));
+  if(step.seconds > 0) aircraft.engine_temperature = static_cast<uint16_t>(aircraft.engine_temperature + maths::accumulate((static_cast<int>(temperature_target) - aircraft.engine_temperature) * (1 - maths::decay(179.0 / 180.0,ratio)), continuous.temperature_fraction));
   else aircraft.engine_temperature = static_cast<uint16_t>(aircraft.engine_temperature + (static_cast<int>(temperature_target) - aircraft.engine_temperature) / 180);
   aircraft.world_to_body = maths::make_rotation(aircraft.attitude);
   aircraft.body_to_world = maths::make_inverse_rotation(aircraft.attitude);
@@ -477,9 +478,9 @@ void session::update_aircraft(input_state const &input, flight::time_step const 
     aircraft.attitude.roll = 0;
     aircraft.velocity.z = 0;
     if(step.seconds > 0) {
-      auto const velocity{vec3<double>{aircraft.velocity}+continuous.motion.velocity};
-      maths::accelerate(aircraft.velocity, velocity*(maths::decay(30000.0/32768.0,ratio)-1), continuous.motion.velocity);
-      maths::turn(aircraft.attitude.heading, (std::abs(velocity.x)+std::abs(velocity.y))*ratio, continuous.motion.angles.x);
+      auto const velocity{vec3<double>{aircraft.velocity} + continuous.motion.velocity};
+      maths::accelerate(aircraft.velocity, velocity * (maths::decay(30000.0 / 32768.0,ratio) - 1), continuous.motion.velocity);
+      maths::turn(aircraft.attitude.heading, (std::abs(velocity.x) + std::abs(velocity.y)) * ratio, continuous.motion.angles.x);
     } else {
       aircraft.velocity.x = maths::word((static_cast<int32_t>(aircraft.velocity.x) * 30'000 >> 16) * 2);
       aircraft.velocity.y = maths::word((static_cast<int32_t>(aircraft.velocity.y) * 30'000 >> 16) * 2);
@@ -628,7 +629,7 @@ void session::advance_step(input_state const &requested, flight::time_step const
   }
   if(builder) {
     if(step.clock_tick) frame = advance_frame(frame);
-    builder->advance(input.stick, input.map, input.walk_forward, input.walk_backward, step.seconds > 0 ? step.seconds/timing::seconds_per_step : 1.0);
+    builder->advance(input.stick, input.map, input.walk_forward, input.walk_backward, step.seconds > 0 ? step.seconds / timing::seconds_per_step : 1.0);
     notice = builder->status();
     if(draw_frame) (*draw_frame)();
     return;
@@ -637,7 +638,7 @@ void session::advance_step(input_state const &requested, flight::time_step const
   auto advance_clock{[&]{
     uint32_t ticks{timing::pit_ticks_per_step};
     if(step.seconds > 0) {
-      double const exact{pit_fraction + step.seconds*timing::pit_frequency};
+      double const exact{pit_fraction + step.seconds * timing::pit_frequency};
       ticks = static_cast<uint32_t>(std::floor(exact + 1e-10));
       pit_fraction = exact - ticks;
     }
@@ -645,7 +646,7 @@ void session::advance_step(input_state const &requested, flight::time_step const
   }};
   if(map) {
     if(step.seconds == 0) advance_clock();
-    map->advance(input.stick, input.map, step.seconds > 0 ? step.seconds/timing::seconds_per_step : 1.0);
+    map->advance(input.stick, input.map, step.seconds > 0 ? step.seconds / timing::seconds_per_step : 1.0);
     if(draw_frame) (*draw_frame)();
     return;
   }
@@ -686,18 +687,19 @@ void session::advance_step(input_state const &requested, flight::time_step const
   }
   orb_distortion = effects.orb_distortion;
   if(mode == player_mode::on_foot && effects.capture_closing) {
-    if(step.seconds > 0) vision.brightness = static_cast<uint16_t>(vision.brightness - maths::accumulate(60*step.seconds/timing::seconds_per_step, capture_fraction));
+    if(step.seconds > 0) vision.brightness = static_cast<uint16_t>(vision.brightness - maths::accumulate(60 * step.seconds / timing::seconds_per_step, capture_fraction));
     else vision.close_capture(step);
   }
   for(unsigned int axis{0}; axis != 3; ++axis) {
     if(step.seconds > 0) aircraft.velocity[axis] = maths::word(maths::dword(static_cast<int64_t>(aircraft.velocity[axis])
-      + maths::accumulate(effects.attraction[axis]*step.seconds/timing::seconds_per_step, continuous.motion.velocity[axis])));
+      + maths::accumulate(effects.attraction[axis] * step.seconds / timing::seconds_per_step, continuous.motion.velocity[axis])));
     else aircraft.velocity[axis] = maths::word(aircraft.velocity[axis] + effects.attraction[axis]);
     std::array<int16_t, 3> constexpr rates{310, 186, 242};
     palette_phase[axis] += static_cast<uint16_t>(maths::multiply(timed_word(rates[axis], step), maths::word(effects.hallucination)));
   }
-  if(std::ranges::none_of(theatre.objects, [](auto const &object){return object.type == world::object_type::mindbender && object.has(world::object_flag::present);}))
+  if(std::ranges::none_of(theatre.objects, [](auto const &object){return object.type == world::object_type::mindbender && object.has(world::object_flag::present);})) {
     palette_phase = vec3<uint16_t>{0, 0, 0};
+  }
   if(effects.rescued) {
     mode = player_mode::rescued;
     notice = "Rescued";
@@ -731,10 +733,10 @@ void session::advance_step(input_state const &requested, flight::time_step const
     auto const delta{effects.approach_target - person.position};
     auto const desired{maths::arctangent(maths::word(delta.x >> 6), maths::word(delta.y >> 6))};
     if(step.seconds > 0) {
-      double const ratio{step.seconds/timing::seconds_per_step};
-      maths::turn(person.attitude.heading, maths::word(desired-person.attitude.heading)*(1-maths::decay(127.0/128.0,ratio)), person_fraction.angles.x);
-      auto const direction{maths::rotation_real({person.attitude.heading+person_fraction.angles.x,0,0})};
-      maths::move(person.position, direction.apply({500*ratio/16,0,0}), person_fraction.position);
+      double const ratio{step.seconds / timing::seconds_per_step};
+      maths::turn(person.attitude.heading, maths::word(desired - person.attitude.heading) * (1 - maths::decay(127.0 / 128.0,ratio)), person_fraction.angles.x);
+      auto const direction{maths::rotation_real({person.attitude.heading + person_fraction.angles.x,0,0})};
+      maths::move(person.position, direction.apply({500 * ratio / 16,0,0}), person_fraction.position);
     } else {
       person.attitude.heading += static_cast<maths::angle>(timed_word(static_cast<int16_t>(maths::word(desired - person.attitude.heading) >> 7), step));
       maths::angles const direction{.heading{person.attitude.heading}};
@@ -757,9 +759,9 @@ void session::advance_step(input_state const &requested, flight::time_step const
     if(input.view.below && mode == player_mode::in_aircraft) desired.pitch = 16'383;
     int const divisor{std::max(2, 2 * step.normal / step.elapsed)};
     if(step.seconds > 0) {
-      double const gain{1-maths::decay(0.5, step.seconds/timing::seconds_per_step)};
-      maths::turn(head_angles.heading, maths::word(desired.heading-head_angles.heading)*gain, head_fraction.x);
-      maths::turn(head_angles.pitch, maths::word(desired.pitch-head_angles.pitch)*gain, head_fraction.y);
+      double const gain{1 - maths::decay(0.5, step.seconds / timing::seconds_per_step)};
+      maths::turn(head_angles.heading, maths::word(desired.heading - head_angles.heading) * gain, head_fraction.x);
+      maths::turn(head_angles.pitch, maths::word(desired.pitch - head_angles.pitch) * gain, head_fraction.y);
     } else {
       head_angles.heading += static_cast<maths::angle>(maths::word(desired.heading - head_angles.heading) / divisor);
       head_angles.pitch += static_cast<maths::angle>(maths::word(desired.pitch - head_angles.pitch) / divisor);
@@ -849,10 +851,11 @@ graphics::camera session::render_camera() const {
   auto const axes{maths::make_inverse_rotation(attitude)};
   auto const offset{maths::transform(axes, on_foot ? maths::fixed_vector{-1800, 0, 260} : maths::fixed_vector{-11000, 0, 2600})};
   auto const ahead{maths::transform(axes, on_foot ? maths::fixed_vector{600, 0, 0} : maths::fixed_vector{1800, 0, 0})};
-  auto add{[](maths::world_position const &position, maths::fixed_vector const &delta) {
+  auto add{[](maths::world_position const &position, maths::fixed_vector const &delta){
     maths::world_position result;
-    for(unsigned int axis{0}; axis != 3; ++axis)
+    for(unsigned int axis{0}; axis != 3; ++axis) {
       result[axis] = maths::dword(static_cast<int64_t>(position[axis]) + delta[axis]);
+    }
     return result;
   }};
   observer.position = add(origin, offset);
@@ -861,7 +864,7 @@ graphics::camera session::render_camera() const {
   observer.position.z = std::max(observer.position.z, floor + 200);
   auto const target{add(origin, ahead)};
   auto const direction{vec3<double>{target} - vec3<double>{observer.position}};
-  auto angle{[](double const radians) { return static_cast<maths::angle>(static_cast<int32_t>(std::lround(radians * 32768.0 / std::numbers::pi))); }};
+  auto angle{[](double const radians){ return static_cast<maths::angle>(static_cast<int32_t>(std::lround(radians * 32768.0 / std::numbers::pi))); }};
   observer.attitude = {
     .heading{angle(std::atan2(direction.y, direction.x))},
     .pitch{angle(std::atan2(-direction.z, std::hypot(direction.x, direction.y)))},

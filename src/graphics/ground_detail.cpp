@@ -50,7 +50,7 @@ void ground_field::range(double const multiplier) {
 double ground_field::point_range(unsigned int const index) const noexcept {
   // Include the ground beneath the lower viewport, then spread points across distance scales.
   // Stagger their edges to avoid a common cutoff at the horizon.
-  double const fraction{std::min(1.0, index / static_cast<double>(std::max<std::size_t>(2, ground.size()) - 1))};
+  double const fraction{std::min(1.0, index / static_cast<double>(std::max<size_t>(2, ground.size()) - 1))};
   return std::min(range_multiplier, 0.0625) * std::exp2(range_exponent * fraction);
 }
 void ground_field::initialise(maths::world_position const &observer, maths::random_source &random) noexcept {
