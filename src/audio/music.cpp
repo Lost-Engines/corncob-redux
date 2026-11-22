@@ -64,10 +64,21 @@ void music::mix(std::span<float> const samples) noexcept {
   auto const requested{state->requested.load(std::memory_order_relaxed)};
   if(requested != state->playing) {
     state->playing = requested;
-    state->track = requested == music_cue::other_title ? 3u : requested == music_cue::other_menus ? 4u : requested == music_cue::menus ? 1u : 0u;
+    if(requested == music_cue::other_title) {
+      state->track = 3u;
+    } else if(requested == music_cue::other_menus) {
+      state->track = 4u;
+    } else if(requested == music_cue::menus) {
+      state->track = 1u;
+    } else {
+      state->track = 0u;
+    }
     if(requested != music_cue::silent && !stb_vorbis_seek_start(state->tracks[state->track].get())) state->playing = music_cue::silent;
   }
-  if(state->playing == music_cue::silent) { state->gain.settle(target_gain); return; }
+  if(state->playing == music_cue::silent) {
+    state->gain.settle(target_gain);
+    return;
+  }
   std::array<float, 1024> decoded;
   size_t offset{0};
   unsigned int empty_tracks{0};

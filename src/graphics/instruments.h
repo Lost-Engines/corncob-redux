@@ -8,9 +8,20 @@
 namespace corncob::graphics {
 
 enum class cockpit_button : uint8_t {
-  autopilot, hold, flaps, stall, eject, complete,
-  first_bomb, second_bomb, third_bomb, low_altitude,
-  ten_thousand_feet, twenty_thousand_feet, help, damage,
+  autopilot,
+  hold,
+  flaps,
+  stall,
+  eject,
+  complete,
+  first_bomb,
+  second_bomb,
+  third_bomb,
+  low_altitude,
+  ten_thousand_feet,
+  twenty_thousand_feet,
+  help,
+  damage,
 };
 
 void recolour_button(indexed_framebuffer &target, cockpit_button button, colour_index source, colour_index destination);

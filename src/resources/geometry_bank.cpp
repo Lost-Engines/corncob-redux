@@ -20,18 +20,22 @@ void geometry_bank::bind_animation(model_address const address, unsigned int con
     std::array<unsigned int, 3> constexpr tables{0x6314, 0x633e, 0x6374};
     for(unsigned int table{0}; table != tables.size(); ++table) {
       unsigned int const start{tables[table]};
-      for(unsigned int i{0}; i != input.word(start); ++i) if(input.word(start + 4 + i * 2) == address) pulse = static_cast<model_pulse>(table);
+      for(unsigned int i{0}; i != input.word(start); ++i) {
+        if(input.word(start + 4 + i * 2) == address) pulse = static_cast<model_pulse>(table);
+      }
     }
   }
-  if(pulse) animation_bindings.push_back({
-    .primitive{primitive},
-    .line{line},
-    .vertex{vertex},
-    .axis{axis},
-    .pulse{*pulse},
-    .negative{input.signed_word(address) < 0},
-    .diameter{diameter},
-  });
+  if(pulse) {
+    animation_bindings.push_back({
+      .primitive{primitive},
+      .line{line},
+      .vertex{vertex},
+      .axis{axis},
+      .pulse{*pulse},
+      .negative{input.signed_word(address) < 0},
+      .diameter{diameter},
+    });
+  }
 }
 unsigned int geometry_bank::load_primitive(unsigned int const kind, model_address const address) {
   /// Cache typed drawing payloads once while preserving their original shared addresses
@@ -44,69 +48,71 @@ unsigned int geometry_bank::load_primitive(unsigned int const kind, model_addres
   switch(kind) {
   case 8:
     {
-      polygon shape{
+    polygon shape{
         .vertices{},
         .colour{input.word(address + 2)},
       };
-      for(unsigned int i{0}; i != count; ++i) {
-        shape.vertices.push_back(input.vector(address + 4 + i * 6));
-        for(unsigned int axis{0}; axis != 3; ++axis) bind_animation(static_cast<model_address>(address + 4 + i * 6 + axis * 2), index, 0, i, axis);
-      }
-      primitives.emplace_back(std::move(shape));
+    for(unsigned int i{0}; i != count; ++i) {
+      shape.vertices.push_back(input.vector(address + 4 + i * 6));
+      for(unsigned int axis{0}; axis != 3; ++axis) bind_animation(static_cast<model_address>(address + 4 + i * 6 + axis * 2), index, 0, i, axis);
     }
+    primitives.emplace_back(std::move(shape));
+  }
     break;
   case 2:
     {
-      wireframe shape;
-      for(unsigned int i{0}; i != count; ++i) {
-        unsigned int const line_address{input.word(address + 2 + i * 2)};
-        unsigned int const segments{input.word(line_address)};
-        if(segments > 4096) throw std::invalid_argument{"original model has an invalid polyline length"};
-        polyline line{
+    wireframe shape;
+    for(unsigned int i{0}; i != count; ++i) {
+      unsigned int const line_address{input.word(address + 2 + i * 2)};
+      unsigned int const segments{input.word(line_address)};
+      if(segments > 4096) throw std::invalid_argument{"original model has an invalid polyline length"};
+      polyline line{
           .vertices{},
           .colour{input.word(line_address + 2)},
         };
-        for(unsigned int vertex{0}; vertex != segments + 1; ++vertex) {
-          line.vertices.push_back(input.vector(line_address + 4 + vertex * 6));
-          for(unsigned int axis{0}; axis != 3; ++axis) bind_animation(static_cast<model_address>(line_address + 4 + vertex * 6 + axis * 2), index, i, vertex, axis);
-        }
-        shape.lines.push_back(std::move(line));
+      for(unsigned int vertex{0}; vertex != segments + 1; ++vertex) {
+        line.vertices.push_back(input.vector(line_address + 4 + vertex * 6));
+        for(unsigned int axis{0}; axis != 3; ++axis) bind_animation(static_cast<model_address>(line_address + 4 + vertex * 6 + axis * 2), index, i, vertex, axis);
       }
-      primitives.emplace_back(std::move(shape));
+      shape.lines.push_back(std::move(line));
     }
+    primitives.emplace_back(std::move(shape));
+  }
     break;
   case 4:
     {
-      point_cloud shape;
-      for(unsigned int i{0}; i != count; ++i) {
-        unsigned int const point_address{address + 2 + i * 8};
-        shape.points.push_back({
+    point_cloud shape;
+    for(unsigned int i{0}; i != count; ++i) {
+      unsigned int const point_address{address + 2 + i * 8};
+      shape.points.push_back({
           .position{input.vector(point_address)},
           .colour{input.word(point_address + 6)},
         });
-      }
-      primitives.emplace_back(std::move(shape));
     }
+    primitives.emplace_back(std::move(shape));
+  }
     break;
   case 6:
     {
-      disc_cloud shape;
-      for(unsigned int i{0}; i != count; ++i) {
-        unsigned int const disc_address{address + 2 + i * 10};
-        bind_animation(static_cast<model_address>(disc_address + 6), index, 0, i, 0, true);
-        if(auto const particle{particle_animation::binding(static_cast<uint16_t>(disc_address))}) particle_bindings.push_back({
-          .primitive{index},
-          .vertex{i},
-          .particle{*particle},
-        });
-        shape.discs.push_back({
+    disc_cloud shape;
+    for(unsigned int i{0}; i != count; ++i) {
+      unsigned int const disc_address{address + 2 + i * 10};
+      bind_animation(static_cast<model_address>(disc_address + 6), index, 0, i, 0, true);
+      if(auto const particle{particle_animation::binding(static_cast<uint16_t>(disc_address))}) {
+        particle_bindings.push_back({
+            .primitive{index},
+            .vertex{i},
+            .particle{*particle},
+          });
+      }
+      shape.discs.push_back({
           .position{input.vector(disc_address)},
           .diameter{input.word(disc_address + 6)},
           .colour{input.word(disc_address + 8)},
         });
-      }
-      primitives.emplace_back(std::move(shape));
     }
+    primitives.emplace_back(std::move(shape));
+  }
     break;
   default:
     throw std::invalid_argument{"original model has an unsupported drawing opcode"};
@@ -200,17 +206,19 @@ geometry_bank::geometry_bank(std::span<uint8_t const> const source, bool const s
   // cannot change ordinary crew, the spy or their authored animation states.
   auto player{models.at(definition(world::object_type::ground_crew).models.near)};
   std::unordered_map<unsigned int, unsigned int> player_primitives;
-  for(auto &octant : player.octants) for(auto &command : octant) {
-    auto const original{command.primitive_index};
-    if(!player_primitives.contains(original)) {
-      auto shape{primitives.at(original)};
-      if(auto *body{std::get_if<polygon>(&shape)}; body && body->colour == 0x6d15) body->colour = 12;
-      if(auto *discs{std::get_if<disc_cloud>(&shape)}) discs->discs.resize(1); // Head without eyes.
-      if(auto *lines{std::get_if<wireframe>(&shape)}) lines->lines.erase(lines->lines.begin()); // Keep the belt, omit the mouth.
-      player_primitives.emplace(original, static_cast<unsigned int>(primitives.size()));
-      primitives.push_back(std::move(shape));
+  for(auto &octant : player.octants) {
+    for(auto &command : octant) {
+      auto const original{command.primitive_index};
+      if(!player_primitives.contains(original)) {
+        auto shape{primitives.at(original)};
+        if(auto *body{std::get_if<polygon>(&shape)}; body && body->colour == 0x6d15) body->colour = 12;
+        if(auto *discs{std::get_if<disc_cloud>(&shape)}) discs->discs.resize(1); // Head without eyes.
+        if(auto *lines{std::get_if<wireframe>(&shape)}) lines->lines.erase(lines->lines.begin()); // Keep the belt, omit the mouth.
+        player_primitives.emplace(original, static_cast<unsigned int>(primitives.size()));
+        primitives.push_back(std::move(shape));
+      }
+      command.primitive_index = player_primitives.at(original);
     }
-    command.primitive_index = player_primitives.at(original);
   }
   models.emplace(player_model, std::move(player));
   // Data-only source branches use a reserved address range, independently of the original executable's resources.
@@ -277,17 +285,21 @@ geometry_bank::geometry_bank(std::span<uint8_t const> const source, bool const s
     maths::fixed_vector{0, -500, 0}, maths::fixed_vector{0, 0, 500}, maths::fixed_vector{0, 0, -500},
   };
   std::array<uint16_t, 6> constexpr colours{13, 4, 9, 14, 0, 15};
-  for(unsigned int i{0}; i != positions.size(); ++i) cursor.discs.push_back({
-    .position{maths::fixed_vector{positions[i]}},
-    .diameter{250},
-    .colour{colours[i]},
-  });
+  for(unsigned int i{0}; i != positions.size(); ++i) {
+    cursor.discs.push_back({
+      .position{maths::fixed_vector{positions[i]}},
+      .diameter{250},
+      .colour{colours[i]},
+    });
+  }
   unsigned int const index{static_cast<unsigned int>(primitives.size())};
   primitives.emplace_back(std::move(cursor));
   model marker;
-  for(auto &octant : marker.octants) octant.push_back({
-    .primitive_index{index},
-  });
+  for(auto &octant : marker.octants) {
+    octant.push_back({
+      .primitive_index{index},
+    });
+  }
   models.emplace(editor_cursor_model, std::move(marker));
 }
 
@@ -300,34 +312,44 @@ model_levels geometry_bank::appearance(world::placed_object const &object) const
   if(object.pose == world::model_pose::experimental_aircraft) return {experimental_model, experimental_model, 0x4ee3};
   if(object.type == world::object_type::aircraft && (object.flags & 0x100u) != 0) return {0x47a1, 0x47a1, 0x4ee3};
   switch(object.pose) {
-  case world::model_pose::editor_cursor: return {editor_cursor_model, editor_cursor_model, editor_cursor_model};
+  case world::model_pose::editor_cursor:
+    return {editor_cursor_model, editor_cursor_model, editor_cursor_model};
   case world::model_pose::damaged:
     if(object.type == world::object_type::aircraft || object.type == world::object_type::internal_aircraft) return {0x47a1, 0x47a1, 0x4ee3};
     if(object.type == world::object_type::generator_orb) return {0x3227, 0x3227, 0x3227};
     if(object.type == world::object_type::radar_dish || object.type == world::object_type::radar_base) return {0x406a, 0x4132, 0x4132};
     if(object.type == world::object_type::fuel_dump) return {0x3521, 0x3569, 0x3569};
     break;
-  case world::model_pose::gesture: return {0x6f71, 0x6f71, 0x6f71};
-  case world::model_pose::shot: return {0x7099, 0x7099, 0x7099};
-  case world::model_pose::paved: return {0x5e2a, 0x5e2a, 0x5ff2};
-  case world::model_pose::yellow_explosion: return {0x3d64, 0x3d64, 0x3d64};
-  case world::model_pose::red_explosion: return {0x3d3c, 0x3d3c, 0x3d3c};
-  case world::model_pose::radar_wreck: return {0x406a, 0x4132, 0x4132};
-  case world::model_pose::fuel_wreck: return {0x3521, 0x3569, 0x3569};
-  case world::model_pose::blast_crater: return {0x72c6, 0x72c6, 0x72c6};
+  case world::model_pose::gesture:
+    return {0x6f71, 0x6f71, 0x6f71};
+  case world::model_pose::shot:
+    return {0x7099, 0x7099, 0x7099};
+  case world::model_pose::paved:
+    return {0x5e2a, 0x5e2a, 0x5ff2};
+  case world::model_pose::yellow_explosion:
+    return {0x3d64, 0x3d64, 0x3d64};
+  case world::model_pose::red_explosion:
+    return {0x3d3c, 0x3d3c, 0x3d3c};
+  case world::model_pose::radar_wreck:
+    return {0x406a, 0x4132, 0x4132};
+  case world::model_pose::fuel_wreck:
+    return {0x3521, 0x3569, 0x3569};
+  case world::model_pose::blast_crater:
+    return {0x72c6, 0x72c6, 0x72c6};
   case world::model_pose::revealed_forcefield:
     {
-      auto result{definition(object.type).models};
-      result.far = result.near;
-      return result;
-    }
+    auto result{definition(object.type).models};
+    result.far = result.near;
+    return result;
+  }
   case world::model_pose::distant_hidden:
     {
-      auto result{definition(object.type).models};
-      result.far = 0;
-      return result;
-    }
-  default: break;
+    auto result{definition(object.type).models};
+    result.far = 0;
+    return result;
+  }
+  default:
+    break;
   }
   return definition(object.type).models;
 }
@@ -358,9 +380,11 @@ void geometry_bank::animate(unsigned int const frame) {
     int16_t const value{binding.negative ? maths::negate(pulse.value(binding.pulse)) : pulse.value(binding.pulse)};
     std::visit([&](auto &shape){
       using shape_type = std::decay_t<decltype(shape)>;
-      if constexpr(std::is_same_v<shape_type, wireframe>) shape.lines[binding.line].vertices[binding.vertex][binding.axis] = value;
-      else if constexpr(std::is_same_v<shape_type, polygon>) shape.vertices[binding.vertex][binding.axis] = value;
-      else if constexpr(std::is_same_v<shape_type, disc_cloud>) shape.discs[binding.vertex].diameter = static_cast<uint16_t>(value);
+      if constexpr(std::is_same_v<shape_type, wireframe>) {
+        shape.lines[binding.line].vertices[binding.vertex][binding.axis] = value;
+      } else if constexpr(std::is_same_v<shape_type, polygon>) {
+        shape.vertices[binding.vertex][binding.axis] = value;
+      } else if constexpr(std::is_same_v<shape_type, disc_cloud>) shape.discs[binding.vertex].diameter = static_cast<uint16_t>(value);
     }, primitives[binding.primitive]);
   }
 }
@@ -383,11 +407,23 @@ maths::fixed_vector geometry_bank::collision_extents(world::object_type const ty
   auto const pulse{model_animation::at(frame)};
   using enum world::object_type;
   switch(type) {
-  case wire_forcefield_x: result.y = maths::word(pulse.wide_wall * 2); result.z = maths::word(pulse.small_wall * 2); break;
-  case wire_forcefield_y: result.x = maths::word(pulse.wide_wall * 2); result.z = maths::word(pulse.small_wall * 2); break;
-  case wire_forcefield_z: result.x = maths::word(pulse.wide_wall * 2); result.y = maths::word(pulse.square_wall * 2); break;
-  case wire_forcefield_z1: result.x = result.y = maths::word(pulse.small_wall * 2); break;
-  default: break;
+  case wire_forcefield_x:
+    result.y = maths::word(pulse.wide_wall * 2);
+    result.z = maths::word(pulse.small_wall * 2);
+    break;
+  case wire_forcefield_y:
+    result.x = maths::word(pulse.wide_wall * 2);
+    result.z = maths::word(pulse.small_wall * 2);
+    break;
+  case wire_forcefield_z:
+    result.x = maths::word(pulse.wide_wall * 2);
+    result.y = maths::word(pulse.square_wall * 2);
+    break;
+  case wire_forcefield_z1:
+    result.x = result.y = maths::word(pulse.small_wall * 2);
+    break;
+  default:
+    break;
   }
   return result;
 }
@@ -405,8 +441,9 @@ void geometry_bank::prepare_colours(world::placed_object const &object, unsigned
   if(slalom_models && object.type == world::object_type::tet) colours[source_tetclr] = random;
   if(slalom_models) {
     colour_reference constexpr wing_colour_address{0x44ce};
-    if(object.type == world::object_type::saucer_site) colours[wing_colour_address] = 0;
-    else if(object.type == world::object_type::aircraft || object.type == world::object_type::internal_aircraft) {
+    if(object.type == world::object_type::saucer_site) {
+      colours[wing_colour_address] = 0;
+    } else if(object.type == world::object_type::aircraft || object.type == world::object_type::internal_aircraft) {
       colours[wing_colour_address] = (object.flags & 0x1000u) != 0 ? 6 : 1;
     }
   }

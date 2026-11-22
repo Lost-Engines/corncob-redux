@@ -20,7 +20,8 @@ int main(int const argc, char const *const argv[]) {
   if(bytes.size() < 12 || std::string{bytes.begin(), bytes.begin() + 8} != "CORNIMP2") throw std::invalid_argument{"invalid impact fixture"};
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   unsigned int const count{data.dword(8)};
-  unsigned int offset{12}, particles{0};
+  unsigned int offset{12};
+  unsigned int particles{0};
   for(unsigned int i{0}; i != count; ++i) {
     world::theatre theatre;
     game::combat weapons{geometry, theatre, data.dword(offset)};
@@ -32,14 +33,19 @@ int main(int const argc, char const *const argv[]) {
     auto const kind{theatre.objects[0].type};
     theatre.objects[1] = corncob::tests::read_actor(data, offset + 74);
     offset += 148;
-    if(paired) weapons.collide(0, 1);
-    else weapons.damage(0, theatre.objects[1]);
+    if(paired) {
+      weapons.collide(0, 1);
+    } else {
+      weapons.damage(0, theatre.objects[1]);
+    }
     auto const &object{theatre.objects[0]};
     auto const expected{corncob::tests::read_actor(data, offset)};
     auto check{[&](bool const match, std::string const &field){
       if(!match) throw std::runtime_error{"native impact " + std::to_string(i) + " (type " + std::to_string(std::to_underlying(kind)) + "): " + field};
     }};
-    try { corncob::tests::compare_actor(object, expected, i, "impact"); }
+    try {
+      corncob::tests::compare_actor(object, expected, i, "impact");
+    }
     catch(std::exception const &error) {
       throw std::runtime_error{std::string{error.what()} + " type " + std::to_string(std::to_underlying(kind))
         + " health " + std::to_string(object.health) + "/" + std::to_string(expected.health)

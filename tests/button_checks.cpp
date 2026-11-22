@@ -14,8 +14,10 @@ int main(int const argc, char const *const argv[]) {
   corncob::graphics::indexed_framebuffer target;
   for(unsigned int i{0}; i != cases; ++i) {
     auto const button{static_cast<corncob::graphics::cockpit_button>(input.byte())};
-    auto const source{input.byte()}, destination{input.byte()};
-    uint64_t const low{input.dword()}, high{input.dword()};
+    auto const source{input.byte()};
+    auto const destination{input.byte()};
+    uint64_t const low{input.dword()};
+    uint64_t const high{input.dword()};
     for(unsigned int y{0}; y != 350; ++y) {
       for(unsigned int x{0}; x != 640; ++x) target.pixels[y * 640 + x] = static_cast<uint8_t>((x * 5 + y * 7) & 15u);
     }
@@ -34,7 +36,8 @@ int main(int const argc, char const *const argv[]) {
       .bottom{sights.signed_word()},
     };
     corncob::graphics::screen_point const centre{sights.signed_word(), sights.signed_word()};
-    uint64_t const low{sights.dword()}, high{sights.dword()};
+    uint64_t const low{sights.dword()};
+    uint64_t const high{sights.dword()};
     std::ranges::fill(target.pixels, 2);
     corncob::maths::random_source random;
     corncob::graphics::draw_gunsight(target, random, bounds, centre);

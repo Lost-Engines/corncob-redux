@@ -20,7 +20,8 @@ int main(int const argc, char const *const argv[]) {
   std::vector<uint8_t> const bytes{std::istreambuf_iterator<char>{file}, {}};
   corncob::resources::binary_reader const data{bytes};
   if(bytes.size() < 16 || std::string{bytes.begin(), bytes.begin() + 8} != "CORNPAR1") throw std::invalid_argument{"invalid parked-aircraft fixture"};
-  unsigned int const planes{data.dword(8)}, towers{data.dword(12)};
+  unsigned int const planes{data.dword(8)};
+  unsigned int const towers{data.dword(12)};
   unsigned int offset{16};
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   for(unsigned int i{0}; i != planes; ++i) {
@@ -36,7 +37,8 @@ int main(int const argc, char const *const argv[]) {
         .roll{data.word(offset + 16)},
       },
     };
-    bool const on_foot{data.byte(offset + 34) != 0}, exiting{data.byte(offset + 35) != 0};
+    bool const on_foot{data.byte(offset + 34) != 0};
+    bool const exiting{data.byte(offset + 35) != 0};
     offset += 36;
     auto object{corncob::tests::read_actor(data, offset)};
     object.aircraft_parking_flags = data.byte(offset + 65);
@@ -85,29 +87,38 @@ int main(int const argc, char const *const argv[]) {
   if(arrival.player() != game::player_mode::on_foot || arrival.craft().position != parked) {
     throw std::runtime_error{"stepping out relocated or automatically re-entered the retained aircraft"};
   }
-  for(unsigned int frame{0}; frame != 4; ++frame) arrival.advance({
-    .walk_forward{true},
-  });
+  for(unsigned int frame{0}; frame != 4; ++frame) {
+    arrival.advance({
+      .walk_forward{true},
+    });
+  }
   if(arrival.player() != game::player_mode::on_foot) throw std::runtime_error{"returning immediately bypassed the original walk-away requirement"};
   bool walked_clear{false};
   for(unsigned int frame{0}; frame != 300; ++frame) {
     auto const distance{game::interaction_range(arrival.craft().position, arrival.pilot().position)};
-    if(distance && *distance > game::reentry_departure_distance) { walked_clear = true; break; }
+    if(distance && *distance > game::reentry_departure_distance) {
+      walked_clear = true;
+      break;
+    }
     arrival.advance({
       .walk_backward{true},
     });
   }
   if(!walked_clear || arrival.player() != game::player_mode::on_foot) throw std::runtime_error{"pilot could not walk clear of the retained aircraft"};
-  for(unsigned int frame{0}; frame != 300 && arrival.player() == game::player_mode::on_foot; ++frame) arrival.advance({
-    .walk_forward{true},
-  });
+  for(unsigned int frame{0}; frame != 300 && arrival.player() == game::player_mode::on_foot; ++frame) {
+    arrival.advance({
+      .walk_forward{true},
+    });
+  }
   if(arrival.player() != game::player_mode::in_aircraft || !arrival.camera().cockpit || arrival.craft().position != parked) {
     throw std::runtime_error{"walking away and returning failed to re-enter the same aircraft"};
   }
   arrival.press(game::action::eject);
-  for(unsigned int frame{0}; frame != 4; ++frame) arrival.advance({
-    .walk_forward{true},
-  });
+  for(unsigned int frame{0}; frame != 4; ++frame) {
+    arrival.advance({
+      .walk_forward{true},
+    });
+  }
   if(arrival.player() != game::player_mode::on_foot) throw std::runtime_error{"a later exit retained boarding permission from the previous walk-away"};
   std::cout << planes << " original parked-aircraft handlers, " << towers << " tower reset cases and exit/return boarding match" << std::endl;
   return EXIT_SUCCESS;

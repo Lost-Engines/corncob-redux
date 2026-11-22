@@ -72,7 +72,9 @@ int main(int const argc, char const *const argv[]) {
     local_objectives += resources::survey_airfield(flatland, field).objectives;
   }
   auto single{world::theatre{flatland}};
-  for(auto &object : single.objects) if(object.type == world::object_type::control_tower && world::airfield_for(object.position) != world::central_airfield) object.flags = 0;
+  for(auto &object : single.objects) {
+    if(object.type == world::object_type::control_tower && world::airfield_for(object.position) != world::central_airfield) object.flags = 0;
+  }
   require(local_objectives == resources::survey_airfield(single).objectives, "airfield partitions lose or duplicate objectives");
 
   game::campaign_store campaign{scratch};
@@ -81,7 +83,8 @@ int main(int const argc, char const *const argv[]) {
   game::sortie_statistics result{
     .objectives_completed{7},
   };
-  result.mark(game::sortie_status::home); result.mark(game::sortie_status::landed);
+  result.mark(game::sortie_status::home);
+  result.mark(game::sortie_status::landed);
   campaign.finish_sortie("morning", world::load_theatre("morning"), result);
   require(campaign.active_pilot()->rank() == game::pilot_rank::captain, "Earth progression changed");
   auto const earth_bytes{std::vector<uint8_t>{campaign.active_pilot()->native_data().begin(), campaign.active_pilot()->native_data().end()}};
@@ -106,11 +109,16 @@ int main(int const argc, char const *const argv[]) {
   require(front->current_page() == game::interface_page::campaigns, "combined campaign selector is unreachable");
   front->character('o');
   require(front->current_page() == game::interface_page::new_theatre, "expansion list is unreachable");
-  front->command(end); front->command(accept);
+  front->command(end);
+  front->command(accept);
   require(reopened.theatres().size() == 2, "last expansion world could not be selected");
-  front->character('f'); front->command(accept);
+  front->character('f');
+  front->command(accept);
   auto launch{front->take_launch()};
-  if(!launch) { front->command(accept); launch = front->take_launch(); }
+  if(!launch) {
+    front->command(accept);
+    launch = front->take_launch();
+  }
   require(launch && launch->theatre == "other_worlds/whtsands", "expansion menu launched the wrong world");
   // The builder changes only the opened copy, and its cursor never leaks into a native saved universe.
   game::mission_builder builder{single, geometry};

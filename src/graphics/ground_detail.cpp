@@ -14,7 +14,8 @@ maths::world_position distant_point(uint16_t const width, int32_t const height, 
     int32_t const high{random.below(width) - width / 2};
     return high * 65'536 + random.next();
   }};
-  int32_t const x{coordinate()}, y{coordinate()};
+  int32_t const x{coordinate()};
+  int32_t const y{coordinate()};
   return {x, y, height};
 }
 

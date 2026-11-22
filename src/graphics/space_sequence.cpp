@@ -34,19 +34,23 @@ star_field::star_field(uint32_t const seed) : random{seed} {
 void star_field::restart() {
   /// The ending uses RAND_W multiplied by the requested range, rather than the flight engine's modulo helper
   auto scaled{[&](unsigned int const range){return static_cast<uint16_t>(static_cast<uint32_t>(random.next()) * range / 65'535u);}};
-  for(auto &star : stars) star = {
-    .x{static_cast<int16_t>(scaled(8192) - 4096)},
-    .y{static_cast<int16_t>(scaled(8192) - 4096)},
-    .z{scaled(32'767)},
-  };
+  for(auto &star : stars) {
+    star = {
+      .x{static_cast<int16_t>(scaled(8192) - 4096)},
+      .y{static_cast<int16_t>(scaled(8192) - 4096)},
+      .z{scaled(32'767)},
+    };
+  }
 }
 void star_field::advance(indexed_framebuffer &target) {
   /// Advance original EPSTR projection, preserving its near-plane guards, half-size coordinates and three intensities
   for(auto &star : stars) {
     star.z = static_cast<uint16_t>((star.z - 128u) & 32'767u);
-    int const x{star.x * 3200}, y{star.y * 3200};
+    int const x{star.x * 3200};
+    int const y{star.y * 3200};
     if(star.z <= 3200 && (std::abs(x / 640) >= star.z || std::abs(y / 457) >= star.z)) continue;
-    int const projected_x{x / star.z + 640}, projected_y{y / star.z + 200};
+    int const projected_x{x / star.z + 640};
+    int const projected_y{y / star.z + 200};
     if(projected_x < 0 || projected_x / 2 >= 639 || projected_y < 0 || projected_y >= 400) continue;
     uint8_t const colour{static_cast<uint8_t>(star.z > 26'000 ? 8 : star.z < 20'000 ? 15 : 7)};
     target.pixels[static_cast<unsigned int>(projected_y / 2) * 640 + static_cast<unsigned int>(projected_x / 2)] = colour;
@@ -66,8 +70,10 @@ space_sequence::space_sequence(indexed_framebuffer const &backdrop, std::array<r
       page.height = render::screen_layout::height;
       page.monochrome = false;
       page.pixels.resize(page.width * page.height);
-      for(unsigned int y{0}; y != page.height; ++y) for(unsigned int x{0}; x != page.width; ++x) {
-        page.pixels[y * page.width + x] = backdrop.pixels[(y * backdrop.height / page.height) * backdrop.width + x * backdrop.width / page.width];
+      for(unsigned int y{0}; y != page.height; ++y) {
+        for(unsigned int x{0}; x != page.width; ++x) {
+          page.pixels[y * page.width + x] = backdrop.pixels[(y * backdrop.height / page.height) * backdrop.width + x * backdrop.width / page.width];
+        }
       }
     }
   }
@@ -78,7 +84,10 @@ void space_sequence::tick() {
   if(complete) return;
   unsigned int constexpr fade_frames{8 * 18};
   frame = std::min(frame + 1, fade_frames);
-  if(leaving && frame == fade_frames) { complete = true; return; }
+  if(leaving && frame == fade_frames) {
+    complete = true;
+    return;
+  }
   display_page ^= 1;
   auto &target{pages[display_page]};
   if(!warp) fill(target, 321, 78, 195, 11);
@@ -107,7 +116,10 @@ void space_sequence::tick() {
 void space_sequence::advance(double const seconds) {
   /// Keep the original starfield clock independent of display refresh and the stopped flight simulation
   clock += seconds;
-  while(clock >= tick_period && !complete) { tick(); clock -= tick_period; }
+  while(clock >= tick_period && !complete) {
+    tick();
+    clock -= tick_period;
+  }
 }
 void space_sequence::toggle_warp() noexcept {
   /// Enter preserves old star pixels independently on the two alternating EGA pages

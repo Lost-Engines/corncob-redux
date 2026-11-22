@@ -34,7 +34,9 @@ bool pitch_locked(aircraft_state const &aircraft, angular_response &response) {
     return false;
   }
   unsigned int const speed{std::clamp(magnitude, 3901u, 15'500u)};
-  unsigned int const scaled{speed * 8}, index{scaled / 15'591 - 2}, remainder{scaled % 15'591};
+  unsigned int const scaled{speed * 8};
+  unsigned int const index{scaled / 15'591 - 2};
+  unsigned int const remainder{scaled % 15'591};
   std::array<int16_t, 8> constexpr pitch_by_speed{-2109, -1507, -1005, -772, -671, -571, -500, -450};
   int const target{pitch_by_speed[index] + (pitch_by_speed[index + 1] - pitch_by_speed[index]) * static_cast<int>(remainder) / 15'591};
   int16_t const error{static_cast<int16_t>(std::clamp<int>(maths::word(aircraft.attitude.pitch - target), -2000, 3200))};
@@ -56,11 +58,14 @@ void advance_autopilot(aircraft_state const &aircraft, angular_response &respons
   int const feedback{std::clamp<int>(maths::negate(aircraft.velocity.z), -50, 50)};
   response.pitch = add(response.pitch, add(paired >> 3, feedback * std::abs(feedback) * 20));
   // DOHLOCK computes ABS into AX but compares the stored unsigned velocity: descent does not capture a lock
-  if(static_cast<uint16_t>(aircraft.velocity.z) > 15) pilot.height_locked = false;
-  else if(!pilot.height_locked) {
+  if(static_cast<uint16_t>(aircraft.velocity.z) > 15) {
+    pilot.height_locked = false;
+  } else if(!pilot.height_locked) {
     pilot.height_locked = true;
     pilot.height = aircraft.position.z;
-  } else response.pitch = add(response.pitch, maths::scale(maths::dword(static_cast<int64_t>(pilot.height) - aircraft.position.z), 655));
+  } else {
+    response.pitch = add(response.pitch, maths::scale(maths::dword(static_cast<int64_t>(pilot.height) - aircraft.position.z), 655));
+  }
   pilot.previous_vertical_airflow = aircraft.body_velocity.z;
 }
 
@@ -68,10 +73,17 @@ void advance_controls(aircraft_state &aircraft, angular_response &response, cont
                       atmosphere const &environment, time_step const step, maths::random_source *const random) {
   /// Apply original stick torque, inertia, weathercock yaw, ground pitch and stall protection
   int16_t constexpr control_airflow_limit{300};
-  int16_t constexpr roll_scale{600}, pitch_scale{125}, yaw_scale{125};
-  int16_t constexpr roll_inertia{8}, pitch_inertia{10}, yaw_inertia{10};
-  int16_t constexpr weathercock_scale{1053}, bank_turn_scale{3859};
-  int16_t constexpr resting_pitch{-1500}, rotation_speed{2821}, maximum_rate{3000};
+  int16_t constexpr roll_scale{600};
+  int16_t constexpr pitch_scale{125};
+  int16_t constexpr yaw_scale{125};
+  int16_t constexpr roll_inertia{8};
+  int16_t constexpr pitch_inertia{10};
+  int16_t constexpr yaw_inertia{10};
+  int16_t constexpr weathercock_scale{1053};
+  int16_t constexpr bank_turn_scale{3859};
+  int16_t constexpr resting_pitch{-1500};
+  int16_t constexpr rotation_speed{2821};
+  int16_t constexpr maximum_rate{3000};
   int16_t const airflow{std::clamp<int16_t>(aircraft.scaled_body_velocity.x, -control_airflow_limit, control_airflow_limit)};
   auto pressure_adjust{[&](int16_t const value){
     return maths::word(static_cast<int32_t>(aircraft.density) * value / environment.sea_level_density);
@@ -117,7 +129,9 @@ void advance_controls(aircraft_state &aircraft, angular_response &response, cont
         | ((static_cast<uint32_t>(static_cast<uint16_t>(error)) << 8) & 0x00ffff00u)
         | (static_cast<uint16_t>(error) & 0xffu)};
       response.pitch = add(response.pitch, maths::rounded_divide(maths::scale(std::bit_cast<int32_t>(shuffled), step.elapsed), step.normal));
-    } else response.pitch = add(response.pitch, -(speed - rotation_speed) * 32);
+    } else {
+      response.pitch = add(response.pitch, -(speed - rotation_speed) * 32);
+    }
     int16_t temporary{pitch};
     if(pitch < resting_pitch) {
       temporary = high(response.pitch);
@@ -139,8 +153,11 @@ void advance_controls(aircraft_state &aircraft, angular_response &response, cont
   if(!aircraft.on_ground && !aircraft.stalled) {
     int16_t const forecast{maths::word(aircraft.angle_of_attack * 2 - aircraft.previous_angle_of_attack)};
     uint16_t const magnitude{static_cast<uint16_t>(forecast < 0 ? maths::negate(forecast) : forecast)};
-    if(response.stall_protection) protect = maths::word(std::abs(static_cast<int>(high(response.pitch))) - response.last_protected_pitch_rate) >= 0;
-    else protect = magnitude >= response.almost_stall_angle;
+    if(response.stall_protection) {
+      protect = maths::word(std::abs(static_cast<int>(high(response.pitch))) - response.last_protected_pitch_rate) >= 0;
+    } else {
+      protect = magnitude >= response.almost_stall_angle;
+    }
     if(protect && magnitude != 0) {
       response.pitch = maths::scale(maths::rounded_divide(response.pitch, maths::word(magnitude)), maths::word(response.almost_stall_angle));
       response.last_protected_pitch_rate = static_cast<uint16_t>(std::abs(static_cast<int>(high(response.pitch))));

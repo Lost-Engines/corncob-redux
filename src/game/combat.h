@@ -24,8 +24,16 @@ struct weapon_origin {
   bool remote;
   bool crashed;
 };
-enum class fragment_pattern { outward, upward, mortar, incendiary };
-enum class contact_continuation { original_partner, fragment_partner };
+enum class fragment_pattern {
+  outward,
+  upward,
+  mortar,
+  incendiary
+};
+enum class contact_continuation {
+  original_partner,
+  fragment_partner
+};
 
 struct sound_cues {
   uint32_t gunshots{0};

@@ -67,23 +67,29 @@ void mission_builder::command(builder_command const command) {
   auto &position{selected ? world.objects[*selected].position : cursor};
   switch(command) {
   case builder_command::cursor:
-    if(selected) { cursor = maths::world_position{position}; selected.reset(); } else {
+    if(selected) {
+      cursor = maths::world_position{position};
+      selected.reset();
+    } else {
       auto const ahead{maths::transform(maths::make_inverse_rotation(observer.attitude), {20'000, 0, 0})};
       cursor = maths::world_position{observer.position + maths::world_position{ahead}};
     }
     cursor_visible = true;
     break;
-  case builder_command::hide_cursor: selected.reset(); cursor_visible = false; break;
+  case builder_command::hide_cursor:
+    selected.reset();
+    cursor_visible = false;
+    break;
   case builder_command::create:
     if(!cursor_visible) this->command(builder_command::cursor);
     {
-      auto const &definition{geometry.definition(world::object_type::generator_orb)};
-      maths::world_position const created_position{
+    auto const &definition{geometry.definition(world::object_type::generator_orb)};
+    maths::world_position const created_position{
         std::clamp(position.x, world::theatre::origin, -world::theatre::origin - 1),
         std::clamp(position.y, world::theatre::origin, -world::theatre::origin - 1),
         std::clamp(position.z, 0, maximum_stored_altitude),
       };
-      world.objects.push_back({
+    world.objects.push_back({
         .position{maths::world_position{created_position}},
         .attitude{},
         .type{world::object_type::generator_orb},
@@ -93,41 +99,65 @@ void mission_builder::command(builder_command const command) {
         .collision_group{definition.collision_group},
         .motion{definition.motion},
       });
-      selected = static_cast<unsigned int>(world.objects.size() - 1);
-    }
+    selected = static_cast<unsigned int>(world.objects.size() - 1);
+  }
     break;
   case builder_command::select:
     {
-      uint64_t nearest{std::numeric_limits<uint64_t>::max()};
-      std::optional<unsigned int> found;
-      for(unsigned int i{0}; i != world.objects.size(); ++i) {
-        auto const &object{world.objects[i]};
-        if(object.pose == world::model_pose::editor_cursor || !object.has(world::object_flag::present) || (geometry.definition(object.type).properties & 1u) != 0) continue;
-        int64_t const dx{(static_cast<int64_t>(object.position.x) - cursor.x) / 256};
-        int64_t const dy{(static_cast<int64_t>(object.position.y) - cursor.y) / 256};
-        int64_t const dz{(static_cast<int64_t>(object.position.z) - cursor.z) / 256};
-        uint64_t const distance{static_cast<uint64_t>(dx * dx + dy * dy + dz * dz)};
-        if(distance < nearest) { found = i; nearest = distance; }
+    uint64_t nearest{std::numeric_limits<uint64_t>::max()};
+    std::optional<unsigned int> found;
+    for(unsigned int i{0}; i != world.objects.size(); ++i) {
+      auto const &object{world.objects[i]};
+      if(object.pose == world::model_pose::editor_cursor || !object.has(world::object_flag::present) || (geometry.definition(object.type).properties & 1u) != 0) continue;
+      int64_t const dx{(static_cast<int64_t>(object.position.x) - cursor.x) / 256};
+      int64_t const dy{(static_cast<int64_t>(object.position.y) - cursor.y) / 256};
+      int64_t const dz{(static_cast<int64_t>(object.position.z) - cursor.z) / 256};
+      uint64_t const distance{static_cast<uint64_t>(dx * dx + dy * dy + dz * dz)};
+      if(distance < nearest) {
+        found = i;
+        nearest = distance;
       }
-      selected = found;
-      cursor_visible = true;
+    }
+    selected = found;
+    cursor_visible = true;
+  }
+    break;
+  case builder_command::erase:
+    if(selected) {
+      cursor = maths::world_position{position};
+      world.objects[*selected].flags = 0;
+      selected.reset();
     }
     break;
-  case builder_command::erase: if(selected) { cursor = maths::world_position{position}; world.objects[*selected].flags = 0; selected.reset(); } break;
-  case builder_command::next_type: change_type(1); break;
-  case builder_command::previous_type: change_type(-1); break;
-  case builder_command::next_quality: case builder_command::previous_quality:
+  case builder_command::next_type:
+    change_type(1);
+    break;
+  case builder_command::previous_type:
+    change_type(-1);
+    break;
+  case builder_command::next_quality:
+  case builder_command::previous_quality:
     if(selected) {
       auto &object{world.objects[*selected]};
       unsigned int const quality{(object.quality() + (command == builder_command::next_quality ? 1 : 7)) & 7u};
       object.flags = static_cast<uint16_t>((object.flags & ~0x7000u) | quality << 12);
     }
     break;
-  case builder_command::special: if(selected) world.objects[*selected].flags ^= std::to_underlying(world::object_flag::special); break;
-  case builder_command::complete: if(selected) world.objects[*selected].flags ^= std::to_underlying(world::object_flag::objective_complete); break;
-  case builder_command::level: observer.attitude.pitch = observer.attitude.roll = 0; break;
-  case builder_command::lock_height: if(cursor_visible) position.z = height_lock; break;
-  case builder_command::remember_height: if(cursor_visible) height_lock = position.z; break;
+  case builder_command::special:
+    if(selected) world.objects[*selected].flags ^= std::to_underlying(world::object_flag::special);
+    break;
+  case builder_command::complete:
+    if(selected) world.objects[*selected].flags ^= std::to_underlying(world::object_flag::objective_complete);
+    break;
+  case builder_command::level:
+    observer.attitude.pitch = observer.attitude.roll = 0;
+    break;
+  case builder_command::lock_height:
+    if(cursor_visible) position.z = height_lock;
+    break;
+  case builder_command::remember_height:
+    if(cursor_visible) height_lock = position.z;
+    break;
   case builder_command::map:
     overhead = !overhead;
     observer.attitude.pitch = overhead ? 16'384 : 6000;
@@ -148,8 +178,8 @@ void mission_builder::advance(flight::control_input const &stick, map_input cons
     return;
   }
   if(overhead) {
-    maths::move(position, {-stick.pitch * std::max(1,observer.position.z >> 14) * ratio,
-                           -stick.roll * std::max(1,observer.position.z >> 14) * ratio, 0}, fraction.position);
+    maths::move(position, {-stick.pitch * std::max(1, observer.position.z >> 14) * ratio,
+                           -stick.roll * std::max(1, observer.position.z >> 14) * ratio, 0}, fraction.position);
   } else if(input.move_object && cursor_visible) {
     maths::angles const level{.heading{observer.attitude.heading}};
     auto const movement{maths::transform(maths::make_inverse_rotation(level), {
@@ -163,7 +193,7 @@ void mission_builder::advance(flight::control_input const &stick, map_input cons
   }
   int32_t const vertical{(input.higher - input.lower) * speed};
   int32_t const maximum_height{input.move_object && cursor_visible ? maximum_stored_altitude : 210 * 65'536};
-  maths::move(position, {0,0,vertical * ratio}, fraction.position);
+  maths::move(position, {0, 0, vertical * ratio}, fraction.position);
   position.z = std::clamp(position.z, 0, maximum_height);
   position.x = std::clamp(position.x, world::theatre::origin, -world::theatre::origin - 1);
   position.y = std::clamp(position.y, world::theatre::origin, -world::theatre::origin - 1);

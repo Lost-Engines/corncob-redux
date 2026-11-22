@@ -26,28 +26,29 @@ void depth_checks() {
   std::vector<float> depth(4096);
   corncob::maths::random_source random;
   graphics::depth_raster draw{frame, depth, {{0, 0, 64, 64}, 32, 32, 32, 32, false}, random};
-  std::array<graphics::view_point, 4> const wall{{{10,-5,-5}, {10,5,-5}, {10,5,5}, {10,-5,5}}};
-  std::array<graphics::view_point, 4> const behind{{{20,-4,-4}, {20,4,-4}, {20,4,4}, {20,-4,4}}};
+  std::array<graphics::view_point, 4> const wall{{{10, -5, -5}, {10, 5, -5}, {10, 5, 5}, {10, -5, 5}}};
+  std::array<graphics::view_point, 4> const behind{{{20, -4, -4}, {20, 4, -4}, {20, 4, 4}, {20, -4, 4}}};
   draw.polygon(wall, 7);
   draw.polygon(behind, 4);
-  draw.line({20,-5,0}, {20,5,0}, 2);
-  draw.disc({20,0,0}, 2, 1);
+  draw.line({20, -5, 0}, {20, 5, 0}, 2);
+  draw.disc({20, 0, 0}, 2, 1);
   require(frame.pixels[32 * 64 + 32] == 7, "hidden polygons, lines or discs leaked through a wall");
   draw.polygon(wall, 15);
   require(frame.pixels[32 * 64 + 32] == 15, "coplanar authored markings were lost");
   std::fill(depth.begin(), depth.end(), 0);
-  std::array<graphics::view_point, 4> const distant{{{1e10,-5e9,-5e9}, {1e10,5e9,-5e9}, {1e10,5e9,5e9}, {1e10,-5e9,5e9}}};
+  std::array<graphics::view_point, 4> const distant{{{1e10, -5e9, -5e9}, {1e10, 5e9, -5e9}, {1e10, 5e9, 5e9}, {1e10, -5e9, 5e9}}};
   draw.polygon(distant, 6);
   require(frame.pixels[32 * 64 + 32] == 6, "distant geometry was clipped or lost depth precision");
-  std::array<graphics::view_point, 3> const crosses_eye{{{-100,100,100}, {20,-20,-20}, {20,20,-20}}};
+  std::array<graphics::view_point, 3> const crosses_eye{{{-100, 100, 100}, {20, -20, -20}, {20, 20, -20}}};
   draw.polygon(crosses_eye, 3);
-  draw.line({-1e12,1e12,0}, {1e12,0,0}, 5);
+  draw.line({-1e12, 1e12, 0}, {1e12, 0, 0}, 5);
 }
 
 void detail_size_checks() {
   namespace graphics = corncob::graphics;
   graphics::indexed_framebuffer frame;
-  frame.width = 192; frame.height = 128;
+  frame.width = 192;
+  frame.height = 128;
   frame.pixels = std::vector<uint8_t>(frame.width * frame.height);
   std::vector<float> depth(frame.pixels.size());
   corncob::maths::random_source random;
@@ -55,45 +56,66 @@ void detail_size_checks() {
   auto position{[&](double const x, double const y, double const z){
     return graphics::view_point{z, (view.centre_x - x) * z / view.focal_x, (view.centre_y - y) * z / view.focal_y};
   }};
-  auto clear{[&]{ std::ranges::fill(frame.pixels, 0); std::ranges::fill(depth, 0); }};
-  auto pixels{[&](uint8_t const colour){ return std::ranges::count(frame.pixels, colour); }};
+  auto clear{[&]{
+    std::ranges::fill(frame.pixels, 0);
+    std::ranges::fill(depth, 0);
+  }};
+  auto pixels{[&](uint8_t const colour){return std::ranges::count(frame.pixels, colour);}};
   graphics::depth_raster draw{frame, depth, view, random};
   draw.point(position(96, 64, 1000), 7);
   require(pixels(7) == 9, "nearby points did not scale to an original pixel at threefold resolution");
-  clear(); draw.point(position(96, 64, 22500), 7);
+  clear();
+  draw.point(position(96, 64, 22500), 7);
   require(pixels(7) == 4, "middle-distance points did not shrink with perspective");
-  clear(); draw.point(position(96, 64, 1e8), 7);
+  clear();
+  draw.point(position(96, 64, 1e8), 7);
   require(pixels(7) == 1, "distant points did not reduce to one physical pixel");
-  clear(); draw.disc(position(96, 64, 1e8), 0.1, 7);
+  clear();
+  draw.disc(position(96, 64, 1e8), 0.1, 7);
   require(pixels(7) == 1, "detail scaling enlarged distant authored discs");
   for(double const scale : {0.5, 1.0}) {
-    clear(); auto native{view}; native.pixel_scale = scale;
+    clear();
+    auto native{view};
+    native.pixel_scale = scale;
     graphics::depth_raster{frame, depth, native, random}.point(position(96, 64, 1000), 7);
     require(pixels(7) == 1, "native or reduced resolutions enlarged source points");
   }
-  clear(); auto rear{view}; rear.rear = true; rear.pixel_scale = 2;
+  clear();
+  auto rear{view};
+  rear.rear = true;
+  rear.pixel_scale = 2;
   auto const forward{position(96, 64, 1000)};
   graphics::depth_raster{frame, depth, rear, random}.point(-forward, 7);
   require(pixels(7) == 4, "rear-view points did not use their own pixel scale or orientation");
-  clear(); draw.line(position(24, 64, 1000), position(168, 64, 1000), 7);
+  clear();
+  draw.line(position(24, 64, 1000), position(168, 64, 1000), 7);
   auto column{[&](int const x){
     unsigned int count{0};
-    for(unsigned int y{0}; y < frame.height; ++y) if(frame.pixels[y * frame.width + static_cast<unsigned int>(x)] == 7) ++count;
+    for(unsigned int y{0}; y < frame.height; ++y) {
+      if(frame.pixels[y * frame.width + static_cast<unsigned int>(x)] == 7) ++count;
+    }
     return count;
   }};
   require(column(96) == 3, "nearby model lines stayed one physical pixel wide");
-  clear(); draw.line(position(24, 64, 1e8), position(168, 64, 1e8), 7);
+  clear();
+  draw.line(position(24, 64, 1e8), position(168, 64, 1e8), 7);
   require(column(96) == 1, "far model lines retained enlarged thickness");
-  clear(); draw.line(position(24, 64, 15000), position(168, 64, 150000), 7);
+  clear();
+  draw.line(position(24, 64, 15000), position(168, 64, 150000), 7);
   require(column(32) >= 2 && column(160) == 1, "receding line thickness did not vary with perspective depth");
-  clear(); draw.line(position(96, 64, 1000), position(96, 64, 1e8), 7);
+  clear();
+  draw.line(position(96, 64, 1000), position(96, 64, 1e8), 7);
   require(pixels(7) == 9, "end-on line failed to retain its nearest endpoint thickness");
-  clear(); draw.line(position(24, 8, 1000), position(168, 8, 1000), 7);
+  clear();
+  draw.line(position(24, 8, 1000), position(168, 8, 1000), 7);
   require(pixels(7) > 100, "viewport clipping dropped an overlapping wide line");
-  clear(); draw.line(position(24, 7.75, 1000), position(168, 7.75, 1000), 7);
+  clear();
+  draw.line(position(24, 7.75, 1000), position(168, 7.75, 1000), 7);
   require(pixels(7) > 100, "line clipping ignored width when the centre was off screen");
-  for(unsigned int y{0}; y < frame.height; ++y) for(unsigned int x{0}; x < frame.width; ++x) {
-    if(x < 8 || x >= 184 || y < 8 || y >= 120) require(frame.pixels[y * frame.width + x] == 0, "wide line leaked outside its view");
+  for(unsigned int y{0}; y < frame.height; ++y) {
+    for(unsigned int x{0}; x < frame.width; ++x) {
+      if(x < 8 || x >= 184 || y < 8 || y >= 120) require(frame.pixels[y * frame.width + x] == 0, "wide line leaked outside its view");
+    }
   }
   clear();
   std::array<graphics::view_point, 4> const wall{{position(30, 20, 100), position(160, 20, 100), position(160, 110, 100), position(30, 110, 100)}};
@@ -103,10 +125,12 @@ void detail_size_checks() {
   require(pixels(7) == 0, "enlarged points or lines leaked through foreground geometry");
   draw.line({-1000, 0, 0}, {1000, 0, 0}, 7);
   require(pixels(7) == 9, "a line crossing the eye failed near-plane clipping or nearest-depth selection");
-  clear(); draw.line(position(60, 20, 1000), position(85, 100, 1000), 7);
+  clear();
+  draw.line(position(60, 20, 1000), position(85, 100, 1000), 7);
   auto const ascending{frame.pixels};
   require(pixels(7) > 200, "steep nearby lines lost their thickness");
-  clear(); draw.line(position(85, 100, 1000), position(60, 20, 1000), 7);
+  clear();
+  draw.line(position(85, 100, 1000), position(60, 20, 1000), 7);
   require(frame.pixels == ascending, "reversing a steep line changed its coverage");
 }
 
@@ -133,20 +157,23 @@ void billboard_detail_checks() {
       draw.disc(point(105, -10, 6), 5, 1, surface);
       draw.line(point(95, 10, -10), point(105, -10, -10), 0, surface);
     }};
-    std::ranges::fill(frame.pixels, 14); std::ranges::fill(depth, 0);
+    std::ranges::fill(frame.pixels, 14);
+    std::ranges::fill(depth, 0);
     face();
     require(frame.pixels[56 * 128 + 50] == 1 && frame.pixels[56 * 128 + 76] == 1, "attached eyes were hidden behind their head billboard");
     require(frame.pixels[77 * 128 + 56] == 0 && frame.pixels[76 * 128 + 72] == 0, "attached mouth was clipped by its head billboard");
     auto const visible{frame.pixels};
     std::array<graphics::view_point, 4> const wall{{point(50, 30, 30), point(50, -30, 30), point(50, -30, -30), point(50, 30, -30)}};
     for(bool const wall_first : {false, true}) {
-      std::ranges::fill(frame.pixels, 14); std::ranges::fill(depth, 0);
+      std::ranges::fill(frame.pixels, 14);
+      std::ranges::fill(depth, 0);
       if(wall_first) draw.polygon(wall, 4);
       face();
       if(!wall_first) draw.polygon(wall, 4);
-      require(std::ranges::all_of(frame.pixels, [](uint8_t const colour){ return colour == 4; }), "billboard artwork leaked through a foreground wall");
+      require(std::ranges::all_of(frame.pixels, [](uint8_t const colour){return colour == 4;}), "billboard artwork leaked through a foreground wall");
     }
-    std::ranges::fill(frame.pixels, 14); std::ranges::fill(depth, 0);
+    std::ranges::fill(frame.pixels, 14);
+    std::ranges::fill(depth, 0);
     draw.disc(point(100, 0, 0), 40, 7);
     auto const head{frame.pixels};
     draw.disc(point(105, -10, 6), 5, 1, -surface);
@@ -162,9 +189,17 @@ void ground_crew_checks() {
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
   graphics::scene_renderer renderer{geometry, cockpit};
-  renderer.configure({.resolution{1280,700}, .ground_points{0}});
+  renderer.configure({
+    .resolution{1280, 700},
+    .ground_points{0}
+  });
   world::theatre theatre;
-  theatre.objects.push_back({.position{0,0,0}, .attitude{}, .type{world::object_type::ground_crew}, .flags{1}});
+  theatre.objects.push_back({
+    .position{0, 0, 0},
+    .attitude{},
+    .type{world::object_type::ground_crew},
+    .flags{1}
+  });
   corncob::render::framebuffer frame;
   maths::random_source random;
   for(auto const pose : {world::model_pose::normal, world::model_pose::gesture, world::model_pose::shot}) {
@@ -172,15 +207,23 @@ void ground_crew_checks() {
     for(auto const heading : std::array<maths::angle, 13>{0, 4096, 8192, 12288, 24576, 28672, 32768, 36864, 40960, 45056, 53248, 57344, 61440}) {
       graphics::camera camera{
         .position{-maths::multiply(maths::cosine(heading), 800), -maths::multiply(maths::sine(heading), 800), 520},
-        .attitude{.heading{heading}}, .cockpit{false}, .rear_view{false}, .ground_detail{false},
+        .attitude{.heading{heading}},
+        .cockpit{false},
+        .rear_view{false},
+        .ground_detail{false},
       };
       renderer.render(theatre, camera, 0, 0, random, frame);
       auto const &indexed{renderer.indexed_frame()};
-      unsigned int left_eye{0}, right_eye{0}, left_mouth{0}, right_mouth{0};
-      for(unsigned int y{320}; y < 380; ++y) for(unsigned int x{600}; x < 680; ++x) {
-        auto const colour{indexed.pixels[y * indexed.width + x]};
-        if(colour == 1) (x < 640 ? left_eye : right_eye)++;
-        if(colour == 0) (x < 640 ? left_mouth : right_mouth)++;
+      unsigned int left_eye{0};
+      unsigned int right_eye{0};
+      unsigned int left_mouth{0};
+      unsigned int right_mouth{0};
+      for(unsigned int y{320}; y < 380; ++y) {
+        for(unsigned int x{600}; x < 680; ++x) {
+          auto const colour{indexed.pixels[y * indexed.width + x]};
+          if(colour == 1) (x < 640 ? left_eye : right_eye)++;
+          if(colour == 0) (x < 640 ? left_mouth : right_mouth)++;
+        }
       }
       if(left_eye == 0 || right_eye == 0) throw std::runtime_error{"real ground crew lost an eye: pose " + std::to_string(std::to_underlying(pose)) + ", heading " + std::to_string(heading) + ", pixels " + std::to_string(left_eye) + "/" + std::to_string(right_eye)};
       require(left_mouth > 0 && right_mouth > 0, "real ground crew lost half their mouth in an oblique view");
@@ -198,36 +241,73 @@ void renderer_checks() {
   corncob::maths::random_source random;
   auto const seed{random.seed()};
   world::theatre theatre;
-  theatre.objects.push_back({.position{5'000'000,0,0}, .attitude{}, .type{world::object_type::control_tower}, .flags{1}});
-  graphics::camera observer{.position{0,0,720}, .attitude{}, .cockpit{false}, .rear_view{false}, .ground_detail{false}};
-  for(auto const &size : {corncob::render::video_size{160,100}, {641,357}, {1920,1080}, {300,900}, {2560,640}}) {
+  theatre.objects.push_back({
+    .position{5'000'000, 0, 0},
+    .attitude{},
+    .type{world::object_type::control_tower},
+    .flags{1}
+  });
+  graphics::camera observer{
+    .position{0, 0, 720},
+    .attitude{},
+    .cockpit{false},
+    .rear_view{false},
+    .ground_detail{false}
+  };
+  for(auto const &size : {corncob::render::video_size{160, 100}, {641, 357}, {1920, 1080}, {300, 900}, {2560, 640}}) {
     for(bool const panel : {false, true}) {
-      renderer.configure({.resolution{size}, .horizontal_fov{110}, .ground_points{0}});
+      renderer.configure({
+        .resolution{size},
+        .horizontal_fov{110},
+        .ground_points{0}
+      });
       observer.cockpit = panel;
       auto const statistics{renderer.render(theatre, observer, 0, 0, random, frame)};
       require(frame.width == size.width && frame.height == size.height && frame.pixels.size() == static_cast<size_t>(size.width) * size.height, "arbitrary resolution changed surface size");
       require(statistics.objects == 1, "a distant object was culled by its original tile or LOD range");
     }
   }
-  renderer.configure({.resolution{640,350}, .draw_distance{20}, .ground_points{0}});
+  renderer.configure({
+    .resolution{640, 350},
+    .draw_distance{20},
+    .ground_points{0}
+  });
   require(renderer.render(theatre, observer, 0, 0, random, frame).objects == 0, "configured draw distance was not honoured");
   require(random.seed() == seed, "rendering consumed simulation randomness");
   theatre.objects.front().position.x = 40'000;
   observer.cockpit = false;
   auto grey_pixels{[&](double const fov){
-    renderer.configure({.resolution{640,350}, .horizontal_fov{fov}, .ground_points{0}});
+    renderer.configure({
+      .resolution{640, 350},
+      .horizontal_fov{fov},
+      .ground_points{0}
+    });
     renderer.render(theatre, observer, 0, 0, random, frame);
     return std::ranges::count(renderer.indexed_frame().pixels, uint8_t{7});
   }};
-  auto const narrow{grey_pixels(50)}, wide{grey_pixels(120)};
+  auto const narrow{grey_pixels(50)};
+  auto const wide{grey_pixels(120)};
   require(narrow > wide && wide > 0, "FOV did not change projected object size");
   theatre.objects.clear();
-  theatre.objects.push_back({.position{0,0,16000}, .attitude{}, .type{world::object_type::control_tower}, .flags{1}});
-  theatre.objects.push_back({.position{0,-2000,0}, .attitude{}, .type{world::object_type::tower_doorway}, .flags{0}});
+  theatre.objects.push_back({
+    .position{0, 0, 16000},
+    .attitude{},
+    .type{world::object_type::control_tower},
+    .flags{1}
+  });
+  theatre.objects.push_back({
+    .position{0, -2000, 0},
+    .attitude{},
+    .type{world::object_type::tower_doorway},
+    .flags{0}
+  });
   for(bool const front : {false, true}) {
     observer.position = corncob::maths::world_position{0, front ? -20000 : 20000, 720};
     observer.attitude.heading = front ? 16384 : 49152;
-    renderer.configure({.resolution{640,350}, .ground_points{0}});
+    renderer.configure({
+      .resolution{640, 350},
+      .ground_points{0}
+    });
     theatre.objects.back().flags = 0;
     renderer.render(theatre, observer, 0, 0, random, frame);
     auto const without{renderer.indexed_frame().pixels};
@@ -249,22 +329,44 @@ void projection_proportion_checks() {
   corncob::maths::random_source random;
   // The original tower is eight times as tall as it is wide. Compare actual
   // rendered geometry, including the rear-view inset, against that model ratio.
-  for(auto const size : {corncob::render::video_size{640,350}, {800,600}, {1280,720}, {1280,350}}) {
-    renderer.configure({.resolution{size}, .horizontal_fov{90}, .ground_points{0}});
+  for(auto const size : {corncob::render::video_size{640, 350}, {800, 600}, {1280, 720}, {1280, 350}}) {
+    renderer.configure({
+      .resolution{size},
+      .horizontal_fov{90},
+      .ground_points{0}
+    });
     for(bool const rear : {false, true}) {
       world::theatre theatre;
-      graphics::camera observer{.position{0,0,16000}, .attitude{}, .cockpit{rear}, .rear_view{rear}, .ground_detail{false}};
+      graphics::camera observer{
+        .position{0, 0, 16000},
+        .attitude{},
+        .cockpit{rear},
+        .rear_view{rear},
+        .ground_detail{false}
+      };
       renderer.render(theatre, observer, 0, 0, random, frame);
       auto const background{renderer.indexed_frame().pixels};
-      theatre.objects.push_back({.position{rear ? -80000 : 80000,0,16000}, .attitude{}, .type{world::object_type::control_tower}, .flags{1}});
+      theatre.objects.push_back({
+        .position{rear ? -80000 : 80000, 0, 16000},
+        .attitude{},
+        .type{world::object_type::control_tower},
+        .flags{1}
+      });
       renderer.render(theatre, observer, 0, 0, random, frame);
       auto const &pixels{renderer.indexed_frame().pixels};
-      int left{static_cast<int>(size.width)}, top{static_cast<int>(size.height)}, right{-1}, bottom{-1};
-      for(unsigned int y{0}; y < size.height; ++y) for(unsigned int x{0}; x < size.width; ++x) {
-        auto const offset{static_cast<size_t>(y) * size.width + x};
-        if(pixels[offset] == background[offset]) continue;
-        left = std::min(left, static_cast<int>(x)); right = std::max(right, static_cast<int>(x));
-        top = std::min(top, static_cast<int>(y)); bottom = std::max(bottom, static_cast<int>(y));
+      int left{static_cast<int>(size.width)};
+      int top{static_cast<int>(size.height)};
+      int right{-1};
+      int bottom{-1};
+      for(unsigned int y{0}; y < size.height; ++y) {
+        for(unsigned int x{0}; x < size.width; ++x) {
+          auto const offset{static_cast<size_t>(y) * size.width + x};
+          if(pixels[offset] == background[offset]) continue;
+          left = std::min(left, static_cast<int>(x));
+          right = std::max(right, static_cast<int>(x));
+          top = std::min(top, static_cast<int>(y));
+          bottom = std::max(bottom, static_cast<int>(y));
+        }
       }
       require(right >= left && bottom >= top, "projection proportion fixture did not render");
       require(std::abs((bottom - top + 1) - 8 * (right - left + 1)) <= 9, "square-pixel view distorted the tower's authored proportions");
@@ -281,8 +383,16 @@ void ground_size_checks() {
   auto count{[&](int32_t const altitude, unsigned int const scale, bool const horizon = false){
     graphics::scene_renderer renderer{geometry, cockpit};
     // The short DOS field does not reach this five-row horizon strip; use Redux's extended field there.
-    renderer.configure({.resolution{640 * scale, 350 * scale}, .ground_points{horizon ? 640u : 80u}, .ground_range{horizon ? 8.0 : 1.0}});
-    graphics::camera observer{.position{0, 0, altitude}, .attitude{}, .cockpit{false}};
+    renderer.configure({
+      .resolution{640 * scale, 350 * scale},
+      .ground_points{horizon ? 640u : 80u},
+      .ground_range{horizon ? 8.0 : 1.0}
+    });
+    graphics::camera observer{
+      .position{0, 0, altitude},
+      .attitude{},
+      .cockpit{false}
+    };
     corncob::maths::random_source random;
     corncob::render::framebuffer frame;
     renderer.render(theatre, observer, 0, 0, random, frame);
@@ -293,11 +403,15 @@ void ground_size_checks() {
     }
     return std::ranges::count(pixels, uint8_t{0});
   }};
-  auto const native{count(720, 1)}, doubled{count(720, 2)}, quadrupled{count(720, 4)};
+  auto const native{count(720, 1)};
+  auto const doubled{count(720, 2)};
+  auto const quadrupled{count(720, 4)};
   require(native > 10 && doubled >= native * 3 && quadrupled >= native * 12, "ground dots did not preserve their nearby screen-space weight at higher resolutions");
-  auto const airborne_native{count(1'000'000, 1)}, airborne_quadrupled{count(1'000'000, 4)};
+  auto const airborne_native{count(1'000'000, 1)};
+  auto const airborne_quadrupled{count(1'000'000, 4)};
   require(airborne_native > 10 && airborne_quadrupled > airborne_native * 2, "ground detail became uniformly single-pixel specks at aircraft altitude");
-  auto const horizon_native{count(1'000'000, 1, true)}, horizon_quadrupled{count(1'000'000, 4, true)};
+  auto const horizon_native{count(1'000'000, 1, true)};
+  auto const horizon_quadrupled{count(1'000'000, 4, true)};
   require(horizon_native > 0 && horizon_quadrupled < horizon_native * 2, "horizon ground dots did not remain single-pixel details");
 }
 
@@ -307,12 +421,15 @@ void ground_range_checks() {
   maths::world_position const observer{20'000, -30'000, 720};
   bool extended{false};
   for(uint32_t seed{0}; seed < 100; ++seed) {
-    maths::random_source near_random{seed}, far_random{seed};
-    maths::world_position near_point{}, far_point{};
+    maths::random_source near_random{seed};
+    maths::random_source far_random{seed};
+    maths::world_position near_point{};
+    maths::world_position far_point{};
     graphics::regenerate_ground_point(near_point, observer, near_random);
     graphics::regenerate_ground_point(far_point, observer, far_random, 8.0);
     for(unsigned int axis{0}; axis < 2; ++axis) {
-      auto const near_delta{near_point[axis] - observer[axis]}, far_delta{far_point[axis] - observer[axis]};
+      auto const near_delta{near_point[axis] - observer[axis]};
+      auto const far_delta{far_point[axis] - observer[axis]};
       require(std::abs(far_delta - near_delta * 8) < 8, "ground field range did not scale its extent");
       extended = extended || std::abs(far_delta) > 720 * 32;
     }
@@ -322,7 +439,8 @@ void ground_range_checks() {
   graphics::ground_field field;
   maths::random_source random;
   field.initialise(observer, random);
-  field.range(8.0); field.initialise(observer, random);
+  field.range(8.0);
+  field.initialise(observer, random);
   require(field.points().size() == 80, "ground range changed the point count");
 }
 
@@ -331,7 +449,8 @@ void ground_tracking_checks() {
   namespace graphics = corncob::graphics;
   namespace maths = corncob::maths;
   graphics::ground_field field;
-  field.density(640); field.range(8.0);
+  field.density(640);
+  field.range(8.0);
   maths::random_source random;
   maths::world_position observer{100'000, -200'000, 720};
   field.update(observer, random);
@@ -342,20 +461,24 @@ void ground_tracking_checks() {
   observer.x += 1;
   field.update(observer, random);
   require(std::ranges::equal(initial, field.points()), "nearby ground dots slid with the camera instead of staying world anchored");
-  for(int32_t const altitude : {720, 72000, 720}) for(unsigned int i{0}; i < 80; ++i) {
-    observer = maths::world_position{static_cast<int32_t>(i * 50000), -static_cast<int32_t>(i * 30000), altitude};
-    field.update(observer, random);
-    unsigned int nearby{0};
-    for(auto const &point : field.points()) {
-      int64_t const dx{std::abs(static_cast<int64_t>(point.x) - observer.x)}, dy{std::abs(static_cast<int64_t>(point.y) - observer.y)};
-      require(point.z == 0 && dx <= altitude * 256LL && dy <= altitude * 256LL, "ground field failed to follow a moving or descending observer");
-      if(dx <= altitude * 32LL && dy <= altitude * 32LL) ++nearby;
+  for(int32_t const altitude : {720, 72000, 720}) {
+    for(unsigned int i{0}; i < 80; ++i) {
+      observer = maths::world_position{static_cast<int32_t>(i * 50000), -static_cast<int32_t>(i * 30000), altitude};
+      field.update(observer, random);
+      unsigned int nearby{0};
+      for(auto const &point : field.points()) {
+        int64_t const dx{std::abs(static_cast<int64_t>(point.x) - observer.x)};
+        int64_t const dy{std::abs(static_cast<int64_t>(point.y) - observer.y)};
+        require(point.z == 0 && dx <= altitude * 256LL && dy <= altitude * 256LL, "ground field failed to follow a moving or descending observer");
+        if(dx <= altitude * 32LL && dy <= altitude * 32LL) ++nearby;
+      }
+      require(nearby > 100, "extending the ground range exhausted the nearby point budget");
     }
-    require(nearby > 100, "extending the ground range exhausted the nearby point budget");
   }
   for(int32_t const altitude : {250, 720, 45'000, 645'000}) {
     graphics::ground_field fresh;
-    fresh.density(640); fresh.range(8.0);
+    fresh.density(640);
+    fresh.range(8.0);
     fresh.update({0, 0, altitude}, random);
     auto const close{std::ranges::count_if(fresh.points(), [altitude](auto const &point){
       return std::abs(point.x) <= altitude * 4LL && std::abs(point.y) <= altitude * 4LL;
@@ -365,9 +488,13 @@ void ground_tracking_checks() {
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
   graphics::scene_renderer renderer{geometry, cockpit};
-  renderer.configure({.resolution{640,350}});
+  renderer.configure({.resolution{640, 350}});
   corncob::world::theatre theatre;
-  graphics::camera view{.position{0,0,720}, .attitude{}, .cockpit{false}};
+  graphics::camera view{
+    .position{0, 0, 720},
+    .attitude{},
+    .cockpit{false}
+  };
   corncob::render::framebuffer frame;
   renderer.render(theatre, view, 0, 0, random, frame);
   auto const forward{renderer.indexed_frame().pixels};
@@ -381,8 +508,10 @@ void ground_tracking_checks() {
     view.position.x = static_cast<int32_t>(i * 6000);
     renderer.render(theatre, view, i, 0, random, frame);
     if(i < 80) continue;
-    for(unsigned int y{210}; y < 350; ++y) for(unsigned int x{0}; x < 640; ++x) {
-      if(renderer.indexed_frame().pixels[y * 640 + x] == 0) ++near_pixels;
+    for(unsigned int y{210}; y < 350; ++y) {
+      for(unsigned int x{0}; x < 640; ++x) {
+        if(renderer.indexed_frame().pixels[y * 640 + x] == 0) ++near_pixels;
+      }
     }
   }
   require(near_pixels > 200, "sustained flight left ground dots only near the horizon");
@@ -397,7 +526,12 @@ void aircraft_exit_checks() {
     for(unsigned int heading{0}; heading < 65'536; heading += 8192) {
       world::theatre theatre;
       theatre.start.z = 720;
-      theatre.objects.push_back({.position{0, -3000, 720}, .attitude{.heading{static_cast<maths::angle>(heading)}}, .type{world::object_type::aircraft}, .flags{static_cast<uint16_t>(1u | variant)}});
+      theatre.objects.push_back({
+        .position{0, -3000, 720},
+        .attitude{.heading{static_cast<maths::angle>(heading)}},
+        .type{world::object_type::aircraft},
+        .flags{static_cast<uint16_t>(1u | variant)}
+      });
       game::session sortie{geometry, std::move(theatre)};
       sortie.advance({});
       require(sortie.player() == game::player_mode::in_aircraft, "exit fixture did not board its parked aircraft");
@@ -412,9 +546,14 @@ void aircraft_exit_checks() {
       require(sortie.player() == game::player_mode::on_foot, "a grounded exit immediately boarded again");
     }
   }
-  world::theatre training; training.training = true;
+  world::theatre training;
+  training.training = true;
   game::session airborne{geometry, std::move(training)};
-  airborne.relocate({.title{"Ejection check"}, .position{0, 0, 200'000}, .heading{16384}});
+  airborne.relocate({
+    .title{"Ejection check"},
+    .position{0, 0, 200'000},
+    .heading{16384}
+  });
   auto const position{airborne.craft().position};
   auto const velocity{airborne.craft().velocity};
   airborne.press(game::action::eject);
@@ -426,23 +565,44 @@ void walking_checks() {
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   corncob::world::theatre ground;
   ground.start = corncob::maths::world_position{0, 3000, 720};
-  game::session reference{geometry, ground}, accelerated{geometry, ground};
+  game::session reference{geometry, ground};
+  game::session accelerated{geometry, ground};
   auto const start{reference.pilot().position};
-  reference.advance({.walk_forward{true}, .look_yaw{8000}});
+  reference.advance({
+    .walk_forward{true},
+    .look_yaw{8000}
+  });
   reference.advance({.walk_forward{true}});
   require(reference.pilot().position - start == corncob::maths::world_position{198, 0, 0}, "smooth walking did not retain the original ten-unit reference gait");
-  accelerated.advance({.walk_forward{true}, .accelerated_walking{true}, .look_yaw{8000}});
-  for(unsigned int i{1}; i < 20; ++i) accelerated.advance({.walk_forward{true}, .accelerated_walking{true}});
+  accelerated.advance({
+    .walk_forward{true},
+    .accelerated_walking{true},
+    .look_yaw{8000}
+  });
+  for(unsigned int i{1}; i < 20; ++i) {
+    accelerated.advance({
+      .walk_forward{true},
+      .accelerated_walking{true}
+    });
+  }
   require(accelerated.pilot().position - start == corncob::maths::world_position{4990, 0, 0}, "fast walking did not retain the original T stride across twenty accelerated updates");
   auto const fast_position{accelerated.pilot().position};
   accelerated.advance({.walk_forward{true}});
   require(accelerated.pilot().position - fast_position == corncob::maths::world_position{99, 0, 0}, "releasing T did not restore the ordinary walking stride");
-  game::session forward{geometry, ground}, diagonal{geometry, ground}, sideways{geometry, ground};
+  game::session forward{geometry, ground};
+  game::session diagonal{geometry, ground};
+  game::session sideways{geometry, ground};
   auto const origin{forward.pilot().position};
   for(unsigned int n{0}; n < 20; ++n) {
     forward.advance({.walk_forward{true}});
-    diagonal.advance({.walk_forward{true}, .strafe{1}});
-    sideways.advance({.strafe{1}, .look_yaw{100}});
+    diagonal.advance({
+      .walk_forward{true},
+      .strafe{1}
+    });
+    sideways.advance({
+      .strafe{1},
+      .look_yaw{100}
+    });
   }
   auto const a{vec3<double>{forward.pilot().position} - vec3<double>{origin}};
   auto const b{vec3<double>{diagonal.pilot().position} - vec3<double>{origin}};
@@ -479,8 +639,10 @@ void fast_forward_checks() {
   }};
   auto pedestrians{theatre};
   pedestrians.training = true;
-  game::session walking{geometry, pedestrians}, fast_walking{geometry, pedestrians};
-  walking.press(game::action::eject); fast_walking.press(game::action::eject);
+  game::session walking{geometry, pedestrians};
+  game::session fast_walking{geometry, pedestrians};
+  walking.press(game::action::eject);
+  fast_walking.press(game::action::eject);
   auto const origin{walking.pilot().position};
   game::input_state const pedestrian{
     .walk_forward{true},
@@ -491,11 +653,14 @@ void fast_forward_checks() {
   require(fast_walking.frame_number() == 300 && fast_walking.timer() == 300 * timing::pit_ticks_per_step, "fast-forward did not advance the full simulation clock tenfold");
   require(fast_walking.pilot().position != origin && fast_walking.pilot().position == walking.pilot().position, "accelerated walking differs from normal fixed steps");
   require(fast_walking.random_stream().seed() == walking.random_stream().seed() && fast_walking.results().encode() == walking.results().encode(), "fast-forward changed gameplay randomness or the sortie clock");
-  auto const &normal{walking.world().objects}, &fast{fast_walking.world().objects};
+  auto const &normal{walking.world().objects};
+  auto const &fast{fast_walking.world().objects};
   require(normal.size() == fast.size(), "fast-forward changed the object pools");
-  bool active_kla{false}, moved_projectile{false};
+  bool active_kla{false};
+  bool moved_projectile{false};
   for(size_t i{0}; i < normal.size(); ++i) {
-    auto const &a{normal[i]}, &b{fast[i]};
+    auto const &a{normal[i]};
+    auto const &b{fast[i]};
     require(a.type == b.type && a.position == b.position && a.velocity == b.velocity && a.flags == b.flags && a.timer == b.timer && a.health == b.health, "enemy or projectile updates diverged during fast-forward");
     if(b.type == world::object_type::kla && b.has(world::object_flag::present)) {
       active_kla = b.timer < 23'900;
@@ -507,13 +672,19 @@ void fast_forward_checks() {
 
   world::theatre training;
   training.training = true;
-  game::session flight{geometry, training}, fast_flight{geometry, training};
+  game::session flight{geometry, training};
+  game::session fast_flight{geometry, training};
   game::input_state const aircraft{
     .throttle_up{true},
-    .weapons{.gun{true}, .missile{true}},
+    .weapons{
+      .gun{true},
+      .missile{true}
+    },
   };
-  flight.set_invincible(true); fast_flight.set_invincible(true);
-  run(flight, false, aircraft); run(fast_flight, true, aircraft);
+  flight.set_invincible(true);
+  fast_flight.set_invincible(true);
+  run(flight, false, aircraft);
+  run(fast_flight, true, aircraft);
   require(fast_flight.craft().position == flight.craft().position && fast_flight.craft().velocity == flight.craft().velocity && fast_flight.random_stream().seed() == flight.random_stream().seed(), "accelerated flight differs from normal fixed steps");
 
   timing::simulation_clock clock;
@@ -538,16 +709,44 @@ void proximity_and_crater_checks() {
   for(unsigned int order{0}; order < 2; ++order) {
     world::theatre theatre;
     auto const flags{geometry.definition(world::object_type::kla).flags};
-    theatre.objects.push_back({.position{10000,0,5000}, .attitude{}, .type{world::object_type::kla}, .flags{static_cast<uint16_t>((flags & ~0x7000u) | 0x1000u)}, .timer{20000}});
-    theatre.objects.push_back({.position{300000,0,5000}, .attitude{}, .type{world::object_type::kla}, .flags{static_cast<uint16_t>((flags & ~0x7000u) | 0x7000u)}, .timer{20000}});
+    theatre.objects.push_back({
+      .position{10000, 0, 5000},
+      .attitude{},
+      .type{world::object_type::kla},
+      .flags{static_cast<uint16_t>((flags & ~0x7000u) | 0x1000u)},
+      .timer{20000}
+    });
+    theatre.objects.push_back({
+      .position{300000, 0, 5000},
+      .attitude{},
+      .type{world::object_type::kla},
+      .flags{static_cast<uint16_t>((flags & ~0x7000u) | 0x7000u)},
+      .timer{20000}
+    });
     if(order != 0) std::ranges::reverse(theatre.objects);
-    game::combat weapons{geometry, theatre}; game::actors actors{geometry, theatre, weapons};
-    corncob::maths::world_position const origin{0,0,720}; corncob::maths::fixed_vector const velocity{0,0,0};
-    sounds[order] = actors.advance({origin,origin,velocity,false,0}, {5,5}).sound;
+    game::combat weapons{geometry, theatre};
+    game::actors actors{geometry, theatre, weapons};
+    corncob::maths::world_position const origin{0, 0, 720};
+    corncob::maths::fixed_vector const velocity{0, 0, 0};
+    sounds[order] = actors.advance({origin, origin, velocity, false, 0}, {5, 5}).sound;
   }
   require(sounds[0].kla_distance < 64 && sounds[0].kla_distance == sounds[1].kla_distance && sounds[0].kla_quality == sounds[1].kla_quality, "far KLA overwrote nearest proximity sound");
-  world::placed_object crater{.position{0,0,10}, .attitude{}, .type{world::object_type::crater}, .flags{9}, .collision_group{1}, .collision_extents{1000,1000,1000}};
-  world::placed_object aircraft{.position{0,0,10}, .attitude{}, .type{world::object_type::aircraft}, .flags{9}, .collision_group{2}, .collision_extents{1000,1000,1000}};
+  world::placed_object crater{
+    .position{0, 0, 10},
+    .attitude{},
+    .type{world::object_type::crater},
+    .flags{9},
+    .collision_group{1},
+    .collision_extents{1000, 1000, 1000}
+  };
+  world::placed_object aircraft{
+    .position{0, 0, 10},
+    .attitude{},
+    .type{world::object_type::aircraft},
+    .flags{9},
+    .collision_group{2},
+    .collision_extents{1000, 1000, 1000}
+  };
   require(!game::objects_overlap(crater, aircraft), "crater damaged an abandoned aircraft");
   aircraft.type = world::object_type::fuel_dump;
   require(game::objects_overlap(crater, aircraft), "crater blast stopped affecting enemy structures");
@@ -563,25 +762,46 @@ void gunsight_checks() {
   namespace graphics = corncob::graphics;
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
-  graphics::scene_renderer renderer{geometry,cockpit};
+  graphics::scene_renderer renderer{geometry, cockpit};
   corncob::world::theatre world;
-  graphics::camera camera{.attitude{},.cockpit{false},.rear_view{false},.ground_detail{false},.gunsight{true}};
+  graphics::camera camera{
+    .attitude{},
+    .cockpit{false},
+    .rear_view{false},
+    .ground_detail{false},
+    .gunsight{true}
+  };
   corncob::maths::random_source random;
   corncob::render::framebuffer output;
-  for(unsigned int scale : {1u,2u,3u}) for(double multiplier : {0.5,1.0,2.0}) {
-    graphics::scene_settings settings;
-    settings.resolution = {640 * scale,350 * scale}; settings.ground_points = 0; settings.gunsight_size = multiplier;
-    renderer.configure(settings); renderer.render(world,camera,0,0,random,output);
-    auto const &frame{renderer.indexed_frame()};
-    int left{static_cast<int>(frame.width)},right{0},top{static_cast<int>(frame.height)},bottom{0};
-    unsigned int pixels{0};
-    for(unsigned int y{0};y < frame.height;++y) for(unsigned int x{0};x < frame.width;++x) if(frame.pixels[y * frame.width + x] == 7) {
-      left = std::min(left,static_cast<int>(x));right = std::max(right,static_cast<int>(x));
-      top = std::min(top,static_cast<int>(y));bottom = std::max(bottom,static_cast<int>(y));++pixels;
+  for(unsigned int scale : {1u, 2u, 3u}) {
+    for(double multiplier : {0.5, 1.0, 2.0}) {
+      graphics::scene_settings settings;
+      settings.resolution = {640 * scale, 350 * scale};
+      settings.ground_points = 0;
+      settings.gunsight_size = multiplier;
+      renderer.configure(settings);
+      renderer.render(world, camera, 0, 0, random, output);
+      auto const &frame{renderer.indexed_frame()};
+      int left{static_cast<int>(frame.width)};
+      int right{0};
+      int top{static_cast<int>(frame.height)};
+      int bottom{0};
+      unsigned int pixels{0};
+      for(unsigned int y{0}; y < frame.height; ++y) {
+        for(unsigned int x{0}; x < frame.width; ++x) {
+          if(frame.pixels[y * frame.width + x] == 7) {
+            left = std::min(left, static_cast<int>(x));
+            right = std::max(right, static_cast<int>(x));
+            top = std::min(top, static_cast<int>(y));
+            bottom = std::max(bottom, static_cast<int>(y));
+            ++pixels;
+          }
+        }
+      }
+      require(std::abs(right - left + 1 - 26 * scale * multiplier) <= 1 && std::abs(bottom - top + 1 - 18 * scale * multiplier) <= 1, "gunsight footprint failed to scale with resolution or its size setting");
+      require(pixels > 0 && frame.pixels[(frame.height / 2) * frame.width + frame.width / 2] != 7, "scaled gunsight filled the aiming gap");
+      if(multiplier == 1) require(pixels == 60 * scale * scale, "gunsight stroke thickness failed to scale with its footprint");
     }
-    require(std::abs(right - left + 1 - 26 * scale * multiplier) <= 1 && std::abs(bottom - top + 1 - 18 * scale * multiplier) <= 1,"gunsight footprint failed to scale with resolution or its size setting");
-    require(pixels > 0 && frame.pixels[(frame.height / 2) * frame.width + frame.width / 2] != 7,"scaled gunsight filled the aiming gap");
-    if(multiplier == 1) require(pixels == 60 * scale * scale,"gunsight stroke thickness failed to scale with its footprint");
   }
 }
 
@@ -633,31 +853,37 @@ void menu_checks(std::filesystem::path const &scratch) {
   front.command(game::interface_command::next);
   auto const adjusted{game::preferences::load(scratch / "redux.cfg")};
   require(adjusted.scene.horizontal_fov == old_fov + 2 && adjusted.mouse_sensitivity == old_sensitivity + 2, "live FOV or mouse sensitivity failed to save");
-  front.command(game::interface_command::down); front.command(game::interface_command::down);
+  front.command(game::interface_command::down);
+  front.command(game::interface_command::down);
   auto const old_range{front.options().scene.ground_range};
   front.command(game::interface_command::previous);
   auto const ranged{game::preferences::load(scratch / "redux.cfg")};
   require(ranged.scene.ground_range == old_range * 0.5, "ground range menu did not save independently of density");
   require(ranged.scene.ground_points == adjusted.scene.ground_points, "ground range changed the configured density");
-  front.command(game::interface_command::down); front.command(game::interface_command::next);
-  require(front.options().scene.gunsight_size == 1.25,"gunsight size menu did not adjust its multiplier");
-  front.command(game::interface_command::down); front.command(game::interface_command::previous);
-  front.command(game::interface_command::down); front.command(game::interface_command::previous);
-  require(front.options().music_volume == 95 && front.options().effects_volume == 95,"audio sliders did not adjust independently");
-  front.command(game::interface_command::down); front.command(game::interface_command::accept);
+  front.command(game::interface_command::down);
+  front.command(game::interface_command::next);
+  require(front.options().scene.gunsight_size == 1.25, "gunsight size menu did not adjust its multiplier");
+  front.command(game::interface_command::down);
+  front.command(game::interface_command::previous);
+  front.command(game::interface_command::down);
+  front.command(game::interface_command::previous);
+  require(front.options().music_volume == 95 && front.options().effects_volume == 95, "audio sliders did not adjust independently");
+  front.command(game::interface_command::down);
+  front.command(game::interface_command::accept);
   auto const polished{game::preferences::load(scratch / "redux.cfg")};
-  require(polished.fullscreen && polished.scene.gunsight_size == 1.25 && polished.music_volume == 95 && polished.effects_volume == 95,"new display and audio options were not saved");
+  require(polished.fullscreen && polished.scene.gunsight_size == 1.25 && polished.music_volume == 95 && polished.effects_volume == 95, "new display and audio options were not saved");
   front.set_fullscreen(false);
-  require(!game::preferences::load(scratch / "redux.cfg").fullscreen,"fullscreen shortcut did not persist the windowed preference");
+  require(!game::preferences::load(scratch / "redux.cfg").fullscreen, "fullscreen shortcut did not persist the windowed preference");
   {
     std::ofstream invalid{scratch / "limits.cfg"};
     invalid << "gunsight_size 99\nmusic_volume -15\neffects_volume 900\n";
   }
   auto const limited{game::preferences::load(scratch / "limits.cfg")};
-  require(limited.scene.gunsight_size == 3 && limited.music_volume == 0 && limited.effects_volume == 100,"out-of-range display/audio settings were not bounded");
-  require(!legacy.fullscreen && legacy.scene.gunsight_size == 1 && legacy.music_volume == 100 && legacy.effects_volume == 100,"old settings files did not retain sensible defaults");
-  front.command(game::interface_command::end); front.command(game::interface_command::accept);
-  require(front.current_page() == game::interface_page::menu,"options Back item did not return to the menu");
+  require(limited.scene.gunsight_size == 3 && limited.music_volume == 0 && limited.effects_volume == 100, "out-of-range display/audio settings were not bounded");
+  require(!legacy.fullscreen && legacy.scene.gunsight_size == 1 && legacy.music_volume == 100 && legacy.effects_volume == 100, "old settings files did not retain sensible defaults");
+  front.command(game::interface_command::end);
+  front.command(game::interface_command::accept);
+  require(front.current_page() == game::interface_page::menu, "options Back item did not return to the menu");
   front.character('p');
   for(auto const name : {"earth", "other_worlds", "hints", "mission_builder"}) {
     auto const path{scratch / "documentation" / (std::string{name} + ".pdf")};
@@ -677,7 +903,21 @@ int main(int argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"scratch directory required"};
   std::filesystem::path const scratch{argv[1]};
   std::filesystem::remove_all(scratch);
-  depth_checks(); detail_size_checks(); billboard_detail_checks(); ground_crew_checks(); renderer_checks(); projection_proportion_checks(); ground_size_checks(); ground_range_checks(); ground_tracking_checks(); aircraft_exit_checks(); walking_checks(); fast_forward_checks(); proximity_and_crater_checks(); gunsight_checks(); menu_checks(scratch);
+  depth_checks();
+  detail_size_checks();
+  billboard_detail_checks();
+  ground_crew_checks();
+  renderer_checks();
+  projection_proportion_checks();
+  ground_size_checks();
+  ground_range_checks();
+  ground_tracking_checks();
+  aircraft_exit_checks();
+  walking_checks();
+  fast_forward_checks();
+  proximity_and_crater_checks();
+  gunsight_checks();
+  menu_checks(scratch);
   std::filesystem::remove_all(scratch);
   std::cout << "Redux depth, detail sizing, resolution, FOV, walking, fast-forward, bindings, scrolling and PDF checks passed\n";
 }

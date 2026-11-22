@@ -25,10 +25,14 @@ inline std::string release_date(int32_t const timestamp) {
 inline std::string duty_description(pilot_record const *const pilot) {
   if(!pilot) return "ACTIVE";
   switch(pilot->condition(report_time())) {
-  case pilot_condition::captured: return "CAPTURED";
-  case pilot_condition::killed: return "K.I.A.";
-  case pilot_condition::stockade: return "CONFINED TO STOCKADE";
-  default: return pilot->selected() ? "ACTIVE" : "WAITING FOR DUTY";
+  case pilot_condition::captured:
+    return "CAPTURED";
+  case pilot_condition::killed:
+    return "K.I.A.";
+  case pilot_condition::stockade:
+    return "CONFINED TO STOCKADE";
+  default:
+    return pilot->selected() ? "ACTIVE" : "WAITING FOR DUTY";
   }
 }
 inline std::string sortie_description(sortie_statistics const &result) {
@@ -44,7 +48,9 @@ inline std::string sortie_description(sortie_statistics const &result) {
     std::pair{sortie_status::crashed_home, "CRASHED-AT-HOME  "},
     std::pair{sortie_status::landed, "LANDED-AT-HOME  "},
     std::pair{sortie_status::building_impact, "COLLISION  "},
-  }) if(result.has(flag)) text += label;
+  }) {
+    if(result.has(flag)) text += label;
+  }
   return text;
 }
 

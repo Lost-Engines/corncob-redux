@@ -34,12 +34,18 @@ void sort_entries(std::span<survey_entry> entries) {
       if(order(entries[0]) > order(entries[1])) std::swap(entries[0], entries[1]);
       return;
     }
-    unsigned int last{count - 1}, middle{count / 2};
+    unsigned int last{count - 1};
+    unsigned int middle{count / 2};
     if(order(entries[middle]) > order(entries[last])) std::swap(entries[middle], entries[last]);
-    if(order(entries[middle]) > order(entries[0])) std::swap(entries[middle], entries[0]);
-    else if(order(entries[0]) > order(entries[last])) std::swap(entries[0], entries[last]);
-    if(count == 3) { std::swap(entries[0], entries[middle]); return; }
-    unsigned int equal_end{1}, scan{1};
+    if(order(entries[middle]) > order(entries[0])) {
+      std::swap(entries[middle], entries[0]);
+    } else if(order(entries[0]) > order(entries[last])) std::swap(entries[0], entries[last]);
+    if(count == 3) {
+      std::swap(entries[0], entries[middle]);
+      return;
+    }
+    unsigned int equal_end{1};
+    unsigned int scan{1};
     for(;;) {
       auto const comparison{order(entries[scan]) <=> order(entries[0])};
       if(comparison <= 0) {
@@ -49,10 +55,14 @@ void sort_entries(std::span<survey_entry> entries) {
       } else {
         while(scan < last) {
           auto const tail{order(entries[0]) <=> order(entries[last])};
-          if(tail < 0) --last;
-          else {
+          if(tail < 0) {
+            --last;
+          } else {
             std::swap(entries[scan], entries[last]);
-            if(tail != 0) { ++scan; --last; }
+            if(tail != 0) {
+              ++scan;
+              --last;
+            }
             break;
           }
         }
@@ -60,9 +70,11 @@ void sort_entries(std::span<survey_entry> entries) {
       }
     }
     if(order(entries[scan]) <= order(entries[0])) ++scan;
-    unsigned int equal{0}, small{scan - 1};
+    unsigned int equal{0};
+    unsigned int small{scan - 1};
     while(equal < equal_end && small >= equal_end) std::swap(entries[equal++], entries[small--]);
-    unsigned int const left_count{scan - equal_end}, right_count{count - scan};
+    unsigned int const left_count{scan - equal_end};
+    unsigned int const right_count{count - scan};
     if(right_count < left_count) {
       sort_entries(entries.subspan(scan));
       entries = entries.first(left_count);
@@ -75,8 +87,10 @@ void sort_entries(std::span<survey_entry> entries) {
 std::string bearing(int32_t const x, int32_t const y) {
   /// The game's positive X axis is north and positive Y is west; MOAG uses integer ratio boundaries of 1.50 and 5.03
   if(x == 0 && y == 0) return "na";
-  char const north_south{x >= 0 ? 'N' : 'S'}, east_west{y >= 0 ? 'W' : 'E'};
-  int64_t const a{std::abs(static_cast<int64_t>(x))}, b{std::abs(static_cast<int64_t>(y))};
+  char const north_south{x >= 0 ? 'N' : 'S'};
+  char const east_west{y >= 0 ? 'W' : 'E'};
+  int64_t const a{std::abs(static_cast<int64_t>(x))};
+  int64_t const b{std::abs(static_cast<int64_t>(y))};
   if(b == 0) return std::string(1, north_south);
   if(a == 0) return std::string(1, east_west);
   if(a > b) {
@@ -114,7 +128,8 @@ std::string distance(int32_t x, int32_t y) {
 airfield_status survey_airfield(world::theatre const &theatre, unsigned int const airfield) {
   auto const origin{world::multiple_airfields(theatre) && airfield < world::airfield_count ? world::airfield_start(theatre, airfield) : maths::world_position{theatre.start}};
   /// INT counts every incomplete objective in a single-airfield theater and every unwrecked plane within its start box
-  int32_t constexpr boarding_region{524'288}, pilot_height{720};
+  int32_t constexpr boarding_region{524'288};
+  int32_t constexpr pilot_height{720};
   airfield_status result;
   for(auto const &object : theatre.objects) {
     if(!object.has(world::object_flag::present) || (airfield < world::airfield_count && !world::belongs_to_airfield(theatre, object, airfield))) continue;
@@ -154,7 +169,9 @@ void group_survey_entries(std::span<survey_entry> const entries) {
       if((entry.group & group_mask) == 0 && nearby(anchor, entry)) entry.group |= anchor.group & group_mask;
     }
   }
-  for(auto &entry : entries) if((entry.group & group_mask) == 0) entry.group |= next;
+  for(auto &entry : entries) {
+    if((entry.group & group_mask) == 0) entry.group |= next;
+  }
   sort_entries(entries);
 }
 std::string describe_survey_entry(survey_entry const &entry, maths::world_position const &origin) {
@@ -167,8 +184,9 @@ std::string describe_survey_entry(survey_entry const &entry, maths::world_positi
   using enum world::object_type;
   switch(entry.type) {
   case generator_orb:
-    if(quality == 4) name += " (Indestructible)";
-    else if((entry.flags & 0x800) != 0) name += " (Gravity)";
+    if(quality == 4) {
+      name += " (Indestructible)";
+    } else if((entry.flags & 0x800) != 0) name += " (Gravity)";
     break;
   case aircraft:
     name += std::format(" ({})", quality == 0 ? "Corsair" : quality == 1 ? "Dumpy" : quality == 2 ? "Stealth" : "Unknown type");
@@ -180,30 +198,46 @@ std::string describe_survey_entry(survey_entry const &entry, maths::world_positi
     break;
   case ground_vehicle:
     typed = true;
-    if((entry.flags & 0xff) == 0x71) name += " (Dead)";
-    else if((entry.flags & 0x800) != 0) name += " (bumpers)";
+    if((entry.flags & 0xff) == 0x71) {
+      name += " (Dead)";
+    } else if((entry.flags & 0x800) != 0) name += " (bumpers)";
     break;
-  case crater: if(quality != 0) return {}; break;
+  case crater:
+    if(quality != 0) return {};
+    break;
   case shell:
     {
-      std::array<std::string_view, 8> constexpr types{"vehicle site", "mortar", "KLA site", "AAA site", "barrage balloon", "bee-swarm", "fuel dump", "unknown type"};
-      name += std::format(" ({})", types[quality]);
-    }
+    std::array<std::string_view, 8> constexpr types{"vehicle site", "mortar", "KLA site", "AAA site", "barrage balloon", "bee-swarm", "fuel dump", "unknown type"};
+    name += std::format(" ({})", types[quality]);
+  }
     break;
-  case kla_site: case vehicle_site: case aaa_site: case kla: case saucer: case saucer_site: case objective_saucer: case portal: typed = true; break;
-  default: break;
+  case kla_site:
+  case vehicle_site:
+  case aaa_site:
+  case kla:
+  case saucer:
+  case saucer_site:
+  case objective_saucer:
+  case portal:
+    typed = true;
+    break;
+  default:
+    break;
   }
   std::string result{typed ? std::format("{:<27.27} Type \\{}   ", name, quality + 1) : std::format("{:<36.36} ", name)};
-  int32_t const dx{maths::dword(static_cast<int64_t>(entry.position.x) - origin.x)}, dy{maths::dword(static_cast<int64_t>(entry.position.y) - origin.y)};
+  int32_t const dx{maths::dword(static_cast<int64_t>(entry.position.x) - origin.x)};
+  int32_t const dy{maths::dword(static_cast<int64_t>(entry.position.y) - origin.y)};
   int32_t const altitude{maths::dword(static_cast<int64_t>(entry.position.z) * 10) / 305};
   result += std::format("{:>4.4} {:>3}    {:>5}             ({})\r\n", distance(dx, dy), bearing(dx, dy), altitude, entry.group & group_mask);
   std::string_view objective;
   if(entry.type == generator_orb || entry.type == destroyed_generator_orb) {
     std::array<std::string_view, 8> constexpr descriptions{"destroy this orb.", "blow up the nearby TRFRU/fuel dumps.", "eliminate the nearby KLA and AAA.", "kill all nearby alien ground vehicles.", "destroy this orb with a suicide plane.", "blast the nearby saucer sites.", "destroy all nearby alien mind-benders.", "kill the nearby congregation of aliens."};
     objective = descriptions[quality];
-  } else if(entry.type == portal && (quality == 4 || quality == 7)) objective = "Fly through this portal.";
-  else if(entry.type == objective_saucer) objective = "Blast this saucer out of the sky.";
-  else if(entry.type == ground_crew && (entry.flags & 0x800) != 0) objective = "Get secret document from spy.";
+  } else if(entry.type == portal && (quality == 4 || quality == 7)) {
+    objective = "Fly through this portal.";
+  } else if(entry.type == objective_saucer) {
+    objective = "Blast this saucer out of the sky.";
+  } else if(entry.type == ground_crew && (entry.flags & 0x800) != 0) objective = "Get secret document from spy.";
   if(!objective.empty() && (entry.flags & 0x200) == 0) result += std::format("\\(         Mission Objective:  {}\\)\r\n", objective);
   return result;
 }

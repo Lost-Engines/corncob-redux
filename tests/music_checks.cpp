@@ -35,13 +35,16 @@ int main() {
     }
   }
   audio::music player;
-  std::array<float, 1024> actual, expected;
+  std::array<float, 1024> actual;
+  std::array<float, 1024> expected;
   actual.fill(0.125f);
   player.mix(actual);
   if(!std::ranges::all_of(actual, [](float const sample){return sample == 0.125f;})) throw std::runtime_error{"silent music erased sound effects"};
   auto verify{[&](audio::music_cue const cue, std::initializer_list<unsigned int> const order){
     player.select(cue);
-    for(auto const track : order) if(!stb_vorbis_seek_start(direct[track].get())) throw std::runtime_error{"cannot rewind reference recording"};
+    for(auto const track : order) {
+      if(!stb_vorbis_seek_start(direct[track].get())) throw std::runtime_error{"cannot rewind reference recording"};
+    }
     auto selected{order.begin()};
     unsigned int remaining{0};
     for(auto const track : order) remaining += native_boundary_ms[track] * 48;
@@ -60,7 +63,9 @@ int main() {
         if(count == 0) {
           if(++selected == order.end()) selected = order.begin();
           if(!stb_vorbis_seek_start(direct[*selected].get())) throw std::runtime_error{"cannot repeat reference music"};
-        } else filled += static_cast<unsigned int>(count);
+        } else {
+          filled += static_cast<unsigned int>(count);
+        }
       }
       for(unsigned int sample{0}; sample != frames * 2; ++sample) {
         if(!std::isfinite(block[sample]) || block[sample] != std::clamp(expected[sample], -1.0f, 1.0f)) {

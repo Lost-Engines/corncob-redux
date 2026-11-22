@@ -55,14 +55,18 @@ struct effects::implementation {
   };
   std::vector<scheduled_write> scheduled;
   uint64_t rendered_frames{0};
-  uint32_t generation{0}, rendering_generation{0};
+  uint32_t generation{0};
+  uint32_t rendering_generation{0};
   mutable std::mutex queue_lock;
   frame_state previous;
   maths::random_source random;
-  uint32_t boom_tick{0}, percussion_stop{0}, next_wind{0};
+  uint32_t boom_tick{0};
+  uint32_t percussion_stop{0};
+  uint32_t next_wind{0};
   unsigned int channel_three_patch{3};
   int kla_frequency{0};
-  bool wind{false}, wind_trigger{false};
+  bool wind{false};
+  bool wind_trigger{false};
 
   void load_patches(resources::collection const &resources) {
     for(auto &patch : patches) patch.clear();
@@ -73,9 +77,13 @@ struct effects::implementation {
     while(std::getline(input, line)) {
       if(!line.empty() && line.back() == '\r') line.pop_back();
       if(line.empty()) continue;
-      if(line == "ff") { ++patch; continue; }
+      if(line == "ff") {
+        ++patch;
+        continue;
+      }
       auto const comma{line.find(',')};
-      unsigned int address{0}, value{0};
+      unsigned int address{0};
+      unsigned int value{0};
       if(patch >= patches.size() || comma == std::string::npos
         || std::from_chars(line.data(), line.data() + comma, address, 16).ec != std::errc{}
         || std::from_chars(line.data() + comma + 1, line.data() + line.size(), value, 16).ec != std::errc{}
@@ -195,7 +203,9 @@ void effects::update(frame_state const &frame) {
     auto const pitch{static_cast<uint16_t>(std::clamp((pressure + static_cast<unsigned int>(frame.forward_velocity)) / 80u, 64u, 1024u))};
     sound.on(0, pitch);
     sound.write(0x40, static_cast<uint8_t>(std::max(0, 16 - frame.engine_damage * 2)));
-  } else sound.off(0, 0x40);
+  } else {
+    sound.off(0, 0x40);
+  }
   if(frame.on_foot != previous.on_foot || !previous.active) {
     sound.patch(frame.on_foot ? 7 : 5);
     sound.wind = frame.on_foot;
@@ -205,8 +215,11 @@ void effects::update(frame_state const &frame) {
     sound.write(0xbd, sound.wind_trigger ? 0x28 : 0x20);
     sound.next_wind = frame.tick + sound.random.below(4096);
   }
-  if(frame.stalled && frame.engine) sound.on(5, 0x180);
-  else sound.off(5, 0x180);
+  if(frame.stalled && frame.engine) {
+    sound.on(5, 0x180);
+  } else {
+    sound.off(5, 0x180);
+  }
   if(frame.gunshots != previous.gunshots) {
     sound.off(1);
     sound.on(1, 0x200);
@@ -301,10 +314,12 @@ void effects::render(std::span<float> const samples) noexcept {
       state->rendering_generation = state->generation;
     }
   }
-  for(auto const &entry : state->consumed) state->scheduled.push_back({
-    .frame{state->rendered_frames + entry.delay_frames},
-    .write{entry},
-  });
+  for(auto const &entry : state->consumed) {
+    state->scheduled.push_back({
+      .frame{state->rendered_frames + entry.delay_frames},
+      .write{entry},
+    });
+  }
   std::ranges::stable_sort(state->scheduled, {}, &implementation::scheduled_write::frame);
   unsigned int event{0};
   float const target_gain{state->gain.begin()};

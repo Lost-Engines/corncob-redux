@@ -7,8 +7,15 @@
 
 namespace corncob::world {
 
-enum class campaign_id { earth, other_worlds };
-enum class theatre_group { earth, other_worlds, practice };
+enum class campaign_id {
+  earth,
+  other_worlds
+};
+enum class theatre_group {
+  earth,
+  other_worlds,
+  practice
+};
 
 struct theatre_definition {
   std::string_view name;

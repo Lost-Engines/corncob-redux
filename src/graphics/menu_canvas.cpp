@@ -10,7 +10,10 @@ menu_canvas::menu_canvas(interface_canvas &canvas) :
 }
 void menu_canvas::colours(unsigned int const ink, unsigned int const paper, unsigned int const line, unsigned int const highlight) {
   /// Original nested windows select independent text, paper, border and emphasis attributes
-  foreground = ink; background = paper; border = line; emphasis = highlight;
+  foreground = ink;
+  background = paper;
+  border = line;
+  emphasis = highlight;
 }
 void menu_canvas::shadow(int const left, int const top, int const right, int const bottom) {
   /// Keep shadows inside the surrounding double frame
@@ -38,8 +41,14 @@ void menu_canvas::rich_text(int column, int const row, std::string_view const va
         ++drawn;
         continue;
       }
-      if(next == '(') { highlighted = true; continue; }
-      if(next == ')') { highlighted = false; continue; }
+      if(next == '(') {
+        highlighted = true;
+        continue;
+      }
+      if(next == ')') {
+        highlighted = false;
+        continue;
+      }
       text(column++, row, std::string_view{&value[i], 1}, 14);
     } else {
       text(column++, row, std::string_view{&value[i], 1}, highlighted ? this->emphasis : colour);
@@ -52,7 +61,8 @@ void menu_canvas::panel(int const left, int const top, int const right, int cons
   if(with_shadow) shadow(left + 1, top + 1, right + 1, bottom + 1);
   unsigned int const line_colour{colour == 16 ? border : colour};
   canvas.rectangle(left * 8, top * 16, (right + 1) * 8, (bottom + 1) * 16, render::ega_palette[background]);
-  char const horizontal{static_cast<char>(double_border ? 205 : 196)}, vertical{static_cast<char>(double_border ? 186 : 179)};
+  char const horizontal{static_cast<char>(double_border ? 205 : 196)};
+  char const vertical{static_cast<char>(double_border ? 186 : 179)};
   text(left, top, std::string{static_cast<char>(double_border ? 201 : 218)} + std::string(static_cast<unsigned int>(right - left - 1), horizontal) + static_cast<char>(double_border ? 187 : 191), line_colour);
   text(left, bottom, std::string{static_cast<char>(double_border ? 200 : 192)} + std::string(static_cast<unsigned int>(right - left - 1), horizontal) + static_cast<char>(double_border ? 188 : 217), line_colour);
   for(int row{top + 1}; row < bottom; ++row) {
@@ -68,10 +78,14 @@ void menu_canvas::frame(std::string_view const title) {
 }
 void menu_canvas::heading(std::string_view const title) {
   /// Changing a submenu heading leaves the original underlying main-menu screen intact
-  auto const ink{foreground}, paper{background}, line{border}, highlight{emphasis};
+  auto const ink{foreground};
+  auto const paper{background};
+  auto const line{border};
+  auto const highlight{emphasis};
   colours(7, 1, 14);
   panel(21, 0, 57, 4, 14, false, false);
-  text(21, 1, "\xb5", 14); text(57, 1, "\xc6", 14);
+  text(21, 1, "\xb5", 14);
+  text(57, 1, "\xc6", 14);
   text(34, 1, "Corncob 3D", 15);
   text(21, 2, std::string{"\xc3"} + std::string(35, '\xc4') + '\xb4', 14);
   colours(ink, paper, line, highlight);

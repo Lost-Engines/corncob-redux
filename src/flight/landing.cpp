@@ -37,7 +37,9 @@ bool find_wheel_height(aircraft_state const &aircraft, landing_state &landing) n
 landing_result advance_landing(aircraft_state &aircraft, angular_response &response, landing_state &landing,
                                control_input const &input, time_step const step) {
   /// Translate the undamped suspension used by the 3.42 binary, including its double lateral brake application
-  int constexpr spring_rest{90}, maximum_compression{540}, spring_coefficient{266};
+  int constexpr spring_rest{90};
+  int constexpr maximum_compression{540};
+  int constexpr spring_coefficient{266};
   int constexpr maximum_grass_compression{maximum_compression / 2};
   if(landing.crash_landing) return landing_result::crash_landing;
   landing.spring_compression = 0;

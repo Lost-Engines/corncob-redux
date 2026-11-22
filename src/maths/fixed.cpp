@@ -11,8 +11,9 @@ coefficient add_saturated(coefficient const lhs, coefficient const rhs) noexcept
   int constexpr half_limit{16'383};
   int sum{(static_cast<int>(lhs) >> 1) + (static_cast<int>(rhs) >> 1)};
   // JS/JNS inspect the wrapped subtraction sign without correcting for overflow
-  if(word(sum - half_limit) >= 0) sum = half_limit;
-  else if(word(sum + half_limit) < 0) sum = -half_limit;
+  if(word(sum - half_limit) >= 0) {
+    sum = half_limit;
+  } else if(word(sum + half_limit) < 0) sum = -half_limit;
   return std::bit_cast<int16_t>(std::rotl(static_cast<uint16_t>(sum), 1));
 }
 
@@ -46,7 +47,8 @@ coefficient cosine(angle const value) noexcept {
 angle arctangent(coefficient x, coefficient y) noexcept {
   /// ATN2 selects a quantised octant table; its zero vector deliberately returns an eighth turn
   if(x == -32'768) ++x;
-  uint8_t quadrant{0}, quarter{0};
+  uint8_t quadrant{0};
+  uint8_t quarter{0};
   if(x < 0) {
     quadrant = 3;
     x = negate(x);
@@ -55,10 +57,12 @@ angle arctangent(coefficient x, coefficient y) noexcept {
     quadrant ^= 5;
     y = negate(y);
   }
-  unsigned int const abs_x{static_cast<uint16_t>(x)}, abs_y{static_cast<uint16_t>(y)};
+  unsigned int const abs_x{static_cast<uint16_t>(x)};
+  unsigned int const abs_y{static_cast<uint16_t>(y)};
   uint16_t value{32'768};
   if(abs_x != abs_y) {
-    unsigned int const larger{std::max(abs_x, abs_y)}, smaller{std::min(abs_x, abs_y)};
+    unsigned int const larger{std::max(abs_x, abs_y)};
+    unsigned int const smaller{std::min(abs_x, abs_y)};
     if(abs_x < abs_y) {
       quarter = 64;
       quadrant ^= 1;
@@ -77,7 +81,8 @@ uint16_t square_root(uint32_t const squared) noexcept {
   /// DSQRT uses a short Newton iteration, including its one-for-zero result and high-input saturation
   if((squared & 0xc0000000u) != 0) return 32'767;
   uint32_t search{squared << 2};
-  unsigned int guess{32'767}, alternate{23'170};
+  unsigned int guess{32'767};
+  unsigned int alternate{23'170};
   bool found{false};
   for(unsigned int i{0}; i != 14; ++i) {
     bool const first{(search & 0x80000000u) != 0};
@@ -114,9 +119,12 @@ uint16_t magnitude(fixed_vector const &value) noexcept {
 
 rotation make_rotation(angles const &value) noexcept {
   /// Translate F3DVEC's CALCMAT with its original sequence of Q15 products and saturated additions
-  coefficient const sy{sine(value.heading)}, cy{cosine(value.heading)};
-  coefficient const sp{sine(value.pitch)}, cp{cosine(value.pitch)};
-  coefficient const sr{sine(value.roll)}, cr{cosine(value.roll)};
+  coefficient const sy{sine(value.heading)};
+  coefficient const cy{cosine(value.heading)};
+  coefficient const sp{sine(value.pitch)};
+  coefficient const cp{cosine(value.pitch)};
+  coefficient const sr{sine(value.roll)};
+  coefficient const cr{cosine(value.roll)};
   return {
     .rows{
       fixed_vector{multiply(cy, cp), multiply(cp, sy), negate(sp)},
@@ -129,10 +137,14 @@ rotation make_rotation(angles const &value) noexcept {
 }
 rotation make_inverse_rotation(angles const &value) noexcept {
   /// NCALCMAT negates the sine terms; transposing an already rounded matrix is not equivalent
-  coefficient const sy{negate(sine(value.heading))}, cy{cosine(value.heading)};
-  coefficient const sp{negate(sine(value.pitch))}, cp{cosine(value.pitch)};
-  coefficient const sr{negate(sine(value.roll))}, cr{cosine(value.roll)};
-  coefficient const cysp{multiply(cy, sp)}, sysp{multiply(sy, sp)};
+  coefficient const sy{negate(sine(value.heading))};
+  coefficient const cy{cosine(value.heading)};
+  coefficient const sp{negate(sine(value.pitch))};
+  coefficient const cp{cosine(value.pitch)};
+  coefficient const sr{negate(sine(value.roll))};
+  coefficient const cr{cosine(value.roll)};
+  coefficient const cysp{multiply(cy, sp)};
+  coefficient const sysp{multiply(sy, sp)};
   return {
     .rows{
       fixed_vector{multiply(cy, cp), add_saturated(multiply(cysp, sr), multiply(sy, cr)),
@@ -188,7 +200,8 @@ angles extract_angles(rotation const &matrix) noexcept {
     return static_cast<coefficient>(std::clamp(static_cast<int>(a) + b, -32'767, 32'767));
   }};
   angles result;
-  coefficient sy{0}, cy{32'767};
+  coefficient sy{0};
+  coefficient cy{32'767};
   auto small{[](coefficient const value){
     return value >= -256 && value <= 255;
   }};

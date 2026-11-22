@@ -6,12 +6,14 @@ namespace corncob::render {
 
 viewport fit_viewport(int const width, int const height, int const source_width, int const source_height, display_aspect const aspect) noexcept {
   /// Enlarge the actual video mode by whole pixels; CRT correction deliberately changes their aspect ratio.
-  if(width <= 0 || height <= 0 || source_width <= 0 || source_height <= 0) return {
-    .x{0},
-    .y{0},
-    .width{0},
-    .height{0},
-  };
+  if(width <= 0 || height <= 0 || source_width <= 0 || source_height <= 0) {
+    return {
+      .x{0},
+      .y{0},
+      .width{0},
+      .height{0},
+    };
+  }
   int const image_width{source_width};
   int const image_height{aspect == display_aspect::crt ? source_width * 3 / 4 : source_height};
   double const available{std::min(width / static_cast<double>(image_width), height / static_cast<double>(image_height))};

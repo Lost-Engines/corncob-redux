@@ -13,14 +13,14 @@ void apply_damage(damage_state &damage, aircraft_state &aircraft, unsigned int c
     switch(random.below(4)) {
     case 0:
       {
-        ++damage.engine;
-        auto const maximum{static_cast<uint16_t>(damage.maximum_throttle * 950u / 1000u)};
-        if(maximum >= 20) {
-          ++damage.indicator_hits[0];
-          damage.maximum_throttle = maximum;
-          aircraft.throttle = std::min(aircraft.throttle, maximum);
-        }
+      ++damage.engine;
+      auto const maximum{static_cast<uint16_t>(damage.maximum_throttle * 950u / 1000u)};
+      if(maximum >= 20) {
+        ++damage.indicator_hits[0];
+        damage.maximum_throttle = maximum;
+        aircraft.throttle = std::min(aircraft.throttle, maximum);
       }
+    }
       break;
     case 1:
       if(std::abs(static_cast<int>(damage.wing)) <= 1600) {

@@ -20,21 +20,28 @@ void write_theatre(mission_score &entry, std::string_view const text) {
   auto const length{std::min(text.size(), entry.theatre.size() + statistics.size() - 1)};
   for(unsigned int i{0}; i <= length; ++i) {
     uint8_t const byte{i == length ? uint8_t{0} : static_cast<uint8_t>(text[i])};
-    if(i < entry.theatre.size()) entry.theatre[i] = byte;
-    else statistics[i - entry.theatre.size()] = byte;
+    if(i < entry.theatre.size()) {
+      entry.theatre[i] = byte;
+    } else {
+      statistics[i - entry.theatre.size()] = byte;
+    }
   }
   entry.statistics = sortie_statistics::decode(statistics);
 }
 int16_t ground_kills(sortie_statistics const &value) {
   /// MOAG's displayed ground sum includes AAA, launch sites and generators, with its original word wrapping
   int32_t sum{value.resource_kills + value.objectives_completed};
-  for(auto const *counts : {&value.aaa_kills, &value.site_kills, &value.orb_kills}) for(auto const count : *counts) sum += count;
+  for(auto const *counts : {&value.aaa_kills, &value.site_kills, &value.orb_kills}) {
+    for(auto const count : *counts) sum += count;
+  }
   return maths::word(sum);
 }
 int16_t air_kills(sortie_statistics const &value) {
   /// The native air total combines KLA and the vehicle counter, regardless of the latter category's name
   int32_t sum{0};
-  for(auto const *counts : {&value.kla_kills, &value.vehicle_kills}) for(auto const count : *counts) sum += count;
+  for(auto const *counts : {&value.kla_kills, &value.vehicle_kills}) {
+    for(auto const count : *counts) sum += count;
+  }
   return maths::word(sum);
 }
 int compare_statistics(sortie_statistics const &a, int32_t const a_points, sortie_statistics const &b, int32_t const b_points) {
@@ -48,10 +55,12 @@ int compare_statistics(sortie_statistics const &a, int32_t const a_points, sorti
 }
 int compare_rate(career_score const &a, career_score const &b) {
   /// The original uses signed mission words, wrapping subtraction of truncated dword rates, then total points
-  int16_t const a_count{maths::word(a.sorties)}, b_count{maths::word(b.sorties)};
+  int16_t const a_count{maths::word(a.sorties)};
+  int16_t const b_count{maths::word(b.sorties)};
   if(a_count == 0) return b_count == 0 ? 0 : -1;
   if(b_count == 0) return 1;
-  int32_t const a_rate{maths::dword(static_cast<int64_t>(a.points) / a_count)}, b_rate{maths::dword(static_cast<int64_t>(b.points) / b_count)};
+  int32_t const a_rate{maths::dword(static_cast<int64_t>(a.points) / a_count)};
+  int32_t const b_rate{maths::dword(static_cast<int64_t>(b.points) / b_count)};
   auto const difference{maths::dword(static_cast<int64_t>(a_rate) - b_rate)};
   if(difference != 0) return difference > 0 ? 1 : -1;
   return a.points == b.points ? 0 : a.points > b.points ? 1 : -1;
@@ -60,11 +69,21 @@ template<typename Entry, typename Better>
 std::optional<unsigned int> insert_position(std::array<Entry, 10> &table, Better better, std::optional<std::string_view> const career = std::nullopt) {
   /// Update the first live matching career, otherwise fill the first empty row or displace a strictly lower last entry
   unsigned int slot{static_cast<unsigned int>(table.size())};
-  if(career) for(unsigned int i{0}; i != table.size(); ++i) {
-    if(table[i].name.front() != 0 && table[i].retired == 0 && score_text(table[i].name) == *career) { slot = i; break; }
+  if(career) {
+    for(unsigned int i{0}; i != table.size(); ++i) {
+      if(table[i].name.front() != 0 && table[i].retired == 0 && score_text(table[i].name) == *career) {
+        slot = i;
+        break;
+      }
+    }
   }
   if(slot == table.size()) {
-    for(unsigned int i{0}; i != table.size(); ++i) if(table[i].name.front() == 0) { slot = i; break; }
+    for(unsigned int i{0}; i != table.size(); ++i) {
+      if(table[i].name.front() == 0) {
+        slot = i;
+        break;
+      }
+    }
     if(slot == table.size()) {
       if(!better(table.back())) return std::nullopt;
       --slot;
@@ -98,7 +117,7 @@ void update_career(std::array<career_score, 10> &table, career_score const &cand
 std::string score_text(score_name const &value) {
   /// Display up to the first NUL without discarding opaque padding from saved entries
   auto const end{std::ranges::find(value, 0)};
-  return {reinterpret_cast<char const*>(value.data()), static_cast<size_t>(end - value.begin())};
+  return {reinterpret_cast<char const *>(value.data()), static_cast<size_t>(end - value.begin())};
 }
 score_tables score_tables::decode(std::span<uint8_t const> const source) {
   /// PILOT.HSC has ten 180-byte mission records followed by two sets of ten 162-byte career records
@@ -106,8 +125,14 @@ score_tables score_tables::decode(std::span<uint8_t const> const source) {
   resources::binary_reader const data{source};
   score_tables result;
   unsigned int offset{0};
-  auto name{[&](score_name &field){std::copy_n(source.begin() + offset, field.size(), field.begin()); offset += static_cast<unsigned int>(field.size());}};
-  auto statistics{[&](sortie_statistics &field){field = sortie_statistics::decode(source.subspan(offset, sortie_statistics::native_bytes)); offset += sortie_statistics::native_bytes;}};
+  auto name{[&](score_name &field){
+    std::copy_n(source.begin() + offset, field.size(), field.begin());
+    offset += static_cast<unsigned int>(field.size());
+  }};
+  auto statistics{[&](sortie_statistics &field){
+    field = sortie_statistics::decode(source.subspan(offset, sortie_statistics::native_bytes));
+    offset += sortie_statistics::native_bytes;
+  }};
   for(auto &entry : result.missions) {
     name(entry.name);
     name(entry.theatre);
@@ -116,15 +141,17 @@ score_tables score_tables::decode(std::span<uint8_t const> const source) {
     entry.retired = data.word(offset + 4);
     offset += 6;
   }
-  for(auto *table : {&result.careers, &result.fastest}) for(auto &entry : *table) {
-    name(entry.name);
-    entry.sorties = data.word(offset);
-    entry.resurrections = data.word(offset + 2);
-    offset += 4;
-    statistics(entry.statistics);
-    entry.points = data.signed_dword(offset);
-    entry.retired = data.word(offset + 4);
-    offset += 6;
+  for(auto *table : {&result.careers, &result.fastest}) {
+    for(auto &entry : *table) {
+      name(entry.name);
+      entry.sorties = data.word(offset);
+      entry.resurrections = data.word(offset + 2);
+      offset += 4;
+      statistics(entry.statistics);
+      entry.points = data.signed_dword(offset);
+      entry.retired = data.word(offset + 4);
+      offset += 6;
+    }
   }
   return result;
 }
@@ -132,22 +159,38 @@ std::array<uint8_t, score_tables::native_bytes> score_tables::encode() const {
   /// Encode the exact original record sizes and preserve every fixed-width name byte and result field
   std::array<uint8_t, native_bytes> result{};
   unsigned int offset{0};
-  auto word{[&](uint16_t const value){result[offset++] = static_cast<uint8_t>(value); result[offset++] = static_cast<uint8_t>(value >> 8);}};
-  auto tail{[&](int32_t const points, uint16_t const retired){word(static_cast<uint16_t>(points)); word(static_cast<uint16_t>(static_cast<uint32_t>(points) >> 16)); word(retired);}};
-  auto name{[&](score_name const &value){std::ranges::copy(value, result.begin() + offset); offset += static_cast<unsigned int>(value.size());}};
-  auto statistics{[&](sortie_statistics const &value){auto const raw{value.encode()}; std::ranges::copy(raw, result.begin() + offset); offset += static_cast<unsigned int>(raw.size());}};
+  auto word{[&](uint16_t const value){
+    result[offset++] = static_cast<uint8_t>(value);
+    result[offset++] = static_cast<uint8_t>(value >> 8);
+  }};
+  auto tail{[&](int32_t const points, uint16_t const retired){
+    word(static_cast<uint16_t>(points));
+    word(static_cast<uint16_t>(static_cast<uint32_t>(points) >> 16));
+    word(retired);
+  }};
+  auto name{[&](score_name const &value){
+    std::ranges::copy(value, result.begin() + offset);
+    offset += static_cast<unsigned int>(value.size());
+  }};
+  auto statistics{[&](sortie_statistics const &value){
+    auto const raw{value.encode()};
+    std::ranges::copy(raw, result.begin() + offset);
+    offset += static_cast<unsigned int>(raw.size());
+  }};
   for(auto const &entry : missions) {
     name(entry.name);
     name(entry.theatre);
     statistics(entry.statistics);
     tail(entry.points, entry.retired);
   }
-  for(auto const *table : {&careers, &fastest}) for(auto const &entry : *table) {
-    name(entry.name);
-    word(entry.sorties);
-    word(entry.resurrections);
-    statistics(entry.statistics);
-    tail(entry.points, entry.retired);
+  for(auto const *table : {&careers, &fastest}) {
+    for(auto const &entry : *table) {
+      name(entry.name);
+      word(entry.sorties);
+      word(entry.resurrections);
+      statistics(entry.statistics);
+      tail(entry.points, entry.retired);
+    }
   }
   return result;
 }
@@ -158,22 +201,37 @@ void score_tables::rename(std::string_view const previous, std::string_view cons
     std::copy_n(name.begin(), length, field.begin());
     field[length] = 0;
   }};
-  for(auto &entry : missions) if(entry.retired == 0 && score_text(entry.name) == previous) replace(entry.name);
-  for(auto *table : {&careers, &fastest}) for(auto &entry : *table) {
+  for(auto &entry : missions) {
     if(entry.retired == 0 && score_text(entry.name) == previous) replace(entry.name);
+  }
+  for(auto *table : {&careers, &fastest}) {
+    for(auto &entry : *table) {
+      if(entry.retired == 0 && score_text(entry.name) == previous) replace(entry.name);
+    }
   }
 }
 void score_tables::clear(unsigned int const list) {
   /// Each of the original three score lists can be reset independently
-  if(list == 0) missions = {};
-  else if(list == 1) careers = {};
-  else if(list == 2) fastest = {};
-  else throw std::invalid_argument{"unknown high-score list"};
+  if(list == 0) {
+    missions = {};
+  } else if(list == 1) {
+    careers = {};
+  } else if(list == 2) {
+    fastest = {};
+  } else {
+    throw std::invalid_argument{"unknown high-score list"};
+  }
 }
 void score_tables::retire(std::string_view const name) {
   /// Preserve a deleted pilot's historical results while allowing a later pilot to reuse the same name
-  for(auto &entry : missions) if(score_text(entry.name) == name) entry.retired = 1;
-  for(auto *table : {&careers, &fastest}) for(auto &entry : *table) if(score_text(entry.name) == name) entry.retired = 1;
+  for(auto &entry : missions) {
+    if(score_text(entry.name) == name) entry.retired = 1;
+  }
+  for(auto *table : {&careers, &fastest}) {
+    for(auto &entry : *table) {
+      if(score_text(entry.name) == name) entry.retired = 1;
+    }
+  }
 }
 void score_tables::record(std::string_view const theatre, sortie_statistics const &result, pilot_record const *const pilot) {
   /// Mission achievements and live career rows use MOAG's insertion order, signed counters and independent tie breakers

@@ -18,15 +18,20 @@ int main(int const argc, char const *const argv[]) {
   corncob::tests::reference_reader input{argv[1], "CORNFRM1"};
   auto const cases{input.dword()};
   for(unsigned int i{0}; i != cases; ++i) {
-    auto const current{input.word()}, expected{input.word()};
+    auto const current{input.word()};
+    auto const expected{input.word()};
     if(game::advance_frame(current) != expected) throw std::runtime_error{"native animation-frame restart differs"};
   }
-  resources::geometry_bank first_geometry{resources::engine_data_asset()}, second_geometry{resources::engine_data_asset()};
+  resources::geometry_bank first_geometry{resources::engine_data_asset()};
+  resources::geometry_bank second_geometry{resources::engine_data_asset()};
   auto const cockpit{resources::decode_cockpit_mask(resources::cockpit_asset())};
   game::session first{first_geometry, world::decode_theatre(resources::morning_asset())};
   game::session second{second_geometry, world::decode_theatre(resources::morning_asset())};
-  graphics::scene_renderer first_renderer{first_geometry, cockpit}, second_renderer{second_geometry, cockpit};
-  corncob::render::framebuffer first_frame, second_frame, preview;
+  graphics::scene_renderer first_renderer{first_geometry, cockpit};
+  graphics::scene_renderer second_renderer{second_geometry, cockpit};
+  corncob::render::framebuffer first_frame;
+  corncob::render::framebuffer second_frame;
+  corncob::render::framebuffer preview;
   first_renderer.initialise(first.camera().position, first.random_stream());
   second_renderer.initialise(second.camera().position, second.random_stream());
   unsigned int draws{0};

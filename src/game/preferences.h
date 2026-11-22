@@ -7,13 +7,52 @@
 
 namespace corncob::game {
 
-enum class control_context { flight, walking, both };
+enum class control_context {
+  flight,
+  walking,
+  both
+};
 enum class control_id {
-  roll_left, roll_right, pitch_up, pitch_down, rudder_left, rudder_right, brakes,
-  throttle_up, throttle_down, forward, backward, strafe_left, strafe_right, jump, drop_through,
-  gun, pistol, cannon, missile, autopilot, flaps, rocket, eject, parachute, remote,
-  rear, cockpit, ground, look, map, rescue, messages, pause, bomb, charge, detonate, sound, fast_forward,
-  first_person, third_person,
+  roll_left,
+  roll_right,
+  pitch_up,
+  pitch_down,
+  rudder_left,
+  rudder_right,
+  brakes,
+  throttle_up,
+  throttle_down,
+  forward,
+  backward,
+  strafe_left,
+  strafe_right,
+  jump,
+  drop_through,
+  gun,
+  pistol,
+  cannon,
+  missile,
+  autopilot,
+  flaps,
+  rocket,
+  eject,
+  parachute,
+  remote,
+  rear,
+  cockpit,
+  ground,
+  look,
+  map,
+  rescue,
+  messages,
+  pause,
+  bomb,
+  charge,
+  detonate,
+  sound,
+  fast_forward,
+  first_person,
+  third_person,
 };
 struct control_binding {
   control_id id;
@@ -31,11 +70,13 @@ std::vector<control_binding> default_bindings();
 std::string binding_name(control_binding const &binding);
 
 struct preferences {
-  static double constexpr minimum_mouse_sensitivity{1}, maximum_mouse_sensitivity{200};
+  static double constexpr minimum_mouse_sensitivity{1};
+  static double constexpr maximum_mouse_sensitivity{200};
   graphics::scene_settings scene;
   bool window_resolution{true};
   bool fullscreen{false};
-  double music_volume{100.0}, effects_volume{100.0};
+  double music_volume{100.0};
+  double effects_volume{100.0};
   double mouse_sensitivity{24.0};                                              // Angle units per physical mouse pixel; full turn = 65536.
   bool invert_mouse{false};
   std::vector<control_binding> bindings{default_bindings()};

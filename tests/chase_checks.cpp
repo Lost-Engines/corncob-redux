@@ -31,8 +31,10 @@ void simulation_checks(r::geometry_bank const &geometry) {
   // Include live actors, weapon fire and repeated view changes: the new display
   // position must not feed back into any of the original proximity mechanisms.
   auto theatre{w::load_theatre("morning")};
-  g::session first{geometry, theatre, true}, third{geometry, theatre, true};
-  first.set_invincible(true); third.set_invincible(true);
+  g::session first{geometry, theatre, true};
+  g::session third{geometry, theatre, true};
+  first.set_invincible(true);
+  third.set_invincible(true);
   third.press(g::action::third_person);
   auto const original{first.camera()};
   auto const chase{third.render_camera()};
@@ -47,18 +49,31 @@ void simulation_checks(r::geometry_bank const &geometry) {
   third.press(g::action::third_person);
   require(third.render_camera().external, "F7 toggled the view off instead of selecting it");
   for(unsigned int i{0}; i < 240; ++i) {
-    g::input_state input{.throttle_up{i < 20}, .weapons{.gun{i % 4 == 0}}};
+    g::input_state input{
+      .throttle_up{i < 20},
+      .weapons{.gun{i % 4 == 0}}
+    };
     if(i > 120) input.stick.roll = 200;
-    first.advance_time(input, 1.0 / 60); third.advance_time(input, 1.0 / 60);
+    first.advance_time(input, 1.0 / 60);
+    third.advance_time(input, 1.0 / 60);
     static_cast<void>(third.render_camera());
-    if(i % 19 == 0) { third.press(g::action::first_person); third.press(g::action::third_person); }
+    if(i % 19 == 0) {
+      third.press(g::action::first_person);
+      third.press(g::action::third_person);
+    }
   }
   equivalent(first, third);
-  first.press(g::action::eject); third.press(g::action::eject);
+  first.press(g::action::eject);
+  third.press(g::action::eject);
   require(third.render_camera().subject && third.render_camera().subject->type == w::object_type::ground_crew, "ejection did not switch the chase subject to the pilot");
   for(unsigned int i{0}; i < 120; ++i) {
-    g::input_state const input{.walk_forward{true}, .look_yaw{20}, .weapons{.gun{i % 9 == 0}}};
-    first.advance_time(input, 1.0 / 60); third.advance_time(input, 1.0 / 60);
+    g::input_state const input{
+      .walk_forward{true},
+      .look_yaw{20},
+      .weapons{.gun{i % 9 == 0}}
+    };
+    first.advance_time(input, 1.0 / 60);
+    third.advance_time(input, 1.0 / 60);
     static_cast<void>(third.render_camera());
   }
   equivalent(first, third);
@@ -71,9 +86,12 @@ void simulation_checks(r::geometry_bank const &geometry) {
   third.press(g::action::first_person);
   require(!third.render_camera().external && !third.render_camera().subject && !third.render_camera().cockpit, "F6 did not restore first person on foot");
   g::session cockpit{geometry, theatre, true};
-  cockpit.press(g::action::toggle_cockpit); cockpit.press(g::action::third_person); cockpit.press(g::action::first_person);
+  cockpit.press(g::action::toggle_cockpit);
+  cockpit.press(g::action::third_person);
+  cockpit.press(g::action::first_person);
   require(cockpit.render_camera().cockpit && !cockpit.render_camera().external, "F6 did not restore the normal cockpit after L/F7");
-  cockpit.begin_builder(); cockpit.press(g::action::third_person);
+  cockpit.begin_builder();
+  cockpit.press(g::action::third_person);
   require(!cockpit.render_camera().external && !cockpit.render_camera().subject, "F7 interfered with the mission builder");
 }
 
@@ -81,28 +99,37 @@ void attitude_checks(r::geometry_bank const &geometry) {
   // At altitude the aircraft should stay in the same place and orientation on
   // screen through banks and loops: rotate the entire camera rig with it.
   for(auto const &pose : std::array<m::angles, 8>{{
-    {0,0,0}, {8192,5000,8192}, {30000,16000,16384}, {30000,16384,32768},
-    {40000,20000,49152}, {50000,32768,40000}, {10000,60000,65535}, {0,0,32768},
+    {0, 0, 0}, {8192, 5000, 8192}, {30000, 16000, 16384}, {30000, 16384, 32768},
+    {40000, 20000, 49152}, {50000, 32768, 40000}, {10000, 60000, 65535}, {0, 0, 32768},
   }}) {
     w::theatre theatre;
     theatre.start.z = 720;
-    theatre.objects.push_back({.position{0,-3000,720}, .attitude{pose}, .type{w::object_type::aircraft}, .flags{1}});
+    theatre.objects.push_back({
+      .position{0, -3000, 720},
+      .attitude{pose},
+      .type{w::object_type::aircraft},
+      .flags{1}
+    });
     g::session game{geometry, theatre};
     game.advance({});
     require(game.player() == g::player_mode::in_aircraft, "attitude fixture failed to board");
-    game.relocate({.title{"Chase attitude check"}, .position{0,0,200000}, .heading{pose.heading}});
+    game.relocate({
+      .title{"Chase attitude check"},
+      .position{0, 0, 200000},
+      .heading{pose.heading}
+    });
     game.press(g::action::third_person);
     auto const view{game.render_camera()};
     auto const body{m::rotation_real(m::real_angles(game.craft().attitude))};
     auto const local_eye{body.inverse(vec3<double>{view.position} - vec3<double>{game.craft().position})};
-    require((local_eye - vec3<double>{-11000,0,2600}).length() < 8,
+    require((local_eye - vec3<double>{-11000, 0, 2600}).length() < 8,
       "chase position did not rotate with the aircraft's full attitude");
     auto const camera{m::rotation_real(m::real_angles(view.attitude))};
-    auto const right{camera.inverse(body.apply({0,-700,0}))};
-    auto const left{camera.inverse(body.apply({0,700,0}))};
+    auto const right{camera.inverse(body.apply({0, -700, 0}))};
+    auto const left{camera.inverse(body.apply({0, 700, 0}))};
     require(std::abs(left.z - right.z) < 2 && left.y > right.y,
       "camera bank did not keep the aircraft's wings level in the chase view");
-    auto const forward{camera.inverse(body.apply({1000,0,0}))};
+    auto const forward{camera.inverse(body.apply({1000, 0, 0}))};
     require(forward.x > 970 && forward.z > 190 && forward.z < 210 && std::abs(forward.y) < 2,
       "chase aim changed relative to the aircraft during a turn or loop");
     game.press(g::action::eject);
@@ -114,7 +141,12 @@ void boarding_checks(r::geometry_bank const &geometry) {
   for(uint16_t const variant : {uint16_t{0}, uint16_t{0x1000}, uint16_t{0x2000}}) {
     w::theatre theatre;
     theatre.start.z = 720;
-    theatre.objects.push_back({.position{0,-3000,720}, .attitude{}, .type{w::object_type::aircraft}, .flags{static_cast<uint16_t>(1u | variant)}});
+    theatre.objects.push_back({
+      .position{0, -3000, 720},
+      .attitude{},
+      .type{w::object_type::aircraft},
+      .flags{static_cast<uint16_t>(1u | variant)}
+    });
     g::session game{geometry, theatre};
     game.press(g::action::third_person);
     game.advance({});
@@ -133,11 +165,14 @@ void boarding_checks(r::geometry_bank const &geometry) {
 void rendering_checks(r::geometry_bank &geometry) {
   auto const cockpit{r::decode_cockpit_mask(r::cockpit_asset())};
   gr::scene_renderer renderer{geometry, cockpit};
-  renderer.configure({.resolution{800,600}, .ground_points{0}});
+  renderer.configure({
+    .resolution{800, 600},
+    .ground_points{0}
+  });
   corncob::render::framebuffer output;
   m::random_source random;
   w::theatre theatre;
-  theatre.start = {0,0,720};
+  theatre.start = {0, 0, 720};
   g::session pedestrian{geometry, theatre};
   pedestrian.press(g::action::third_person);
   auto view{pedestrian.render_camera()};
@@ -148,7 +183,8 @@ void rendering_checks(r::geometry_bank &geometry) {
   auto const red{std::ranges::count(frame.pixels, uint8_t{12})};
   require(red > 500, "player shirt was not red or the pilot was off screen");
   auto const player_frame{frame.pixels};
-  view.subject.reset(); view.external = false;
+  view.subject.reset();
+  view.external = false;
   theatre.objects.push_back(*pedestrian.render_camera().subject);
   renderer.render(theatre, view, 0, 0, random, output);
   require(std::ranges::count(frame.pixels, uint8_t{12}) == 0 && std::ranges::count(frame.pixels, uint8_t{6}) > 500,
@@ -162,10 +198,17 @@ void rendering_checks(r::geometry_bank &geometry) {
   renderer.render(pedestrian.world(), pedestrian.render_camera(), 0, 0, random, output);
   // A wall must occlude the visual-only subject through the same depth buffer.
   auto hidden{pedestrian.render_camera()};
-  hidden.position = {-10000,0,1000}; hidden.attitude = {};
-  hidden.subject->position = {0,0,0}; hidden.subject->attitude = {};
+  hidden.position = {-10000, 0, 1000};
+  hidden.attitude = {};
+  hidden.subject->position = {0, 0, 0};
+  hidden.subject->attitude = {};
   theatre.objects.clear();
-  theatre.objects.push_back({.position{-5000,0,16000}, .attitude{}, .type{w::object_type::control_tower}, .flags{1}});
+  theatre.objects.push_back({
+    .position{-5000, 0, 16000},
+    .attitude{},
+    .type{w::object_type::control_tower},
+    .flags{1}
+  });
   renderer.render(theatre, hidden, 0, 0, random, output);
   require(std::ranges::count(frame.pixels, uint8_t{12}) == 0, "player model drew through a foreground tower");
 }
@@ -178,10 +221,10 @@ int main() {
   boarding_checks(geometry);
   rendering_checks(geometry);
   auto const bindings{g::default_bindings()};
-  for(auto const &[id,key] : {std::pair{g::control_id::first_person,295}, {g::control_id::third_person,296}}) {
+  for(auto const &[id, key] : {std::pair{g::control_id::first_person, 295}, {g::control_id::third_person, 296}}) {
     auto const found{std::ranges::find(bindings, id, &g::control_binding::id)};
     require(found != bindings.end() && found->key == key && found->context == g::control_context::both, "F6/F7 defaults do not work in both contexts");
   }
-  require(std::ranges::none_of(bindings, [](auto const &b){ return b.matches_key(297); }), "F8 was not left free");
+  require(std::ranges::none_of(bindings, [](auto const &b){return b.matches_key(297);}), "F8 was not left free");
   std::cout << "Third-person cameras, player visuals, isolation and bindings passed\n";
 }

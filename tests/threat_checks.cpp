@@ -20,7 +20,8 @@ int main(int const argc, char const *const argv[]) {
   namespace maths = corncob::maths;
   namespace world = corncob::world;
   resources::geometry_bank geometry{resources::engine_data_asset()};
-  unsigned int offset{12}, shells{0};
+  unsigned int offset{12};
+  unsigned int shells{0};
   for(unsigned int i{0}; i != 1536; ++i, offset += 248) {
     world::theatre theatre;
     game::combat weapons{geometry, theatre, data.dword(offset + 95)};
@@ -45,11 +46,15 @@ int main(int const argc, char const *const argv[]) {
       object.flags, static_cast<uint16_t>(object.velocity.x), static_cast<uint16_t>(object.velocity.y), static_cast<uint16_t>(object.velocity.z), object.timer,
       static_cast<uint16_t>(object.motion.gravity)};
     std::array<unsigned int, 9> constexpr fields{12, 14, 16, 24, 46, 48, 50, 52, 64};
-    for(unsigned int field{0}; field != fields.size(); ++field) if(actual[field] != data.word(expected + fields[field])) {
-      throw std::runtime_error{"native threat case " + std::to_string(i) + " field " + std::to_string(fields[field]) + ": got " + std::to_string(actual[field]) + ", expected " + std::to_string(data.word(expected + fields[field]))};
+    for(unsigned int field{0}; field != fields.size(); ++field) {
+      if(actual[field] != data.word(expected + fields[field])) {
+        throw std::runtime_error{"native threat case " + std::to_string(i) + " field " + std::to_string(fields[field]) + ": got " + std::to_string(actual[field]) + ", expected " + std::to_string(data.word(expected + fields[field]))};
+      }
     }
     if(object.position.z != data.signed_dword(expected + 8)) throw std::runtime_error{"native threat height case " + std::to_string(i)};
-    auto const shell{std::ranges::find_if(theatre.objects, [](auto const &candidate){return candidate.type == world::object_type::aa_shell && candidate.has(world::object_flag::present);})};
+    auto const shell{std::ranges::find_if(theatre.objects, [](auto const &candidate){
+      return candidate.type == world::object_type::aa_shell && candidate.has(world::object_flag::present);
+    })};
     bool const launched{shell != theatre.objects.end()};
     if(launched != (data.byte(expected + 74) != 0)) throw std::runtime_error{"native shell launch case " + std::to_string(i)};
     if(launched) {

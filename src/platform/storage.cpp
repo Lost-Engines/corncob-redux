@@ -35,7 +35,7 @@ std::vector<uint8_t> read_binary(std::filesystem::path const &path) {
   if(bytes < 0 || bytes > 64 * 1024 * 1024) throw std::runtime_error{"invalid save-file size: " + path.string()};
   std::vector<uint8_t> result(static_cast<size_t>(bytes));
   input.seekg(0);
-  if(!input.read(reinterpret_cast<char*>(result.data()), bytes)) throw std::runtime_error{"cannot read complete save file: " + path.string()};
+  if(!input.read(reinterpret_cast<char *>(result.data()), bytes)) throw std::runtime_error{"cannot read complete save file: " + path.string()};
   return result;
 }
 void write_binary(std::filesystem::path const &path, std::span<uint8_t const> const bytes) {
@@ -45,7 +45,7 @@ void write_binary(std::filesystem::path const &path, std::span<uint8_t const> co
   temporary += ".tmp";
   {
     std::ofstream output{temporary, std::ios::binary | std::ios::trunc};
-    if(!output || !output.write(reinterpret_cast<char const*>(bytes.data()), static_cast<std::streamsize>(bytes.size()))) {
+    if(!output || !output.write(reinterpret_cast<char const *>(bytes.data()), static_cast<std::streamsize>(bytes.size()))) {
       throw std::runtime_error{"cannot write save file: " + temporary.string()};
     }
     output.close();

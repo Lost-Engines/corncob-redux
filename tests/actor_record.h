@@ -33,7 +33,9 @@ inline corncob::world::placed_object read_actor(corncob::resources::binary_reade
 }
 inline void compare_actor(corncob::world::placed_object const &actual, corncob::world::placed_object const &expected, unsigned int const index, char const *const name) {
   /// Check full constructed actor state rather than only whether a new object appeared
-  auto check{[&](bool const value, char const *const field){if(!value) throw std::runtime_error{"native actor case " + std::to_string(index) + " " + name + " " + field};}};
+  auto check{[&](bool const value, char const *const field){
+    if(!value) throw std::runtime_error{"native actor case " + std::to_string(index) + " " + name + " " + field};
+  }};
   check(actual.position == expected.position, "position");
   check(actual.attitude.heading == expected.attitude.heading && actual.attitude.pitch == expected.attitude.pitch && actual.attitude.roll == expected.attitude.roll, "attitude");
   check(actual.velocity == expected.velocity, "velocity");

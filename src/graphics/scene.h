@@ -42,15 +42,19 @@ struct render_statistics {
 };
 
 struct scene_settings {
-  static double constexpr minimum_fov{30}, maximum_fov{150};
+  static double constexpr minimum_fov{30};
+  static double constexpr maximum_fov{150};
   static double constexpr maximum_draw_distance{100000};
-  static unsigned int constexpr original_ground_points{80}, maximum_ground_points{20000};
+  static unsigned int constexpr original_ground_points{80};
+  static unsigned int constexpr maximum_ground_points{20000};
   render::video_size resolution{1280, 700};
   double horizontal_fov{94.0};
   double draw_distance{0.0};                                                   // Kilometres; zero has no far plane.
   unsigned int ground_points{640};
-  static double constexpr minimum_ground_range{0.25}, maximum_ground_range{64.0};
-  static double constexpr minimum_gunsight_size{0.5}, maximum_gunsight_size{3.0};
+  static double constexpr minimum_ground_range{0.25};
+  static double constexpr maximum_ground_range{64.0};
+  static double constexpr minimum_gunsight_size{0.5};
+  static double constexpr maximum_gunsight_size{3.0};
   double gunsight_size{1.0};                                                   // Multiplier after scaling from the original 640x350 display.
   double ground_range{8.0};                                                    // Ground-field spread relative to the original altitude-scaled range.
 };

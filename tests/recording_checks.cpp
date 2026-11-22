@@ -16,7 +16,8 @@ int main(int const argc, char const *const argv[]) {
   resources::geometry_bank geometry{resources::engine_data_asset()};
   std::ifstream references{argv[1]};
   std::string name;
-  unsigned int count{0}, compared{0};
+  unsigned int count{0};
+  unsigned int compared{0};
   uint64_t expected{0};
   while(references >> name >> std::dec >> count >> std::hex >> expected) {
     auto const bytes{assets.file("dmo/" + name + ".dmo")};
@@ -41,8 +42,12 @@ int main(int const argc, char const *const argv[]) {
       if(flight->craft().position != expected_frame.position) throw std::runtime_error{"playback drifted away from the stored aircraft path"};
     }
     bool rejected{false};
-    try { game::recorded_flight truncated{bytes.first(bytes.size() - 1)}; }
-    catch(std::invalid_argument const&) { rejected = true; }
+    try {
+      game::recorded_flight truncated{bytes.first(bytes.size() - 1)};
+    }
+    catch(std::invalid_argument const &) {
+      rejected = true;
+    }
     if(!rejected) throw std::runtime_error{"truncated recording was accepted"};
     ++compared;
   }

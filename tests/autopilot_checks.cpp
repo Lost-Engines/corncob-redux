@@ -25,7 +25,8 @@ int main(int const argc, char const *const argv[]) {
     aircraft.stalled = input.word() != 0;
     corncob::flight::advance_autopilot(aircraft, response);
     auto const expected_pitch{input.signed_dword()};
-    bool const engaged{input.byte() != 0}, locked{input.byte() != 0};
+    bool const engaged{input.byte() != 0};
+    bool const locked{input.byte() != 0};
     auto const height{input.signed_dword()};
     auto const previous{input.signed_word()};
     if(response.pitch != expected_pitch || response.autopilot.engaged != engaged || response.autopilot.height_locked != locked

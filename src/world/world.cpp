@@ -19,7 +19,10 @@ bool in_active_neighbourhood(maths::world_position const &position, maths::world
 
 namespace {
 
-enum class type_encoding { coordinates_xor, plain };
+enum class type_encoding {
+  coordinates_xor,
+  plain
+};
 
 theatre decode_tiles(std::span<uint8_t const> const source, type_encoding const encoding) {
   /// Expand the original 64-tile CCT stream while retaining its tile and palette boundaries
@@ -41,7 +44,9 @@ theatre decode_tiles(std::span<uint8_t const> const source, type_encoding const 
       offset += header_bytes;
       for(unsigned int i{0}; i != tile.object_count; ++i) {
         auto const packed{input.word(offset)};
-        auto const low_x{input.word(offset + 2)}, low_y{input.word(offset + 4)}, low_z{input.word(offset + 6)};
+        auto const low_x{input.word(offset + 2)};
+        auto const low_y{input.word(offset + 4)};
+        auto const low_z{input.word(offset + 6)};
         auto const kind{static_cast<uint16_t>(input.word(offset + 21) ^ (encoding == type_encoding::coordinates_xor ? low_x ^ low_y : 0))};
         if(kind >= std::to_underlying(object_type::count)) throw std::invalid_argument{"embedded theatre contains an invalid object type"};
         result.objects.push_back({
@@ -84,8 +89,14 @@ std::vector<uint8_t> encode_theatre(theatre const &source) {
   /// Rebuild the original 64-tile CCT stream, preserving native position packing, byte angles and XOR type words
   std::vector<uint8_t> output;
   auto byte{[&](uint8_t const value){output.push_back(value);}};
-  auto word{[&](uint16_t const value){byte(static_cast<uint8_t>(value)); byte(static_cast<uint8_t>(value >> 8));}};
-  auto dword{[&](uint32_t const value){word(static_cast<uint16_t>(value)); word(static_cast<uint16_t>(value >> 16));}};
+  auto word{[&](uint16_t const value){
+    byte(static_cast<uint8_t>(value));
+    byte(static_cast<uint8_t>(value >> 8));
+  }};
+  auto dword{[&](uint32_t const value){
+    word(static_cast<uint16_t>(value));
+    word(static_cast<uint16_t>(value >> 16));
+  }};
   for(unsigned int y{0}; y != theatre::rows; ++y) {
     for(unsigned int x{0}; x != theatre::columns; ++x) {
       std::vector<placed_object const*> placements;
@@ -104,7 +115,8 @@ std::vector<uint8_t> encode_theatre(theatre const &source) {
       byte(tile.storage_flags);
       for(auto const value : tile.packed_colours) byte(value);
       for(auto const *object : placements) {
-        auto const low_x{static_cast<uint16_t>(object->position.x)}, low_y{static_cast<uint16_t>(object->position.y)};
+        auto const low_x{static_cast<uint16_t>(object->position.x)};
+        auto const low_y{static_cast<uint16_t>(object->position.y)};
         uint16_t const packed{static_cast<uint16_t>(((object->position.x >> 16) & 31) | (((object->position.y >> 16) & 31) << 5)
           | (((object->position.z >> 16) & 31) << 10))};
         word(packed);
@@ -128,10 +140,14 @@ std::vector<uint8_t> encode_theatre(theatre const &source) {
 void apply_briefing(theatre &theatre, std::span<uint8_t const> const source) {
   /// TWR's optional first-line X directive controls the actual sun, atmosphere and star settings
   theatre.missions.clear();
-  if(source.empty()) { theatre.briefing.clear(); return; }
+  if(source.empty()) {
+    theatre.briefing.clear();
+    return;
+  }
   theatre.briefing.assign(reinterpret_cast<char const*>(source.data()), source.size());
   std::istringstream lines{theatre.briefing};
-  std::string line, title;
+  std::string line;
+  std::string title;
   while(std::getline(lines, line)) {
     if(!line.empty() && line.back() == '\r') line.pop_back();
     if(line.find("Mission Code Name") != std::string::npos) {
@@ -154,7 +170,13 @@ void apply_briefing(theatre &theatre, std::span<uint8_t const> const source) {
   }
   if(source.front() != 'X') return;
   std::istringstream input{theatre.briefing.substr(1, theatre.briefing.find('\n'))};
-  int angle{0}, diameter{0}, colour{0}, gravity{0}, density{0}, stars{0}, height{0};
+  int angle{0};
+  int diameter{0};
+  int colour{0};
+  int gravity{0};
+  int density{0};
+  int stars{0};
+  int height{0};
   if(!(input >> angle >> diameter >> colour >> gravity >> density >> stars)) throw std::invalid_argument{"embedded theatre has an invalid X directive"};
   // Older TWR headers omit atmosphere height; READUNIVPARAMS retains the engine default in that case.
   input >> height;

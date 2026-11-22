@@ -16,8 +16,10 @@ namespace {
 template<typename value_type>
 void check(value_type const actual, value_type const expected, char const *const name, unsigned int const index) {
   /// Give the first differing original intermediate, not only a final flight trajectory mismatch
-  if(actual != expected) throw std::runtime_error{std::string{name} + " case " + std::to_string(index)
-    + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+  if(actual != expected) {
+    throw std::runtime_error{std::string{name} + " case " + std::to_string(index)
+      + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+  }
 }
 
 corncob::flight::aircraft_variant variant(uint16_t const flags) {
@@ -33,9 +35,12 @@ int main(int const argc, char const *const argv[]) {
   /// Compare the original atmosphere, force and integration code with its native C++ translation
   if(argc != 2) throw std::invalid_argument{"flight_checks requires its reference fixture path"};
   corncob::tests::reference_reader input{argv[1], "CORNFY01"};
-  unsigned int const angles{input.dword()}, forces{input.dword()}, positions{input.dword()};
+  unsigned int const angles{input.dword()};
+  unsigned int const forces{input.dword()};
+  unsigned int const positions{input.dword()};
   for(unsigned int i{0}; i != angles; ++i) {
-    auto const x{input.signed_word()}, y{input.signed_word()};
+    auto const x{input.signed_word()};
+    auto const y{input.signed_word()};
     check(corncob::maths::arctangent(x, y), input.word(), "airflow angle", i);
   }
   for(unsigned int i{0}; i != forces; ++i) {

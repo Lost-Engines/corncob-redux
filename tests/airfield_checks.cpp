@@ -30,7 +30,7 @@ int main(int const argc, char const *const argv[]) {
     corncob::maths::world_position const origin{data.signed_dword(offset), data.signed_dword(offset + 4), 0};
     unsigned int const length{data.word(offset + 8)};
     offset += 10;
-    std::string const expected{reinterpret_cast<char const*>(bytes.data() + offset), length};
+    std::string const expected{reinterpret_cast<char const *>(bytes.data() + offset), length};
     offset += length;
     auto const actual{corncob::resources::describe_survey_entry(object, origin)};
     if(actual != expected) {
@@ -64,6 +64,9 @@ int main(int const argc, char const *const argv[]) {
     ++failures;
   }
   if(offset != bytes.size()) throw std::runtime_error{"native airfield fixture has an unread trailer"};
-  if(failures != 0) { std::cerr << failures << " survey differences\n"; return EXIT_FAILURE; }
+  if(failures != 0) {
+    std::cerr << failures << " survey differences\n";
+    return EXIT_FAILURE;
+  }
   std::cout << data.dword(8) << " original survey descriptions and " << data.dword(12) << " complete grouping/sort cases match" << std::endl;
 }

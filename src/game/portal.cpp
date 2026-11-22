@@ -11,10 +11,13 @@ void transfer_portal(maths::world_position &position, maths::world_position cons
   if(transfer == portal_transfer::random) {
     int32_t const high_x{static_cast<int32_t>(random.below(coordinate_span)) - coordinate_bias};
     int32_t const high_y{static_cast<int32_t>(random.below(coordinate_span)) - coordinate_bias};
-    uint16_t const low_x{random.next()}, low_y{random.next()};
+    uint16_t const low_x{random.next()};
+    uint16_t const low_y{random.next()};
     position.x = high_x * 65'536 + low_x;
     position.y = high_y * 65'536 + low_y;
-  } else position = maths::world_position{start};
+  } else {
+    position = maths::world_position{start};
+  }
   position.z = arrival_altitude;
 }
 

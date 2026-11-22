@@ -4,7 +4,11 @@
 
 namespace corncob::game {
 
-enum class parking_reset { unchanged, enable, disable };
+enum class parking_reset {
+  unchanged,
+  enable,
+  disable
+};
 
 struct aircraft_parking {
   static uint8_t constexpr positioned{1};

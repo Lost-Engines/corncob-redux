@@ -24,7 +24,8 @@ int main(int const argc, char const *const argv[]) {
   for(auto &byte : original) byte = static_cast<uint8_t>(random.next());
   require(game::score_tables::decode(original).encode() == original, "high-score codec discarded record or padding bytes");
   game::score_tables tables;
-  game::pilot_record alba{"Alba"}, birch{"Birch"};
+  game::pilot_record alba{"Alba"};
+  game::pilot_record birch{"Birch"};
   game::sortie_statistics result{
     .objectives_completed{1},
   };
@@ -63,7 +64,8 @@ int main(int const argc, char const *const argv[]) {
     std::array<uint8_t, 623> pilot_bytes;
     for(auto &byte : pilot_bytes) byte = input.byte();
     game::pilot_record const pilot{pilot_bytes};
-    std::array<uint8_t, game::score_tables::native_bytes> before, after;
+    std::array<uint8_t, game::score_tables::native_bytes> before;
+    std::array<uint8_t, game::score_tables::native_bytes> after;
     for(auto &byte : before) byte = input.byte();
     for(auto &byte : after) byte = input.byte();
     auto tables{game::score_tables::decode(before)};

@@ -37,8 +37,11 @@ void map_view::advance(flight::control_input const &stick, map_input const &inpu
     vec3<double> movement{-stick.pitch * (observer.position.z / 16.0) / 1024.0 * ratio,
                           -stick.roll * (observer.position.z / 16.0) / 1024.0 * ratio, 0};
     if((input.higher && observer.position.z < 210 * 65536) || input.lower) {
-      if(input.slow) movement.z = (input.lower ? -1000 : 1000) * ratio;
-      else movement.z = (observer.position.z + 640.0) * (std::pow(input.lower ? 15.0 / 16.0 : 17.0 / 16.0,ratio) - 1);
+      if(input.slow) {
+        movement.z = (input.lower ? -1000 : 1000) * ratio;
+      } else {
+        movement.z = (observer.position.z + 640.0) * (std::pow(input.lower ? 15.0 / 16.0 : 17.0 / 16.0, ratio) - 1);
+      }
     }
     maths::move(observer.position, movement, fraction.position);
     observer.position.z = std::clamp(observer.position.z, 0, 210 * 65536);

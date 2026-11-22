@@ -12,7 +12,9 @@ void sortie_clock::advance(uint32_t const ticks) noexcept {
 }
 uint16_t sortie_clock::elapsed() const noexcept {
   /// ADDTOETIME uses only minutes/seconds from SAS TMR_READ; its hour component is deliberately ignored
-  uint64_t constexpr pit_frequency{1'193'182}, pit_divisor{1024}, seconds_per_hour{3600};
+  uint64_t constexpr pit_frequency{1'193'182};
+  uint64_t constexpr pit_divisor{1024};
+  uint64_t constexpr seconds_per_hour{3600};
   uint64_t const seconds{static_cast<uint64_t>(pending_ticks) * pit_divisor / pit_frequency};
   return static_cast<uint16_t>(recorded_seconds + seconds % seconds_per_hour);
 }

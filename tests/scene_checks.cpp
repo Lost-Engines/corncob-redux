@@ -16,8 +16,14 @@ int main(int const argc, char const *const /*argv*/[]) {
   corncob::maths::random_source scene_random;
   corncob::graphics::scene_renderer renderer{geometry, cockpit};
   corncob::render::framebuffer output;
-  renderer.configure({.resolution{160,100}, .ground_points{0}});
-  unsigned int frames{0}, objects{0}, polygons{0}, discs{0};
+  renderer.configure({
+    .resolution{160, 100},
+    .ground_points{0}
+  });
+  unsigned int frames{0};
+  unsigned int objects{0};
+  unsigned int polygons{0};
+  unsigned int discs{0};
   for(auto const data : {corncob::resources::white_sands_asset(), corncob::resources::morning_asset(),
                         corncob::resources::dusk_asset(), corncob::resources::wasteland_asset()}) {
     auto const theatre{corncob::world::decode_theatre(data)};

@@ -53,11 +53,16 @@ title_frame title_motion::advance() {
     .stage{stage},
   };
   ++frame;
-  auto random{[this]{random_seed = random_seed * 0x015a4e35u + 1; return static_cast<int>((random_seed >> 16) & 0x7fffu);}};
-  auto sprite{[&](title_sprite_kind const kind, int const x, int const y){result.sprites[result.sprite_count++] = {
+  auto random{[this]{
+    random_seed = random_seed * 0x015a4e35u + 1;
+    return static_cast<int>((random_seed >> 16) & 0x7fffu);
+  }};
+  auto sprite{[&](title_sprite_kind const kind, int const x, int const y){
+    result.sprites[result.sprite_count++] = {
     .kind{kind},
     .position{x, y},
-  };}};
+  };
+  }};
   if(stage == title_stage::flyby) {
     if(--terrain_scroll < 0) terrain_scroll = 399;
     result.scroll = terrain_scroll;
@@ -66,8 +71,9 @@ title_frame title_motion::advance() {
       auto const &size{saucer_sizes[static_cast<unsigned int>(saucer_frame)]};
       saucer.y = maths::word((aircraft_y - 150) * 2 + size.y / 2);
       if(saucer.y < -200) saucer.x = maths::word((random() >> 8) + 160 - size.x / 2 - 64);
-      if(saucer.x < 160) ++saucer.x;
-      else if(saucer.x > 160) --saucer.x;
+      if(saucer.x < 160) {
+        ++saucer.x;
+      } else if(saucer.x > 160) --saucer.x;
       sprite(static_cast<title_sprite_kind>(saucer_frame), saucer.x, saucer.y);
     }
     if((random() >> 9) + 10 < explosion_timer) explosion_timer = 0;
@@ -77,7 +83,9 @@ title_frame title_motion::advance() {
       if(explosion_frame == 0) {
         explosion.x = maths::word((random() >> 7) + 32);
         explosion.y = maths::word((random() >> 8) + 36);
-      } else explosion.y = maths::word(explosion.y + 11);
+      } else {
+        explosion.y = maths::word(explosion.y + 11);
+      }
       auto const &size{explosion_sizes[static_cast<unsigned int>(explosion_frame)]};
       sprite(static_cast<title_sprite_kind>(static_cast<int>(title_sprite_kind::flak_1) + explosion_frame), explosion.x - size.x / 2, explosion.y - size.y / 2);
     }
@@ -89,14 +97,22 @@ title_frame title_motion::advance() {
       aircraft_y = maths::word(aircraft_y - 4);
       if(aircraft_y < -121 - 4 * 90) {
         aircraft_y = 210 + 4 * 90;
-        if(first_pass) { fade = 255; first_pass = false; } else if(passes < 2) ++passes;
-        else fade = 255;
+        if(first_pass) {
+          fade = 255;
+          first_pass = false;
+        } else if(passes < 2) {
+          ++passes;
+        } else {
+          fade = 255;
+        }
       }
       if(aircraft_y > -50 && aircraft_y < 160 && terrain_scroll % 2 == 0) {
         sprite(title_sprite_kind::flash, 56 + 52, aircraft_y + 22);
         sprite(title_sprite_kind::flash, 56 + 116, aircraft_y + 22);
       }
-    } else aircraft_y = 210 + 4 * 30;
+    } else {
+      aircraft_y = 210 + 4 * 30;
+    }
     result.sky_intensity = sky_intensity;
     result.stage_finished = fade == 255 && sky_intensity == 0;
   } else {
@@ -104,16 +120,26 @@ title_frame title_motion::advance() {
     result.scroll = cloud_scroll;
     result.mask_threshold = fade == 0 ? mask_maximum : mask_threshold;
     if(fade == -1) {
-      if(mask_threshold < mask_maximum) mask_threshold = static_cast<int16_t>(mask_threshold + mask_step);
-      else fade = 0;
+      if(mask_threshold < mask_maximum) {
+        mask_threshold = static_cast<int16_t>(mask_threshold + mask_step);
+      } else {
+        fade = 0;
+      }
     }
     if(fade == 255) {
-      if(mask_threshold > mask_step) mask_threshold = static_cast<int16_t>(mask_threshold - mask_step);
-      else { result.stage_finished = true; return result; }
+      if(mask_threshold > mask_step) {
+        mask_threshold = static_cast<int16_t>(mask_threshold - mask_step);
+      } else {
+        result.stage_finished = true;
+        return result;
+      }
     }
     result.credit_intensity = mask_threshold * 42 / mask_maximum;
     result.credits_row = credits_row;
-    if(++credits_row >= static_cast<int>(credit_height)) { credits_row = 0; fade = 255; }
+    if(++credits_row >= static_cast<int>(credit_height)) {
+      credits_row = 0;
+      fade = 255;
+    }
   }
   return result;
 }
@@ -135,30 +161,38 @@ title_sequence::title_sequence(resources::collection const &assets, bool const e
   for(auto &page : pages) page.resize(width * height, 0);
   std::ranges::copy(assets.file("vga/sky.pal"), sky_palette.begin());
   auto const base{assets.file("vga/hc6.pal")};
-  for(unsigned int i{0}; i != 256; ++i) palette[i] = {
-    .red{expand(base[i * 3])},
-    .green{expand(base[i * 3 + 1])},
-    .blue{expand(base[i * 3 + 2])},
-  };
+  for(unsigned int i{0}; i != 256; ++i) {
+    palette[i] = {
+      .red{expand(base[i * 3])},
+      .green{expand(base[i * 3 + 1])},
+      .blue{expand(base[i * 3 + 2])},
+    };
+  }
   std::array<uint8_t, 256> terrain_mapping;
   for(unsigned int colour_index{0}; colour_index != terrain_mapping.size(); ++colour_index) {
     auto const colour{terrain.palette[colour_index]};
-    unsigned int closest{192}, distance{0xffffffffu};
+    unsigned int closest{192};
+    unsigned int distance{0xffffffffu};
     for(unsigned int i{192}; i != 224; ++i) {
       auto square{[](int const value){return value * value;}};
       unsigned int const difference{static_cast<unsigned int>(square((colour.red >> 2) - base[i * 3]) + square((colour.green >> 2) - base[i * 3 + 1]) + square((colour.blue >> 2) - base[i * 3 + 2]))};
-      if(difference < distance) { closest = i; distance = difference; }
+      if(difference < distance) {
+        closest = i;
+        distance = difference;
+      }
     }
     terrain_mapping[colour_index] = static_cast<uint8_t>(closest);
   }
   for(auto &pixel : terrain.pixels) pixel = terrain_mapping[pixel];
   flyby_palette = palette;
   auto const lettering{assets.file("vga/gradsky.pal")};
-  for(unsigned int i{0}; i != 256; ++i) lettering_palette[i] = {
-    .red{expand(lettering[i * 3])},
-    .green{expand(lettering[i * 3 + 1])},
-    .blue{expand(lettering[i * 3 + 2])},
-  };
+  for(unsigned int i{0}; i != 256; ++i) {
+    lettering_palette[i] = {
+      .red{expand(lettering[i * 3])},
+      .green{expand(lettering[i * 3 + 1])},
+      .blue{expand(lettering[i * 3 + 2])},
+    };
+  }
   std::string_view constexpr text{
     "\n     An MVP Software Production\n\n"
     " Design and Programming : Kevin Stokes\n"
@@ -169,15 +203,22 @@ title_sequence::title_sequence(resources::collection const &assets, bool const e
     " Jeff Gardner          Darell Phillips\n"
     " Sean Gallaty              Thomas Pope\n\n"
   };
-  int x{0}, y{0};
+  int x{0};
+  int y{0};
   auto const font{assets.file("font8.bin")};
   for(unsigned char const ch : text) {
-    if(ch == '\n') { x = 0; y += 8; continue; }
-    for(int row{0}; row != 8; ++row) for(int bit{0}; bit != 8; ++bit) {
-      if(y + row < static_cast<int>(credit_height) && x + bit < static_cast<int>(width) && (font[ch * 8u + static_cast<unsigned int>(row)] & (128u >> bit))) {
-        credits[static_cast<unsigned int>(y + row) * width + static_cast<unsigned int>(x + bit)] = 7;
+    if(ch == '\n') {
+      x = 0;
+      y += 8;
+      continue;
     }
+    for(int row{0}; row != 8; ++row) {
+      for(int bit{0}; bit != 8; ++bit) {
+        if(y + row < static_cast<int>(credit_height) && x + bit < static_cast<int>(width) && (font[ch * 8u + static_cast<unsigned int>(row)] & (128u >> bit))) {
+          credits[static_cast<unsigned int>(y + row) * width + static_cast<unsigned int>(x + bit)] = 7;
+        }
       }
+    }
     x += 8;
   }
 }
@@ -194,17 +235,22 @@ void title_sequence::draw_frame(title_frame const &frame) {
       auto const &command{frame.sprites[i]};
       auto const &image{sprites[static_cast<unsigned int>(command.kind)]};
       int const left{command.position.x / 4 * 4};
-      for(unsigned int row{0}; row != image.height; ++row) for(unsigned int column{0}; column != image.width; ++column) {
-        int const x{left + static_cast<int>(column)}, y{command.position.y + static_cast<int>(row)};
-        uint8_t const colour{image.pixels[row * image.width + column]};
-        if(colour != 0 && x >= 0 && x < static_cast<int>(width) && y >= 0 && y < static_cast<int>(height)) pixels[static_cast<unsigned int>(y) * width + static_cast<unsigned int>(x)] = colour;
+      for(unsigned int row{0}; row != image.height; ++row) {
+        for(unsigned int column{0}; column != image.width; ++column) {
+          int const x{left + static_cast<int>(column)};
+          int const y{command.position.y + static_cast<int>(row)};
+          uint8_t const colour{image.pixels[row * image.width + column]};
+          if(colour != 0 && x >= 0 && x < static_cast<int>(width) && y >= 0 && y < static_cast<int>(height)) pixels[static_cast<unsigned int>(y) * width + static_cast<unsigned int>(x)] = colour;
+        }
       }
     }
-    for(unsigned int i{0}; i != 32; ++i) palette[192 + i] = {
-      .red{expand(static_cast<uint8_t>(sky_palette[(32 + i) * 3] * frame.sky_intensity / sky_fade_divisor))},
-      .green{expand(static_cast<uint8_t>(sky_palette[(32 + i) * 3 + 1] * frame.sky_intensity / sky_fade_divisor))},
-      .blue{expand(static_cast<uint8_t>(sky_palette[(32 + i) * 3 + 2] * frame.sky_intensity / sky_fade_divisor))},
-    };
+    for(unsigned int i{0}; i != 32; ++i) {
+      palette[192 + i] = {
+        .red{expand(static_cast<uint8_t>(sky_palette[(32 + i) * 3] * frame.sky_intensity / sky_fade_divisor))},
+        .green{expand(static_cast<uint8_t>(sky_palette[(32 + i) * 3 + 1] * frame.sky_intensity / sky_fade_divisor))},
+        .blue{expand(static_cast<uint8_t>(sky_palette[(32 + i) * 3 + 2] * frame.sky_intensity / sky_fade_divisor))},
+      };
+    }
   } else {
     auto logo{[&](resources::indexed_image const &image, int const left, int const top){
       for(unsigned int row{0}; row != image.height; ++row) {
@@ -215,8 +261,9 @@ void title_sequence::draw_frame(title_frame const &frame) {
         }
       }
     }};
-    if(expansion) logo(top_logo, 40, 10);
-    else {
+    if(expansion) {
+      logo(top_logo, 40, 10);
+    } else {
       logo(top_logo, 8, 10);
       logo(bottom_logo, 72, 64);
     }
@@ -244,7 +291,10 @@ void title_sequence::advance(double const seconds) {
       change_stage = false;
     }
     latest = motion.advance();
-    if(latest.stage_finished) { change_stage = true; continue; }
+    if(latest.stage_finished) {
+      change_stage = true;
+      continue;
+    }
     draw_frame(latest);
   }
 }

@@ -30,7 +30,10 @@ struct framebuffer {
   std::vector<rgba_pixel> pixels{screen_layout::pixel_count};
 };
 
-enum class display_aspect { square_pixels, crt };
+enum class display_aspect {
+  square_pixels,
+  crt
+};
 
 struct viewport {
   int x;

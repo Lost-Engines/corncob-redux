@@ -6,7 +6,8 @@ namespace corncob::game {
 
 int16_t joystick_axis(int16_t const displacement) noexcept {
   /// SPKE squares the calibrated axis after scaling by 0x205; JOYTD clips its signed output to half of 0x400
-  unsigned int constexpr maximum_sample{32'767}, half_range{512};
+  unsigned int constexpr maximum_sample{32'767};
+  unsigned int constexpr half_range{512};
   unsigned int const magnitude{std::min(static_cast<unsigned int>(std::abs(static_cast<int>(displacement))), maximum_sample)};
   unsigned int const scaled{magnitude * 0x205u / maximum_sample};
   int const result{static_cast<int>(std::min(scaled * scaled / half_range, half_range))};

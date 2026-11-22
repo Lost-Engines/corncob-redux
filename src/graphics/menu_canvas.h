@@ -7,10 +7,14 @@ namespace corncob::graphics {
 class menu_canvas {
 private:
   interface_canvas &canvas;
-  unsigned int foreground{7}, background{1}, border{14}, emphasis{14};
+  unsigned int foreground{7};
+  unsigned int background{1};
+  unsigned int border{14};
+  unsigned int emphasis{14};
 
 public:
-  static unsigned int constexpr columns{80}, rows{25};
+  static unsigned int constexpr columns{80};
+  static unsigned int constexpr rows{25};
   explicit menu_canvas(interface_canvas &canvas);
   void colours(unsigned int foreground, unsigned int background, unsigned int border, unsigned int emphasis = 14);
   void shadow(int left, int top, int right, int bottom);

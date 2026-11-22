@@ -15,7 +15,8 @@ int main(int const argc, char const *const argv[]) {
   std::vector<uint8_t> bytes{std::istreambuf_iterator<char>{input}, {}};
   corncob::resources::binary_reader const data{bytes};
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
-  unsigned int offset{12}, particles{0};
+  unsigned int offset{12};
+  unsigned int particles{0};
   for(unsigned int trial{0}; trial != data.dword(8); ++trial) {
     corncob::world::theatre theatre;
     corncob::game::combat weapons{geometry, theatre, data.dword(offset + 8)};
@@ -34,9 +35,13 @@ int main(int const argc, char const *const argv[]) {
     offset += 74;
     unsigned int const count{data.dword(offset)};
     offset += 4;
-    if(std::to_underlying(pattern) == 6) weapons.explosion(source.position, static_cast<uint16_t>(requested));
-    else if(std::to_underlying(pattern) >= 4) weapons.shatter(source, requested, std::to_underlying(pattern) == 4);
-    else weapons.scatter(source, requested, pattern, step);
+    if(std::to_underlying(pattern) == 6) {
+      weapons.explosion(source.position, static_cast<uint16_t>(requested));
+    } else if(std::to_underlying(pattern) >= 4) {
+      weapons.shatter(source, requested, std::to_underlying(pattern) == 4);
+    } else {
+      weapons.scatter(source, requested, pattern, step);
+    }
     unsigned int actual{0};
     for(auto const &object : theatre.objects) {
       if(!object.has(corncob::world::object_flag::present)) continue;

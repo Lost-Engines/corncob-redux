@@ -28,7 +28,8 @@ public:
   }
   uint16_t word() {
     /// Decode the fixture's explicit little-endian word order
-    unsigned int const low{byte()}, high{byte()};
+    unsigned int const low{byte()};
+    unsigned int const high{byte()};
     return static_cast<uint16_t>(low | (high << 8));
   }
   int16_t signed_word() {

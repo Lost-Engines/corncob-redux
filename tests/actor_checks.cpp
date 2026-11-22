@@ -62,8 +62,10 @@ int main(int const argc, char const *const argv[]) {
     std::array<unsigned int, 9> constexpr fields{12, 14, 16, 46, 48, 50, 60, 62, 64};
     for(unsigned int field{0}; field != fields.size(); ++field) {
       auto const wanted{word(expected, fields[field])};
-      if(actual[field] != wanted) throw std::runtime_error{"native KLA case " + std::to_string(i) + " field " + std::to_string(fields[field])
-        + ": expected " + std::to_string(wanted) + ", got " + std::to_string(actual[field])};
+      if(actual[field] != wanted) {
+        throw std::runtime_error{"native KLA case " + std::to_string(i) + " field " + std::to_string(fields[field])
+          + ": expected " + std::to_string(wanted) + ", got " + std::to_string(actual[field])};
+      }
     }
   }
   std::cout << cases << " native KLA steering passes match" << std::endl;

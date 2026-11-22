@@ -20,7 +20,8 @@ int main(int const argc, char const *const argv[]) {
   std::vector<uint8_t> const bytes{std::istreambuf_iterator<char>{file}, {}};
   corncob::resources::binary_reader const data{bytes};
   if(bytes.size() < 16 || std::string{bytes.begin(), bytes.begin() + 8} != "CORNSCN1") throw std::invalid_argument{"invalid scenery fixture"};
-  unsigned int const ranges{data.dword(8)}, handlers{data.dword(12)};
+  unsigned int const ranges{data.dword(8)};
+  unsigned int const handlers{data.dword(12)};
   unsigned int offset{16};
   for(unsigned int i{0}; i != ranges; ++i, offset += 27) {
     maths::world_position const position{data.signed_dword(offset), data.signed_dword(offset + 4), data.signed_dword(offset + 8)};

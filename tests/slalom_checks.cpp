@@ -50,7 +50,7 @@ auto main()->int {
   require(geometry.definition(world::object_type::shell).collision_extents.z == 8000, "tree collision dimensions lost");
   auto const original{world::generate_training(geometry, {})};
   auto const recovered{world::generate_slalom(geometry)};
-  auto count{[&](world::object_type const type){ return std::ranges::count(recovered.objects, type, &world::placed_object::type); }};
+  auto count{[&](world::object_type const type){return std::ranges::count(recovered.objects, type, &world::placed_object::type);}};
   require(recovered.slalom && recovered.training && count(world::object_type::tet) == 12 && count(world::object_type::shell) == 50
     && count(world::object_type::saucer) == 1 && count(world::object_type::saucer_site) == 3, "source layout omitted objects");
   require(count(world::object_type::objective_saucer) == 0 && count(world::object_type::generator_orb) == 0, "combat-only generator branch leaked into source layout");
@@ -64,9 +64,11 @@ auto main()->int {
     corncob::maths::world_position{-383'216, 87'536, 131'072},
     corncob::maths::world_position{-383'216, 107'536, 131'072},
   };
-  for(auto const &object : recovered.objects) if(object.type == world::object_type::saucer_site) {
-    require(object.position == source_planes[npc++] && object.attitude.heading == 0 && object.attitude.pitch == 0 && object.attitude.roll == 0,
-      "KBUF did not override the NPC template's position and angles");
+  for(auto const &object : recovered.objects) {
+    if(object.type == world::object_type::saucer_site) {
+      require(object.position == source_planes[npc++] && object.attitude.heading == 0 && object.attitude.pitch == 0 && object.attitude.roll == 0,
+        "KBUF did not override the NPC template's position and angles");
+    }
   }
   require(original.objects.front().position == recovered.objects.front().position, "common airfield changed");
   world::theatre damage_world;
@@ -100,13 +102,15 @@ auto main()->int {
   game::session flight{geometry, recovered};
   flight.set_invincible(true);
   flight.press(game::action::drop_bomb);
-  for(unsigned int i{0}; i != 30; ++i) flight.advance({
-    .weapons{
-      .gun{true},
-      .cannon{true},
-      .missile{true},
-    },
-  });
+  for(unsigned int i{0}; i != 30; ++i) {
+    flight.advance({
+      .weapons{
+        .gun{true},
+        .cannon{true},
+        .missile{true},
+      },
+    });
+  }
   require(flight.sounds().gunshots == 0 && flight.sounds().missiles == 0 && flight.bomb_supply() == 3, "guns=0 left a weapon enabled");
   for(unsigned int i{0}; i != game::slalom_course::marker_count; ++i) {
     flight.relocate({
@@ -135,9 +139,11 @@ auto main()->int {
       observer.attitude.pitch = pitch;
       renderer.preview(flight.world(), observer, 0, 0, flight.random_stream(), output, &instruments);
       require(output.width == size.width && output.height == size.height && output.pixels.size() == size.width * size.height, "video dimensions incorrect");
-      if(video == render::video_mode::hercules) require(std::ranges::all_of(output.pixels, [](auto const &pixel){
-        return pixel.red == pixel.green && pixel.red == pixel.blue && (pixel.red == 0 || pixel.red == 255);
-      }), "Hercules emitted non-monochrome pixels");
+      if(video == render::video_mode::hercules) {
+        require(std::ranges::all_of(output.pixels, [](auto const &pixel){
+          return pixel.red == pixel.green && pixel.red == pixel.blue && (pixel.red == 0 || pixel.red == 255);
+        }), "Hercules emitted non-monochrome pixels");
+      }
       corncob::graphics::space_sequence ending{renderer.indexed_frame(), renderer.colours()};
       ending.advance(1.0);
       ending.render(output);
@@ -158,8 +164,10 @@ auto main()->int {
     .ground_detail{false},
   };
   for(auto const video : {render::video_mode::ega_low, render::video_mode::hercules}) {
-    corncob::graphics::scene_renderer normal{geometry, cockpit, video}, marked{geometry, marked_mask, video};
-    render::framebuffer expected, actual;
+    corncob::graphics::scene_renderer normal{geometry, cockpit, video};
+    corncob::graphics::scene_renderer marked{geometry, marked_mask, video};
+    render::framebuffer expected;
+    render::framebuffer actual;
     normal.preview(empty_world, observer, 0, 0, flight.random_stream(), expected);
     marked.preview(empty_world, observer, 0, 0, flight.random_stream(), actual);
     require(std::ranges::equal(expected.pixels, actual.pixels, [](auto const &a, auto const &b){

@@ -11,8 +11,10 @@ namespace {
 template<typename value_type>
 void check(value_type const actual, value_type const expected, char const *const field, unsigned int const index) {
   /// Report the first mismatching native control accumulator or angle
-  if(actual != expected) throw std::runtime_error{std::string{field} + " case " + std::to_string(index)
-    + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+  if(actual != expected) {
+    throw std::runtime_error{std::string{field} + " case " + std::to_string(index)
+      + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+  }
 }
 
 corncob::maths::angles angles(corncob::tests::reference_reader &input) {
@@ -36,9 +38,11 @@ int main(int const argc, char const *const argv[]) {
   /// Compare aircraft control torque, matrix composition and attitude recovery with original machine code
   if(argc != 2) throw std::invalid_argument{"control_checks requires a fixture path"};
   corncob::tests::reference_reader input{argv[1], "CORNCT01"};
-  auto const matrices{input.dword()}, controls{input.dword()};
+  auto const matrices{input.dword()};
+  auto const controls{input.dword()};
   for(unsigned int i{0}; i != matrices; ++i) {
-    auto const attitude{angles(input)}, change{angles(input)};
+    auto const attitude{angles(input)};
+    auto const change{angles(input)};
     auto const matrix{corncob::maths::make_inverse_rotation(attitude)};
     check_angles(corncob::maths::extract_angles(matrix), input, i);
     auto const rotated{corncob::maths::rotate_local(matrix, change)};

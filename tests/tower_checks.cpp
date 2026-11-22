@@ -22,24 +22,43 @@ int main(int const argc, char const *const argv[]) {
   auto const storage{std::make_unique<game::front_end>(assets, career, true)};
   auto &front{*storage};
   auto key{[&](std::string_view const name){
-    if(name == "Up") front.command(up);
-    else if(name == "Down") front.command(down);
-    else if(name == "Left") front.command(previous);
-    else if(name == "Right") front.command(next);
-    else if(name == "Prior") front.command(page_up);
-    else if(name == "Next") front.command(page_down);
-    else if(name == "Home") front.command(home);
-    else if(name == "End") front.command(end);
-    else if(name == "Return") front.command(accept);
-    else if(name == "Escape") front.command(cancel);
-    else if(name == "BackSpace") front.command(backspace);
-    else if(name == "F1") front.show_boss();
-    else if(name == "space") {
-      if(front.current_page() == game::interface_page::boss) front.command(accept);
-      else front.character(' ');
-    } else if(name.starts_with("ctrl+") && name.size() == 6) front.character(static_cast<uint32_t>(name.back() - 'a' + 1));
-    else if(name.size() == 1) front.character(static_cast<unsigned char>(name.front()));
-    else throw std::runtime_error{"unknown native tower input"};
+    if(name == "Up") {
+      front.command(up);
+    } else if(name == "Down") {
+      front.command(down);
+    } else if(name == "Left") {
+      front.command(previous);
+    } else if(name == "Right") {
+      front.command(next);
+    } else if(name == "Prior") {
+      front.command(page_up);
+    } else if(name == "Next") {
+      front.command(page_down);
+    } else if(name == "Home") {
+      front.command(home);
+    } else if(name == "End") {
+      front.command(end);
+    } else if(name == "Return") {
+      front.command(accept);
+    } else if(name == "Escape") {
+      front.command(cancel);
+    } else if(name == "BackSpace") {
+      front.command(backspace);
+    } else if(name == "F1") {
+      front.show_boss();
+    } else if(name == "space") {
+      if(front.current_page() == game::interface_page::boss) {
+        front.command(accept);
+      } else {
+        front.character(' ');
+      }
+    } else if(name.starts_with("ctrl+") && name.size() == 6) {
+      front.character(static_cast<uint32_t>(name.back() - 'a' + 1));
+    } else if(name.size() == 1) {
+      front.character(static_cast<unsigned char>(name.front()));
+    } else {
+      throw std::runtime_error{"unknown native tower input"};
+    }
   }};
   if(argc == 3) std::filesystem::create_directories(argv[2]);
   unsigned int failures{0};
@@ -49,7 +68,7 @@ int main(int const argc, char const *const argv[]) {
       : reference.source == "DUSK" ? corncob::resources::dusk_briefing_asset()
       : reference.source == "WASTELND" ? corncob::resources::wasteland_briefing_asset()
       : reference.source == "WHTSANDS" ? corncob::resources::white_sands_briefing_asset() : std::span<uint8_t const>{}};
-    world.briefing = raw.empty() ? std::string{reference.text} : std::string{reinterpret_cast<char const*>(raw.data()), raw.size()};
+    world.briefing = raw.empty() ? std::string{reference.text} : std::string{reinterpret_cast<char const *>(raw.data()), raw.size()};
     if(reference.source == "TRAINING") {
       corncob::resources::geometry_bank const geometry{corncob::resources::engine_data_asset()};
       world = corncob::world::generate_training(geometry, {});
@@ -71,7 +90,9 @@ int main(int const argc, char const *const argv[]) {
     if(argc == 3) {
       std::ofstream file{std::filesystem::path{argv[2]} / (std::string{reference.name} + ".ppm"), std::ios::binary};
       file << "P6\n640 400\n255\n";
-      for(auto const &pixel : frame.pixels) for(auto const component : {pixel.red, pixel.green, pixel.blue}) file.put(static_cast<char>(component));
+      for(auto const &pixel : frame.pixels) {
+        for(auto const component : {pixel.red, pixel.green, pixel.blue}) file.put(static_cast<char>(component));
+      }
     }
     key(reference.close);
     if(!front.in_flight()) throw std::runtime_error{"tower helper did not resume the retained flight"};
@@ -79,7 +100,10 @@ int main(int const argc, char const *const argv[]) {
     if(start.has_value() != !reference.start.empty()) throw std::runtime_error{"tower selection presence differs: " + std::string{reference.name}};
     if(start) {
       std::istringstream expected{std::string{reference.start}};
-      int32_t x{0}, y{0}, z{0}, heading{0};
+      int32_t x{0};
+      int32_t y{0};
+      int32_t z{0};
+      int32_t heading{0};
       if(!(expected >> x >> y >> z >> heading) || start->position.x != x || start->position.y != y || start->position.z != z
           || start->heading != static_cast<corncob::maths::angle>(heading)) throw std::runtime_error{"native tower mission coordinates differ: " + std::string{reference.name}};
     }
@@ -90,7 +114,8 @@ int main(int const argc, char const *const argv[]) {
   corncob::world::apply_briefing(world, corncob::resources::morning_briefing_asset());
   front.show_intelligence(world);
   front.command(page_down);
-  corncob::render::framebuffer before, after;
+  corncob::render::framebuffer before;
+  corncob::render::framebuffer after;
   front.render(before);
   front.show_boss();
   front.command(accept);
@@ -107,7 +132,7 @@ int main(int const argc, char const *const argv[]) {
   try {
     game::tower_briefing invalid{world.briefing, game::tower_briefing::airfield_count};
     throw std::runtime_error{"tower accepted an out-of-range airfield"};
-  } catch(std::out_of_range const&) {
+  } catch(std::out_of_range const &) {
   }
   std::filesystem::remove_all(scratch);
   if(failures != 0) return EXIT_FAILURE;

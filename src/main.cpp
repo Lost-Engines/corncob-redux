@@ -43,8 +43,12 @@ struct window_state {
   bool &sound_enabled;
   corncob::render::framebuffer &frame;
   std::bitset<GLFW_KEY_LAST + 1> consumed_key_releases{};
-  double look_x{0}, look_y{0}, last_x{0}, last_y{0};
-  bool mouse_captured{false}, mouse_primed{false};
+  double look_x{0};
+  double look_y{0};
+  double last_x{0};
+  double last_y{0};
+  bool mouse_captured{false};
+  bool mouse_primed{false};
   double wheel_remainder{0};
   bool changing_window_mode{false};
 };
@@ -54,27 +58,68 @@ void activate_control(window_state &state, corncob::game::control_id const id) {
   using corncob::game::control_id;
   auto &game{*state.game};
   switch(id) {
-  case control_id::sound: state.sound_enabled = !state.sound_enabled; break;
-  case control_id::autopilot: game.press(action::toggle_autopilot); break;
-  case control_id::flaps: game.press(action::toggle_flaps); break;
-  case control_id::rocket: game.press(action::rocket); break;
-  case control_id::eject: game.press(action::eject); break;
-  case control_id::parachute: game.press(action::parachute); break;
-  case control_id::remote: game.press(action::toggle_remote); break;
-  case control_id::rear: game.press(action::toggle_rear); break;
-  case control_id::cockpit: game.press(action::toggle_cockpit); break;
-  case control_id::first_person: game.press(action::first_person); break;
-  case control_id::third_person: game.press(action::third_person); break;
-  case control_id::ground: game.press(action::toggle_ground); break;
-  case control_id::look: game.press(action::toggle_look); break;
-  case control_id::map: game.press(action::toggle_map); break;
-  case control_id::rescue: game.press(action::call_rescue); break;
-  case control_id::messages: game.press(action::toggle_messages); break;
-  case control_id::pause: state.front.show_menu(); break;
-  case control_id::bomb: game.press(action::drop_bomb); break;
-  case control_id::charge: game.press(action::plant_charge); break;
-  case control_id::detonate: game.press(action::arm_charges); break;
-  default: break;
+  case control_id::sound:
+    state.sound_enabled = !state.sound_enabled;
+    break;
+  case control_id::autopilot:
+    game.press(action::toggle_autopilot);
+    break;
+  case control_id::flaps:
+    game.press(action::toggle_flaps);
+    break;
+  case control_id::rocket:
+    game.press(action::rocket);
+    break;
+  case control_id::eject:
+    game.press(action::eject);
+    break;
+  case control_id::parachute:
+    game.press(action::parachute);
+    break;
+  case control_id::remote:
+    game.press(action::toggle_remote);
+    break;
+  case control_id::rear:
+    game.press(action::toggle_rear);
+    break;
+  case control_id::cockpit:
+    game.press(action::toggle_cockpit);
+    break;
+  case control_id::first_person:
+    game.press(action::first_person);
+    break;
+  case control_id::third_person:
+    game.press(action::third_person);
+    break;
+  case control_id::ground:
+    game.press(action::toggle_ground);
+    break;
+  case control_id::look:
+    game.press(action::toggle_look);
+    break;
+  case control_id::map:
+    game.press(action::toggle_map);
+    break;
+  case control_id::rescue:
+    game.press(action::call_rescue);
+    break;
+  case control_id::messages:
+    game.press(action::toggle_messages);
+    break;
+  case control_id::pause:
+    state.front.show_menu();
+    break;
+  case control_id::bomb:
+    game.press(action::drop_bomb);
+    break;
+  case control_id::charge:
+    game.press(action::plant_charge);
+    break;
+  case control_id::detonate:
+    game.press(action::arm_charges);
+    break;
+  default:
+    break;
   }
 }
 bool applies(corncob::game::control_binding const &binding, bool const walking) {
@@ -159,8 +204,9 @@ auto main(int const argc, char const *const argv[])->int {
   if(flight_model != "advanced" && flight_model != "beginner") return startup_failure("--flight-model must be advanced or beginner");
   int joystick_device{-1};
   auto const joystick_argument{arguments["joystick"].as<std::string>()};
-  if(joystick_argument == "none") joystick_device = -2;
-  else if(joystick_argument != "auto") {
+  if(joystick_argument == "none") {
+    joystick_device = -2;
+  } else if(joystick_argument != "auto") {
     auto const result{std::from_chars(joystick_argument.data(), joystick_argument.data() + joystick_argument.size(), joystick_device)};
     if(result.ec != std::errc{} || result.ptr != joystick_argument.data() + joystick_argument.size() || joystick_device < GLFW_JOYSTICK_1 || joystick_device > GLFW_JOYSTICK_LAST) {
       return startup_failure("--joystick must be auto, none or a device index from 0 to 15");
@@ -185,7 +231,9 @@ auto main(int const argc, char const *const argv[])->int {
   std::unique_ptr<corncob::game::campaign_store> campaign;
   try {
     campaign = std::make_unique<corncob::game::campaign_store>(arguments["save-dir"].as<std::string>());
-  } catch(std::exception const &error) { return startup_failure(error.what()); }
+  } catch(std::exception const &error) {
+    return startup_failure(error.what());
+  }
   corncob::world::theatre theatre;
   try {
     campaign->select_campaign(corncob::world::find_theatre(theatre_name).campaign);
@@ -203,7 +251,10 @@ auto main(int const argc, char const *const argv[])->int {
   corncob::render::framebuffer frame;
   auto const cockpit{corncob::resources::decode_cockpit_mask(corncob::resources::cockpit_asset())};
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset(), slalom_mode};
-  if(slalom_mode) { theatre = corncob::world::generate_slalom(geometry); theatre_name = "training"; }
+  if(slalom_mode) {
+    theatre = corncob::world::generate_slalom(geometry);
+    theatre_name = "training";
+  }
   auto renderer{std::make_unique<corncob::graphics::scene_renderer>(geometry, cockpit, video)};
   auto game{std::make_unique<corncob::game::session>(geometry, std::move(theatre))};
   renderer->initialise(game->camera().position, game->random_stream());
@@ -222,7 +273,8 @@ auto main(int const argc, char const *const argv[])->int {
     if(!preferences.window_resolution) {
       auto const separator{value.find('x')};
       if(separator == std::string::npos) return startup_failure("--resolution must be window or WIDTHxHEIGHT");
-      unsigned int width{}, height{};
+      unsigned int width{0};
+      unsigned int height{0};
       auto const w{std::from_chars(value.data(), value.data() + separator, width)};
       auto const h{std::from_chars(value.data() + separator + 1, value.data() + value.size(), height)};
       if(w.ec != std::errc{} || h.ec != std::errc{} || w.ptr != value.data() + separator || h.ptr != value.data() + value.size()
@@ -253,7 +305,10 @@ auto main(int const argc, char const *const argv[])->int {
   renderer->configure(preferences.scene);
   game->set_experimental_clearance(game->world().expansion || (campaign->active_pilot() && campaign->active_pilot()->awards(corncob::game::medal::combat_master) != 0));
   game->set_beginner_flight(front.flight_controls().beginner_flight);
-  if(slalom_mode) { game->set_invincible(true); front.begin_flight(); }
+  if(slalom_mode) {
+    game->set_invincible(true);
+    front.begin_flight();
+  }
   auto observer{game->camera()};
 #ifndef NDEBUG
   bool const no_cockpit{arguments.contains("no-cockpit")};
@@ -264,8 +319,11 @@ auto main(int const argc, char const *const argv[])->int {
     observer.position = corncob::maths::world_position{game->world().start};
     observer.cockpit = !no_cockpit;
   }
-  if(cockpit_preview) corncob::resources::draw_cockpit_preview(cockpit, frame);
-  else renderer->preview(game->world(), observer, 0, 0, game->random_stream(), frame);
+  if(cockpit_preview) {
+    corncob::resources::draw_cockpit_preview(cockpit, frame);
+  } else {
+    renderer->preview(game->world(), observer, 0, 0, game->random_stream(), frame);
+  }
 #else
   renderer->preview(game->world(), observer, 0, 0, game->random_stream(), frame);
 #endif // NDEBUG
@@ -300,9 +358,11 @@ auto main(int const argc, char const *const argv[])->int {
   }};
   if(arguments.contains("list-joysticks")) {
     bool found{false};
-    for(int device{GLFW_JOYSTICK_1}; device <= GLFW_JOYSTICK_LAST; ++device) if(glfwJoystickPresent(device)) {
-      std::cout << device << ": " << glfwGetJoystickName(device) << '\n';
-      found = true;
+    for(int device{GLFW_JOYSTICK_1}; device <= GLFW_JOYSTICK_LAST; ++device) {
+      if(glfwJoystickPresent(device)) {
+        std::cout << device << ": " << glfwGetJoystickName(device) << '\n';
+        found = true;
+      }
     }
     if(!found) std::cout << "No joysticks connected" << std::endl;
     return EXIT_SUCCESS;
@@ -320,9 +380,15 @@ auto main(int const argc, char const *const argv[])->int {
   if(!window) return startup_failure("cannot create the Corncob window");
   if(automatic_scale && !compositor_sizing) {
     if(auto *monitor{glfwGetPrimaryMonitor()}) {
-      int x{0}, y{0}, width{0}, height{0};
+      int x{0};
+      int y{0};
+      int width{0};
+      int height{0};
       glfwGetMonitorWorkarea(monitor, &x, &y, &width, &height);
-      int left{0}, top{0}, right{0}, bottom{0};
+      int left{0};
+      int top{0};
+      int right{0};
+      int bottom{0};
       glfwGetWindowFrameSize(window.get(), &left, &top, &right, &bottom);
       if(width > left + right && height > top + bottom) {
         auto const fitted{corncob::render::fit_viewport(width - left - right, height - top - bottom, display_width, display_height)};
@@ -333,7 +399,8 @@ auto main(int const argc, char const *const argv[])->int {
   }
   glfwShowWindow(window.get());
   if(compositor_sizing) {
-    int width{0}, height{0};
+    int width{0};
+    int height{0};
     glfwGetWindowSize(window.get(), &width, &height);
     glfwRestoreWindow(window.get());
     double const deadline{glfwGetTime() + 1.0};
@@ -365,7 +432,10 @@ auto main(int const argc, char const *const argv[])->int {
       return;
     }
     if(front.capturing_binding()) {
-      if(action == GLFW_PRESS) { front.bind_input(key); if(key >= 0) state.consumed_key_releases.set(static_cast<unsigned int>(key)); }
+      if(action == GLFW_PRESS) {
+        front.bind_input(key);
+        if(key >= 0) state.consumed_key_releases.set(static_cast<unsigned int>(key));
+      }
       return;
     }
     if(front.current_page() == corncob::game::interface_page::briefing && action != GLFW_RELEASE) {
@@ -378,16 +448,48 @@ auto main(int const argc, char const *const argv[])->int {
         return;
       }
       switch(key) {
-      case GLFW_KEY_UP: case GLFW_KEY_LEFT: case GLFW_KEY_KP_4: case GLFW_KEY_KP_8: front.command(up); break;
-      case GLFW_KEY_DOWN: case GLFW_KEY_RIGHT: case GLFW_KEY_KP_2: case GLFW_KEY_KP_6: front.command(down); break;
-      case GLFW_KEY_HOME: case GLFW_KEY_KP_7: front.command(home); break;
-      case GLFW_KEY_END: case GLFW_KEY_KP_1: front.command(end); break;
-      case GLFW_KEY_PAGE_UP: case GLFW_KEY_KP_9: front.command(page_up); break;
-      case GLFW_KEY_PAGE_DOWN: case GLFW_KEY_KP_3: front.command(page_down); break;
-      case GLFW_KEY_ENTER: case GLFW_KEY_KP_ENTER: front.command(accept); break;
-      case GLFW_KEY_ESCAPE: case GLFW_KEY_BACKSPACE: front.command(cancel); break;
-      case GLFW_KEY_F1: front.show_boss(); break;
-      default: front.command(any_key); break;
+      case GLFW_KEY_UP:
+      case GLFW_KEY_LEFT:
+      case GLFW_KEY_KP_4:
+      case GLFW_KEY_KP_8:
+        front.command(up);
+        break;
+      case GLFW_KEY_DOWN:
+      case GLFW_KEY_RIGHT:
+      case GLFW_KEY_KP_2:
+      case GLFW_KEY_KP_6:
+        front.command(down);
+        break;
+      case GLFW_KEY_HOME:
+      case GLFW_KEY_KP_7:
+        front.command(home);
+        break;
+      case GLFW_KEY_END:
+      case GLFW_KEY_KP_1:
+        front.command(end);
+        break;
+      case GLFW_KEY_PAGE_UP:
+      case GLFW_KEY_KP_9:
+        front.command(page_up);
+        break;
+      case GLFW_KEY_PAGE_DOWN:
+      case GLFW_KEY_KP_3:
+        front.command(page_down);
+        break;
+      case GLFW_KEY_ENTER:
+      case GLFW_KEY_KP_ENTER:
+        front.command(accept);
+        break;
+      case GLFW_KEY_ESCAPE:
+      case GLFW_KEY_BACKSPACE:
+        front.command(cancel);
+        break;
+      case GLFW_KEY_F1:
+        front.show_boss();
+        break;
+      default:
+        front.command(any_key);
+        break;
       }
       return;
     }
@@ -410,74 +512,171 @@ auto main(int const argc, char const *const argv[])->int {
         return;
       }
       switch(key) {
-      case GLFW_KEY_UP: front.command(up); break;
-      case GLFW_KEY_DOWN: front.command(down); break;
-      case GLFW_KEY_LEFT: front.command(previous); break;
-      case GLFW_KEY_RIGHT: front.command(next); break;
-      case GLFW_KEY_INSERT: front.command(details); break;
-      case GLFW_KEY_HOME: front.command(home); break;
-      case GLFW_KEY_END: front.command(end); break;
-      case GLFW_KEY_PAGE_UP: front.command(page_up); break;
-      case GLFW_KEY_PAGE_DOWN: front.command(page_down); break;
-      case GLFW_KEY_ENTER: case GLFW_KEY_KP_ENTER: front.command(accept); break;
+      case GLFW_KEY_UP:
+        front.command(up);
+        break;
+      case GLFW_KEY_DOWN:
+        front.command(down);
+        break;
+      case GLFW_KEY_LEFT:
+        front.command(previous);
+        break;
+      case GLFW_KEY_RIGHT:
+        front.command(next);
+        break;
+      case GLFW_KEY_INSERT:
+        front.command(details);
+        break;
+      case GLFW_KEY_HOME:
+        front.command(home);
+        break;
+      case GLFW_KEY_END:
+        front.command(end);
+        break;
+      case GLFW_KEY_PAGE_UP:
+        front.command(page_up);
+        break;
+      case GLFW_KEY_PAGE_DOWN:
+        front.command(page_down);
+        break;
+      case GLFW_KEY_ENTER:
+      case GLFW_KEY_KP_ENTER:
+        front.command(accept);
+        break;
 
       case GLFW_KEY_SPACE:
         if(!front.editing_name() && (front.current_page() == corncob::game::interface_page::help
             || front.current_page() == corncob::game::interface_page::title || front.current_page() == corncob::game::interface_page::story
             || front.current_page() == corncob::game::interface_page::high_scores || front.current_page() == corncob::game::interface_page::notice)) front.command(accept);
         break;
-      case GLFW_KEY_BACKSPACE: front.command(backspace); break;
-      case GLFW_KEY_ESCAPE: front.command(cancel); break;
-      case GLFW_KEY_F4: front.command(help); break;
-      default: break;
+      case GLFW_KEY_BACKSPACE:
+        front.command(backspace);
+        break;
+      case GLFW_KEY_ESCAPE:
+        front.command(cancel);
+        break;
+      case GLFW_KEY_F4:
+        front.command(help);
+        break;
+      default:
+        break;
       }
       return;
     }
-    if(game->in_recording() && key == GLFW_KEY_ESCAPE) { front.leave_sortie(); return; }
+    if(game->in_recording() && key == GLFW_KEY_ESCAPE) {
+      front.leave_sortie();
+      return;
+    }
     if(game->in_builder()) {
       using enum corncob::game::builder_command;
       if(key >= GLFW_KEY_1 && key <= GLFW_KEY_8) game->builder_speed(static_cast<unsigned int>(key - GLFW_KEY_0));
       switch(key) {
-      case GLFW_KEY_LEFT_SHIFT: game->edit(cursor); break;
-      case GLFW_KEY_LEFT_CONTROL: game->edit(hide_cursor); break;
-      case GLFW_KEY_C: game->edit(create); break;
-      case GLFW_KEY_SPACE: game->edit(select); break;
-      case GLFW_KEY_D: game->edit(erase); break;
-      case GLFW_KEY_EQUAL: game->edit(next_type); break;
-      case GLFW_KEY_MINUS: game->edit(previous_type); break;
-      case GLFW_KEY_RIGHT_BRACKET: game->edit(next_quality); break;
-      case GLFW_KEY_LEFT_BRACKET: game->edit(previous_quality); break;
-      case GLFW_KEY_F9: game->edit(special); break;
-      case GLFW_KEY_F10: game->edit(complete); break;
-      case GLFW_KEY_CAPS_LOCK: game->edit(level); break;
-      case GLFW_KEY_H: game->edit((modifiers & GLFW_MOD_ALT) != 0 ? remember_height : lock_height); break;
-      case GLFW_KEY_B: case GLFW_KEY_M: case GLFW_KEY_ESCAPE: game->edit(map); break;
-      case GLFW_KEY_F5: front.leave_sortie(); break;
-      default: break;
+      case GLFW_KEY_LEFT_SHIFT:
+        game->edit(cursor);
+        break;
+      case GLFW_KEY_LEFT_CONTROL:
+        game->edit(hide_cursor);
+        break;
+      case GLFW_KEY_C:
+        game->edit(create);
+        break;
+      case GLFW_KEY_SPACE:
+        game->edit(select);
+        break;
+      case GLFW_KEY_D:
+        game->edit(erase);
+        break;
+      case GLFW_KEY_EQUAL:
+        game->edit(next_type);
+        break;
+      case GLFW_KEY_MINUS:
+        game->edit(previous_type);
+        break;
+      case GLFW_KEY_RIGHT_BRACKET:
+        game->edit(next_quality);
+        break;
+      case GLFW_KEY_LEFT_BRACKET:
+        game->edit(previous_quality);
+        break;
+      case GLFW_KEY_F9:
+        game->edit(special);
+        break;
+      case GLFW_KEY_F10:
+        game->edit(complete);
+        break;
+      case GLFW_KEY_CAPS_LOCK:
+        game->edit(level);
+        break;
+      case GLFW_KEY_H:
+        game->edit((modifiers & GLFW_MOD_ALT) != 0 ? remember_height : lock_height);
+        break;
+      case GLFW_KEY_B:
+      case GLFW_KEY_M:
+      case GLFW_KEY_ESCAPE:
+        game->edit(map);
+        break;
+      case GLFW_KEY_F5:
+        front.leave_sortie();
+        break;
+      default:
+        break;
       }
       return;
     }
     if(game->in_map()) {
-      for(auto const &binding : front.options().bindings) if(binding.id == corncob::game::control_id::map && binding.matches_key(key)) { game->press(corncob::game::action::toggle_map); return; }
+      for(auto const &binding : front.options().bindings) {
+        if(binding.id == corncob::game::control_id::map && binding.matches_key(key)) {
+          game->press(corncob::game::action::toggle_map);
+          return;
+        }
+      }
       if(key == GLFW_KEY_ESCAPE || key == GLFW_KEY_M || key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER || key == GLFW_KEY_SPACE) game->press(corncob::game::action::toggle_map);
       return;
     }
-    if(key == GLFW_KEY_C && (modifiers & GLFW_MOD_CONTROL) != 0) { front.abort_sortie(); return; }
-    if(key == GLFW_KEY_I && (modifiers & GLFW_MOD_ALT) != 0) { game->press(corncob::game::action::toggle_invulnerability); return; }
-    if(key == GLFW_KEY_ESCAPE) { front.show_menu(); return; }
-    if(key == GLFW_KEY_F1) { front.show_boss(); return; }
-    if(key == GLFW_KEY_F2) { front.show_intelligence(game->world(), corncob::world::nearest_airfield(game->world(), game->camera().position)); return; }
-    if(key == GLFW_KEY_F3) { front.show_current_score(game->results(), game->world().training); return; }
-    if(key == GLFW_KEY_F4) { front.show_flight_help(); return; }
+    if(key == GLFW_KEY_C && (modifiers & GLFW_MOD_CONTROL) != 0) {
+      front.abort_sortie();
+      return;
+    }
+    if(key == GLFW_KEY_I && (modifiers & GLFW_MOD_ALT) != 0) {
+      game->press(corncob::game::action::toggle_invulnerability);
+      return;
+    }
+    if(key == GLFW_KEY_ESCAPE) {
+      front.show_menu();
+      return;
+    }
+    if(key == GLFW_KEY_F1) {
+      front.show_boss();
+      return;
+    }
+    if(key == GLFW_KEY_F2) {
+      front.show_intelligence(game->world(), corncob::world::nearest_airfield(game->world(), game->camera().position));
+      return;
+    }
+    if(key == GLFW_KEY_F3) {
+      front.show_current_score(game->results(), game->world().training);
+      return;
+    }
+    if(key == GLFW_KEY_F4) {
+      front.show_flight_help();
+      return;
+    }
     bool const walking{game->player() == corncob::game::player_mode::on_foot && !game->remote_control()};
-    for(auto const &binding : front.options().bindings) if(applies(binding, walking) && binding.matches_key(key)) activate_control(state, binding.id);
+    for(auto const &binding : front.options().bindings) {
+      if(applies(binding, walking) && binding.matches_key(key)) activate_control(state, binding.id);
+    }
   });
   glfwSetMouseButtonCallback(window.get(), [](GLFWwindow *window, int button, int action, int){
     auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
-    if(state.front.capturing_binding()) { if(action == GLFW_PRESS) state.front.bind_input(-1, button); return; }
+    if(state.front.capturing_binding()) {
+      if(action == GLFW_PRESS) state.front.bind_input(-1, button);
+      return;
+    }
     if(!state.front.in_flight() || action != GLFW_RELEASE || !glfwGetWindowAttrib(window, GLFW_FOCUSED)) return;
     bool const walking{state.game->player() == corncob::game::player_mode::on_foot && !state.game->remote_control()};
-    for(auto const &binding : state.front.options().bindings) if(applies(binding, walking) && binding.mouse == button) activate_control(state, binding.id);
+    for(auto const &binding : state.front.options().bindings) {
+      if(applies(binding, walking) && binding.mouse == button) activate_control(state, binding.id);
+    }
   });
   glfwSetScrollCallback(window.get(), [](GLFWwindow *window, double, double y){
     auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
@@ -488,9 +687,17 @@ auto main(int const argc, char const *const argv[])->int {
   });
   glfwSetCursorPosCallback(window.get(), [](GLFWwindow *window, double x, double y){
     auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
-    if(!state.mouse_captured || !glfwGetWindowAttrib(window, GLFW_FOCUSED)) { state.mouse_primed = false; return; }
-    if(state.mouse_primed) { state.look_x += x - state.last_x; state.look_y += y - state.last_y; }
-    state.last_x = x; state.last_y = y; state.mouse_primed = true;
+    if(!state.mouse_captured || !glfwGetWindowAttrib(window, GLFW_FOCUSED)) {
+      state.mouse_primed = false;
+      return;
+    }
+    if(state.mouse_primed) {
+      state.look_x += x - state.last_x;
+      state.look_y += y - state.last_y;
+    }
+    state.last_x = x;
+    state.last_y = y;
+    state.mouse_primed = true;
   });
   glfwSetWindowFocusCallback(window.get(), [](GLFWwindow *window, int focused){
     auto &state{*static_cast<window_state*>(glfwGetWindowUserPointer(window))};
@@ -533,7 +740,8 @@ auto main(int const argc, char const *const argv[])->int {
       state.changing_window_mode = true;
       bool const changed{display_mode.set_fullscreen(preferences.fullscreen)};
       state.changing_window_mode = false;
-      state.look_x = state.look_y = 0; state.mouse_primed = false;
+      state.look_x = state.look_y = 0;
+      state.mouse_primed = false;
       game->suspend_clock();
       if(!changed) front.set_fullscreen(display_mode.fullscreen());
     }
@@ -629,7 +837,9 @@ auto main(int const argc, char const *const argv[])->int {
     auto configure_renderer{[&]{
       auto settings{preferences.scene};
       if(preferences.window_resolution) {
-        int width{}, height{}; glfwGetFramebufferSize(window.get(), &width, &height);
+        int width{0};
+        int height{0};
+        glfwGetFramebufferSize(window.get(), &width, &height);
         settings.resolution = {static_cast<unsigned int>(std::clamp(width, static_cast<int>(resolution_limits::minimum_width), static_cast<int>(resolution_limits::maximum_width))), static_cast<unsigned int>(std::clamp(height, static_cast<int>(resolution_limits::minimum_height), static_cast<int>(resolution_limits::maximum_height)))};
       }
       renderer->configure(settings);
@@ -637,7 +847,8 @@ auto main(int const argc, char const *const argv[])->int {
     configure_renderer();
     bool const capture{!inspect && front.in_flight() && !game->in_builder() && !game->in_map() && game->player() == corncob::game::player_mode::on_foot && !game->remote_control() && glfwGetWindowAttrib(window.get(), GLFW_FOCUSED)};
     if(capture != state.mouse_captured) {
-      state.mouse_captured = capture; state.mouse_primed = false;
+      state.mouse_captured = capture;
+      state.mouse_primed = false;
       state.look_x = state.look_y = 0;
       glfwSetInputMode(window.get(), GLFW_CURSOR, capture ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
       if(glfwRawMouseMotionSupported()) glfwSetInputMode(window.get(), GLFW_RAW_MOUSE_MOTION, capture ? GLFW_TRUE : GLFW_FALSE);
@@ -663,8 +874,11 @@ auto main(int const argc, char const *const argv[])->int {
         .slalom_progress{game->slalom_progress()},
       };
       auto const *const panel{!game->in_map() && game->player() == corncob::game::player_mode::in_aircraft ? &telemetry : nullptr};
-      if(preview) renderer->preview(game->world(), observer, game->frame_number(), static_cast<uint16_t>(game->timer()), game->random_stream(), flight_frame, panel);
-      else renderer->render(game->world(), observer, game->frame_number(), static_cast<uint16_t>(game->timer()), game->random_stream(), flight_frame, panel);
+      if(preview) {
+        renderer->preview(game->world(), observer, game->frame_number(), static_cast<uint16_t>(game->timer()), game->random_stream(), flight_frame, panel);
+      } else {
+        renderer->render(game->world(), observer, game->frame_number(), static_cast<uint16_t>(game->timer()), game->random_stream(), flight_frame, panel);
+      }
       if(game->in_builder()) {
         corncob::render::framebuffer builder_overlay;
         corncob::graphics::interface_canvas overlay{builder_overlay, interface_assets.file("font8.bin"), 8};
@@ -676,7 +890,8 @@ auto main(int const argc, char const *const argv[])->int {
         double const ui_scale{flight_frame.height / 350.0};
         for(unsigned int y{0}; y < std::min(flight_frame.height, static_cast<unsigned int>(34 * ui_scale)); ++y) {
           for(unsigned int x{0}; x < flight_frame.width; ++x) {
-            unsigned int const source_x{static_cast<unsigned int>(x / ui_scale)}, source_y{static_cast<unsigned int>(y / ui_scale)};
+            unsigned int const source_x{static_cast<unsigned int>(x / ui_scale)};
+            unsigned int const source_y{static_cast<unsigned int>(y / ui_scale)};
             flight_frame.pixels[y * flight_frame.width + x] = source_x < 640 ? builder_overlay.pixels[source_y * 640 + source_x] : corncob::render::rgba_pixel{0, 0, 0};
           }
         }
@@ -694,7 +909,7 @@ auto main(int const argc, char const *const argv[])->int {
     }};
     if(!inspect && front.in_flight()) {
       if(glfwGetWindowAttrib(window.get(), GLFW_FOCUSED)) {
-        auto held{[&window](int const key){ return glfwGetKey(window.get(), key) == GLFW_PRESS; }};
+        auto held{[&window](int const key){return glfwGetKey(window.get(), key) == GLFW_PRESS;}};
         bool const walking{game->player() == corncob::game::player_mode::on_foot && !game->remote_control()};
         auto down{[&](corncob::game::control_id const id){
           auto const found{std::ranges::find(preferences.bindings, id, &corncob::game::control_binding::id)};
@@ -708,13 +923,33 @@ auto main(int const argc, char const *const argv[])->int {
         input.stick.pitch = static_cast<int16_t>((down(pitch_up) - down(pitch_down)) * 512);
         input.stick.rudder = static_cast<int16_t>((down(rudder_left) - down(rudder_right)) * 512);
         input.stick.brakes = down(brakes);
-        input.throttle_up = down(throttle_up); input.throttle_down = down(throttle_down);
-        input.walk_forward = down(forward); input.walk_backward = down(backward);
+        input.throttle_up = down(throttle_up);
+        input.throttle_down = down(throttle_down);
+        input.walk_forward = down(forward);
+        input.walk_backward = down(backward);
         input.strafe = static_cast<int16_t>(down(strafe_left) - down(strafe_right));
-        input.jump = down(jump); input.drop_through = down(drop_through);
-        input.weapons.gun = down(gun) || down(pistol); input.weapons.cannon = down(cannon); input.weapons.missile = down(missile);
-        input.view = {.left{held(GLFW_KEY_LEFT)}, .right{held(GLFW_KEY_RIGHT)}, .up{held(GLFW_KEY_UP)}, .down{held(GLFW_KEY_DOWN)}, .below{held(GLFW_KEY_KP_5)}, .modifier{held(GLFW_KEY_LEFT_CONTROL) || held(GLFW_KEY_RIGHT_CONTROL)}};
-        input.map = {.higher{held(GLFW_KEY_PAGE_DOWN) || held(GLFW_KEY_KP_3)}, .lower{held(GLFW_KEY_PAGE_UP) || held(GLFW_KEY_KP_9)}, .home{held(GLFW_KEY_HOME)}, .rotate{held(GLFW_KEY_LEFT_SHIFT)}, .slow{held(GLFW_KEY_S)}, .move_object{held(GLFW_KEY_LEFT_ALT)}, .rotate_object{held(GLFW_KEY_A)}};
+        input.jump = down(jump);
+        input.drop_through = down(drop_through);
+        input.weapons.gun = down(gun) || down(pistol);
+        input.weapons.cannon = down(cannon);
+        input.weapons.missile = down(missile);
+        input.view = {
+          .left{held(GLFW_KEY_LEFT)},
+          .right{held(GLFW_KEY_RIGHT)},
+          .up{held(GLFW_KEY_UP)},
+          .down{held(GLFW_KEY_DOWN)},
+          .below{held(GLFW_KEY_KP_5)},
+          .modifier{held(GLFW_KEY_LEFT_CONTROL) || held(GLFW_KEY_RIGHT_CONTROL)}
+        };
+        input.map = {
+          .higher{held(GLFW_KEY_PAGE_DOWN) || held(GLFW_KEY_KP_3)},
+          .lower{held(GLFW_KEY_PAGE_UP) || held(GLFW_KEY_KP_9)},
+          .home{held(GLFW_KEY_HOME)},
+          .rotate{held(GLFW_KEY_LEFT_SHIFT)},
+          .slow{held(GLFW_KEY_S)},
+          .move_object{held(GLFW_KEY_LEFT_ALT)},
+          .rotate_object{held(GLFW_KEY_A)}
+        };
         if(walking) {
           input.look_yaw = static_cast<int16_t>(std::clamp(-state.look_x * preferences.mouse_sensitivity, -16000.0, 16000.0));
           input.look_pitch = static_cast<int16_t>(std::clamp(state.look_y * preferences.mouse_sensitivity * (preferences.invert_mouse ? -1 : 1), -16000.0, 16000.0));
@@ -722,7 +957,8 @@ auto main(int const argc, char const *const argv[])->int {
         if(game->in_builder() || game->in_map()) {
           input.stick.roll = static_cast<int16_t>((held(GLFW_KEY_RIGHT) - held(GLFW_KEY_LEFT)) * 512);
           input.stick.pitch = static_cast<int16_t>((held(GLFW_KEY_DOWN) - held(GLFW_KEY_UP)) * 512);
-          input.walk_forward = held(GLFW_KEY_KP_5); input.walk_backward = held(GLFW_KEY_KP_0);
+          input.walk_forward = held(GLFW_KEY_KP_5);
+          input.walk_backward = held(GLFW_KEY_KP_0);
         }
         if(auto const joystick{walking ? std::nullopt : corncob::platform::poll_joystick(front.flight_controls().joystick_device)}) {
           corncob::game::apply_joystick(input, *joystick, input.view.modifier || game->looking_around());
@@ -765,13 +1001,17 @@ auto main(int const argc, char const *const argv[])->int {
         corncob::platform::write_binary(briefing_path, corncob::world::theatre_briefing(theatre_name));
         front.finish_editing();
         editing_session = false;
-      } else front.finish_sortie(result, previous ? &*previous : nullptr, previous_theatre ? &*previous_theatre : nullptr);
+      } else {
+        front.finish_sortie(result, previous ? &*previous : nullptr, previous_theatre ? &*previous_theatre : nullptr);
+      }
       if(result.has(corncob::game::sortie_status::earth_saved)) front.begin_ending(renderer->indexed_frame(), renderer->colours());
     }
     if(front.in_flight() && !inspect && game->take_tower()) front.show_intelligence(game->world(), corncob::world::nearest_airfield(game->world(), game->camera().position));
-    if(front.in_flight() && !inspect) if(auto const notice{game->take_radio()}) {
-      if(!flight_frame_valid) draw_flight(true);
-      front.show_radio(*notice, flight_frame);
+    if(front.in_flight() && !inspect) {
+      if(auto const notice{game->take_radio()}) {
+        if(!flight_frame_valid) draw_flight(true);
+        front.show_radio(*notice, flight_frame);
+      }
     }
     if(!front.in_flight() && !inspect) {
       if(clock_was_flying) game->suspend_clock();
@@ -784,8 +1024,10 @@ auto main(int const argc, char const *const argv[])->int {
     }
 #ifndef NDEBUG
     if(inspect) {
-      if(!cockpit_preview) renderer->preview(game->world(), observer, frame_number,
-        static_cast<uint16_t>(static_cast<uint64_t>(now * 1'193'182.0 / 1024.0)), game->random_stream(), frame);
+      if(!cockpit_preview) {
+        renderer->preview(game->world(), observer, frame_number,
+          static_cast<uint16_t>(static_cast<uint64_t>(now * 1'193'182.0 / 1024.0)), game->random_stream(), frame);
+      }
     } else
 #endif // NDEBUG
     {

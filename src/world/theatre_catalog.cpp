@@ -20,9 +20,12 @@ resources::collection const &expansion() {
 std::span<theatre_definition const> theatres(theatre_group const group) noexcept {
   /// Grouping affects selection only; every world retains its own edition and original definition stem.
   switch(group) {
-  case theatre_group::earth: return theatre_catalog;
-  case theatre_group::other_worlds: return other_worlds_catalog;
-  case theatre_group::practice: return practice_catalog;
+  case theatre_group::earth:
+    return theatre_catalog;
+  case theatre_group::other_worlds:
+    return other_worlds_catalog;
+  case theatre_group::practice:
+    return practice_catalog;
   }
   std::unreachable();
 }
@@ -39,14 +42,18 @@ std::span<theatre_definition const> campaign_theatres(campaign_id const campaign
 theatre_definition const &find_theatre(std::string_view const name) {
   /// Earth keeps its historical command-line names; expansion variants are explicitly namespaced.
   for(auto const group : {theatre_group::earth, theatre_group::other_worlds, theatre_group::practice}) {
-    for(auto const &definition : theatres(group)) if(definition.name == name) return definition;
+    for(auto const &definition : theatres(group)) {
+      if(definition.name == name) return definition;
+    }
   }
   throw std::invalid_argument{"unknown theatre '" + std::string{name} + "'; use --list-theatres to list the available worlds"};
 }
 theatre_group group_for(std::string_view const name) {
   /// Practice definitions never become an additional campaign completion requirement.
   for(auto const group : {theatre_group::earth, theatre_group::other_worlds, theatre_group::practice}) {
-    for(auto const &definition : theatres(group)) if(definition.name == name) return group;
+    for(auto const &definition : theatres(group)) {
+      if(definition.name == name) return group;
+    }
   }
   find_theatre(name);
   std::unreachable();
@@ -68,11 +75,17 @@ theatre load_theatre(std::string_view const name) {
   /// The same checked decoder accepts both original CCT XOR records and the expansion's plain DEF records.
   auto const &definition{find_theatre(name)};
   std::span<uint8_t const> bytes;
-  if(definition.campaign == campaign_id::other_worlds) bytes = expansion().file("def/" + std::string{definition.dos_name} + ".def");
-  else if(name == "morning") bytes = resources::morning_asset();
-  else if(name == "dusk") bytes = resources::dusk_asset();
-  else if(name == "wasteland") bytes = resources::wasteland_asset();
-  else bytes = resources::white_sands_asset();
+  if(definition.campaign == campaign_id::other_worlds) {
+    bytes = expansion().file("def/" + std::string{definition.dos_name} + ".def");
+  } else if(name == "morning") {
+    bytes = resources::morning_asset();
+  } else if(name == "dusk") {
+    bytes = resources::dusk_asset();
+  } else if(name == "wasteland") {
+    bytes = resources::wasteland_asset();
+  } else {
+    bytes = resources::white_sands_asset();
+  }
   auto result{decode_theatre(bytes)};
   result.expansion = definition.campaign == campaign_id::other_worlds;
   apply_briefing(result, theatre_briefing(name));

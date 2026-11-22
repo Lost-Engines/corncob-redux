@@ -48,7 +48,8 @@ void interface_canvas::box(int const left, int const top, int const right, int c
 }
 void interface_canvas::text(int const column, int const row, std::string_view const value, render::rgba_pixel const colour, unsigned int const scale) {
   /// Text bytes address the BIOS-compatible CP437 glyphs directly, including original menu borders and symbols
-  int x{column}, y{row};
+  int x{column};
+  int y{row};
   for(auto const ch : value) {
     if(ch == '\r') continue;
     if(ch == '\n') {
@@ -58,9 +59,12 @@ void interface_canvas::text(int const column, int const row, std::string_view co
     }
     for(unsigned int line{0}; line != font_height; ++line) {
       auto const bits{font[static_cast<unsigned char>(ch) * font_height + line]};
-      for(unsigned int bit{0}; bit != 8; ++bit) if((bits & (128u >> bit)) != 0) {
-        int const px{x + static_cast<int>(bit * scale)}, py{y + static_cast<int>(line * scale)};
-        rectangle(px, py, px + static_cast<int>(scale), py + static_cast<int>(scale), colour);
+      for(unsigned int bit{0}; bit != 8; ++bit) {
+        if((bits & (128u >> bit)) != 0) {
+          int const px{x + static_cast<int>(bit * scale)};
+          int const py{y + static_cast<int>(line * scale)};
+          rectangle(px, py, px + static_cast<int>(scale), py + static_cast<int>(scale), colour);
+        }
       }
     }
     x += static_cast<int>(8 * scale);
@@ -70,7 +74,8 @@ void interface_canvas::image(resources::indexed_image const &image, int const x,
   /// Copy indexed artwork through its actual palette without scaling, filtering or colour conversion guesses
   for(unsigned int row{0}; row != image.height; ++row) {
     for(unsigned int column{0}; column != image.width; ++column) {
-      int const px{x + static_cast<int>(column)}, py{y + static_cast<int>(row)};
+      int const px{x + static_cast<int>(column)};
+      int const py{y + static_cast<int>(row)};
       if(px < 0 || py < 0 || px >= static_cast<int>(target.width) || py >= static_cast<int>(target.height)) continue;
       target.pixels[static_cast<unsigned int>(py) * target.width + static_cast<unsigned int>(px)] = image.palette[image.pixels[row * image.width + column]];
     }

@@ -12,10 +12,13 @@ int main(int const argc, char const *const argv[]) {
   corncob::tests::reference_reader input{argv[1], "CORNPLT1"};
   auto const cases{input.dword()};
   for(unsigned int i{0}; i != cases; ++i) {
-    auto const seed{input.word()}, bytes{input.word()};
+    auto const seed{input.word()};
+    auto const bytes{input.word()};
     std::vector<uint8_t> actual(bytes);
     corncob::game::pilot_roster::mask(actual, seed);
-    for(auto const byte : actual) if(byte != input.byte()) throw std::runtime_error{"native pilot masking stream differs"};
+    for(auto const byte : actual) {
+      if(byte != input.byte()) throw std::runtime_error{"native pilot masking stream differs"};
+    }
   }
   for(unsigned int const header : {23u, 24u}) {
     for(unsigned int count{0}; count != 4; ++count) {
@@ -89,7 +92,8 @@ int main(int const argc, char const *const argv[]) {
     corncob::tests::reference_reader careers{fixture.c_str(), "CORNCRR1"};
     unsigned int const cases{careers.dword()};
     for(unsigned int i{0}; i != cases; ++i) {
-      std::array<uint8_t, 623> before, expected;
+      std::array<uint8_t, 623> before;
+      std::array<uint8_t, 623> expected;
       std::array<uint8_t, corncob::game::sortie_statistics::native_bytes> sortie;
       for(auto &byte : before) byte = careers.byte();
       for(auto &byte : sortie) byte = careers.byte();

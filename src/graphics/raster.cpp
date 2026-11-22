@@ -14,13 +14,15 @@ bool clip_wire_line(screen_point &start, screen_point &end, clip_rectangle const
     return (point.x < bounds.left ? 1u : point.x > bounds.right ? 4u : 0u)
       | (point.y < bounds.top ? 2u : point.y > bounds.bottom ? 8u : 0u);
   }};
-  auto first{region(start)}, last{region(end)};
+  auto first{region(start)};
+  auto last{region(end)};
   if((first & last) != 0) return false;
   if((first | last) == 0) return true;
   auto clip_x{[&](screen_point &point, unsigned int const code){
     if((code & 5u) == 0) return;
     int const x{(code & 1u) != 0 ? bounds.left : bounds.right};
-    int const dx{end.x - start.x}, dy{end.y - start.y};
+    int const dx{end.x - start.x};
+    int const dy{end.y - start.y};
     point.y = start.y + static_cast<int>(static_cast<int64_t>(x - start.x) * dy / dx);
     point.x = x;
   }};
@@ -32,7 +34,8 @@ bool clip_wire_line(screen_point &start, screen_point &end, clip_rectangle const
   auto clip_y{[&](screen_point &point, unsigned int const code){
     if((code & 10u) == 0) return;
     int const y{(code & 2u) != 0 ? bounds.top : bounds.bottom};
-    int const dx{end.x - start.x}, dy{end.y - start.y};
+    int const dx{end.x - start.x};
+    int const dy{end.y - start.y};
     point.x = start.x + static_cast<int>(static_cast<int64_t>(y - start.y) * dx / dy);
     point.y = y;
   }};
@@ -52,7 +55,8 @@ void raster::span(int const y, int const left, int const right, colour_index con
   /// Native horizontal spans include the left pixel and exclude the right pixel and bottom border
   // EGA spans compare a whole-row byte address with a viewport address that includes its left byte
   if(y < bounds.top + (bounds.left / 8 != 0 ? 1 : 0) || y >= bounds.bottom) return;
-  int const first{std::max(left, bounds.left)}, last{std::min(right, bounds.right)};
+  int const first{std::max(left, bounds.left)};
+  int const last{std::min(right, bounds.right)};
   if(first >= last) return;
   auto *const pixels{target.pixels.data() + static_cast<unsigned int>(y) * target.width};
   if(!target.monochrome && mask == 0xff && operation == pixel_operation::replace) {
@@ -89,7 +93,8 @@ bool raster::clip_line(screen_point &start, screen_point &end) const noexcept {
     return code;
   }};
   for(unsigned int attempt{0}; attempt != 8; ++attempt) {
-    auto const first{region(start)}, last{region(end)};
+    auto const first{region(start)};
+    auto const last{region(end)};
     if((first & last) != 0) return false;
     if((first | last) == 0) return true;
     auto const outside{first != 0 ? first : last};
@@ -103,8 +108,11 @@ bool raster::clip_line(screen_point &start, screen_point &end) const noexcept {
       clipped.x = (outside & 1u) != 0 ? bounds.left : bounds.right - 1;
       clipped.y = start.y + static_cast<int>(static_cast<int64_t>(end.y - start.y) * (clipped.x - start.x) / (end.x - start.x));
     }
-    if(first != 0) start = clipped;
-    else end = clipped;
+    if(first != 0) {
+      start = clipped;
+    } else {
+      end = clipped;
+    }
   }
   return false;
 }
@@ -117,8 +125,10 @@ void raster::line(screen_point start, screen_point end, colour_index const colou
     end = temporary;
   }
   if(!clip_line(start, end)) return;
-  int const dx{std::abs(end.x - start.x)}, dy{-std::abs(end.y - start.y)};
-  int const step_x{start.x < end.x ? 1 : -1}, step_y{start.y < end.y ? 1 : -1};
+  int const dx{std::abs(end.x - start.x)};
+  int const dy{-std::abs(end.y - start.y)};
+  int const step_x{start.x < end.x ? 1 : -1};
+  int const step_y{start.y < end.y ? 1 : -1};
   int error{dx + dy};
   for(;;) {
     point(start, colour);
@@ -148,7 +158,8 @@ void raster::wire(screen_point start, screen_point end, colour_index const colou
     start = end;
     end = temporary;
   }
-  int const dx{end.x - start.x}, dy{std::abs(end.y - start.y)};
+  int const dx{end.x - start.x};
+  int const dy{std::abs(end.y - start.y)};
   int constexpr shallow_line_minimum_width{30};
   if(dy == 0) {
     // KLINE's horizontal span excludes its right endpoint; a zero-length horizontal segment emits nothing
@@ -168,7 +179,8 @@ void raster::wire(screen_point start, screen_point end, colour_index const colou
   // native SAR halves the remainder before its 16.16 divide; retain that lost low bit and signed half-unit accumulator
   int const fraction{((dx % dy) >> 1) * 65'536 / dy};
   int16_t decision{0};
-  int x{start.x}, y{start.y};
+  int x{start.x};
+  int y{start.y};
   int const vertical_step{start.y < end.y ? 1 : -1};
   for(int row{0}; row != dy; ++row) {
     bool const longer{decision >= 0};
@@ -212,7 +224,8 @@ void raster::polygon(std::span<screen_point const> const vertices, colour_index 
       auto const &top{vertices[current.index]};
       current.index = forward ? (current.index + 1) % vertex_count : (current.index + vertex_count - 1) % vertex_count;
       auto const &bottom{vertices[current.index]};
-      int const dx{bottom.x - top.x}, dy{bottom.y - top.y};
+      int const dx{bottom.x - top.x};
+      int const dy{bottom.y - top.y};
       if(dy < 0) return false;
       if(dy == 0) continue;
       // cwd followed by xchg puts 0xffff in the fractional word for negative edges
@@ -238,7 +251,8 @@ void raster::polygon(std::span<screen_point const> const vertices, colour_index 
       continue;
     }
     uint8_t const mask{stippled ? static_cast<uint8_t>(random.next() & 0b0101'0101u) : uint8_t{0xff}};
-    int const x1{static_cast<int>(left.x >> 16)}, x2{static_cast<int>(right.x >> 16)};
+    int const x1{static_cast<int>(left.x >> 16)};
+    int const x2{static_cast<int>(right.x >> 16)};
     span(y, std::min(x1, x2), std::max(x1, x2), colour, mask);
     left.x += left.slope;
     right.x += right.slope;

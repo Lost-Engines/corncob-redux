@@ -11,9 +11,13 @@ int main(int const argc, char const *const argv[]) {
   namespace graphics = corncob::graphics;
   namespace maths = corncob::maths;
   corncob::tests::reference_reader input{argv[1], "CORNGRD1"};
-  unsigned int const points{input.dword()}, stars{input.dword()}, banks{input.dword()};
+  unsigned int const points{input.dword()};
+  unsigned int const stars{input.dword()};
+  unsigned int const banks{input.dword()};
   auto position{[&input]{
-    int32_t const x{input.signed_dword()}, y{input.signed_dword()}, z{input.signed_dword()};
+    int32_t const x{input.signed_dword()};
+    int32_t const y{input.signed_dword()};
+    int32_t const z{input.signed_dword()};
     return maths::world_position{x, y, z};
   }};
   for(unsigned int i{0}; i != points; ++i) {
@@ -38,8 +42,12 @@ int main(int const argc, char const *const argv[]) {
     graphics::ground_field field;
     field.density(80);
     field.initialise(observer, random);
-    for(auto const &point : field.points()) if(point != position()) throw std::runtime_error{"native initial ground bank " + std::to_string(i)};
-    for(auto const &star : field.stars()) if(star != position()) throw std::runtime_error{"native initial star bank " + std::to_string(i)};
+    for(auto const &point : field.points()) {
+      if(point != position()) throw std::runtime_error{"native initial ground bank " + std::to_string(i)};
+    }
+    for(auto const &star : field.stars()) {
+      if(star != position()) throw std::runtime_error{"native initial star bank " + std::to_string(i)};
+    }
     auto const seed{input.dword()};
     if(random.seed() != seed) throw std::runtime_error{"native bank initialisation random continuation " + std::to_string(i)};
     field.density(80);

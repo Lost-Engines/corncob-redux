@@ -33,7 +33,9 @@ int main(int const argc, char const *const argv[]) {
   auto check{[&](std::string const &name){
     front.render(frame);
     uint64_t actual{0xcbf29ce484222325ull};
-    for(auto const &pixel : frame.pixels) for(auto const component : {pixel.red, pixel.green, pixel.blue}) actual = (actual ^ component) * 0x100000001b3ull;
+    for(auto const &pixel : frame.pixels) {
+      for(auto const component : {pixel.red, pixel.green, pixel.blue}) actual = (actual ^ component) * 0x100000001b3ull;
+    }
     // The combined main entry and grouped world selector deliberately extend the DOS interface.
     // Their navigation is exercised in expansion_checks; all other retained screens still compare complete native RGB hashes.
     if(frame.width != 640 || frame.height != 400 || (name != "main" && name != "new-theatre" && name != "joystick" && name != "training-information" && !name.starts_with("documentation") && name != "read-this" && actual != expected.at(name))) {
@@ -44,40 +46,87 @@ int main(int const argc, char const *const argv[]) {
       std::filesystem::create_directories(argv[3]);
       std::ofstream output{std::filesystem::path{argv[3]} / (name + ".ppm"), std::ios::binary};
       output << "P6\n640 400\n255\n";
-      for(auto const &pixel : frame.pixels) { output.put(static_cast<char>(pixel.red)); output.put(static_cast<char>(pixel.green)); output.put(static_cast<char>(pixel.blue)); }
+      for(auto const &pixel : frame.pixels) {
+        output.put(static_cast<char>(pixel.red));
+        output.put(static_cast<char>(pixel.green));
+        output.put(static_cast<char>(pixel.blue));
+      }
     }
   }};
   check("main");
-  front.character('d'); check("roster-empty");
+  front.character('d');
+  check("roster-empty");
   front.character('c');
   for(unsigned int c : std::string{"Test Pilot"}) front.character(c);
-  front.command(accept); front.command(accept); check("roster");
-  front.character('v'); check("records");
-  front.command(details); check("record-statistics");
-  front.command(cancel); front.command(cancel); front.character('t'); check("training");
-  front.character('w'); check("training-quality");
-  front.command(accept); front.command(cancel); front.command(cancel); front.character('n'); check("training-counts");
-  front.command(accept); front.command(cancel); front.command(cancel); front.character('i'); check("training-information");
-  front.command(cancel); front.command(cancel); front.character('o'); check("joystick");
-  front.command(cancel); front.character('h'); check("score-menu");
-  front.character('s'); check("high-scores");
-  front.command(cancel); front.character('c'); check("top-careers");
-  front.command(cancel); front.character('f'); check("fast-careers");
-  front.command(cancel); front.command(cancel); front.character('v'); check("documentation");
-  front.character('1'); check("documentation-one");
-  front.character('3'); check("documentation-input");
-  front.command(accept); front.command(cancel);
-  front.command(cancel); front.character('r'); check("read-this");
-  front.command(cancel); front.character('c'); check("combat-empty");
-  front.character('o'); check("new-theatre");
-  front.command(accept); check("combat");
+  front.command(accept);
+  front.command(accept);
+  check("roster");
+  front.character('v');
+  check("records");
+  front.command(details);
+  check("record-statistics");
+  front.command(cancel);
+  front.command(cancel);
+  front.character('t');
+  check("training");
+  front.character('w');
+  check("training-quality");
+  front.command(accept);
+  front.command(cancel);
+  front.command(cancel);
+  front.character('n');
+  check("training-counts");
+  front.command(accept);
+  front.command(cancel);
+  front.command(cancel);
+  front.character('i');
+  check("training-information");
+  front.command(cancel);
+  front.command(cancel);
+  front.character('o');
+  check("joystick");
+  front.command(cancel);
+  front.character('h');
+  check("score-menu");
+  front.character('s');
+  check("high-scores");
+  front.command(cancel);
+  front.character('c');
+  check("top-careers");
+  front.command(cancel);
+  front.character('f');
+  check("fast-careers");
+  front.command(cancel);
+  front.command(cancel);
+  front.character('v');
+  check("documentation");
+  front.character('1');
+  check("documentation-one");
+  front.character('3');
+  check("documentation-input");
+  front.command(accept);
+  front.command(cancel);
+  front.command(cancel);
+  front.character('r');
+  check("read-this");
+  front.command(cancel);
+  front.character('c');
+  check("combat-empty");
+  front.character('o');
+  check("new-theatre");
+  front.command(accept);
+  check("combat");
   auto const saved{career.theatres()};
   auto const native_header{corncob::platform::read_binary(std::filesystem::path{argv[1]}.parent_path() / "menu_theatre_header.bin")};
   auto const created_file{corncob::platform::read_binary(scratch / "THT" / (std::to_string(saved.front().number) + ".THT"))};
   if(native_header.size() != 48 || !std::ranges::equal(std::span{created_file}.first(48), native_header)) {
     throw std::runtime_error{"opening a theater changed its original native header"};
   }
-  front.character('a'); front.command(cancel); front.character('v'); front.command(accept); check("theatre-records");
+  front.character('a');
+  front.command(cancel);
+  front.character('v');
+  front.command(accept);
+  check("theatre-records");
 
   /// Clearing a populated list preserves both other tables, including their persisted native bytes
   game::sortie_statistics result{

@@ -10,7 +10,8 @@ std::optional<game::joystick_sample> poll_joystick(int const requested) {
   if(requested < -1) return std::nullopt;
   for(int device{requested < 0 ? GLFW_JOYSTICK_1 : requested}; device <= (requested < 0 ? GLFW_JOYSTICK_LAST : requested); ++device) {
     if(!glfwJoystickPresent(device)) continue;
-    int axis_count{0}, button_count{0};
+    int axis_count{0};
+    int button_count{0};
     auto const *axes{glfwGetJoystickAxes(device, &axis_count)};
     auto const *buttons{glfwGetJoystickButtons(device, &button_count)};
     if(axes == nullptr || axis_count < 2) continue;

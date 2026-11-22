@@ -38,14 +38,16 @@ int main(int const argc, char const *const argv[]) {
   if(game.player() != corncob::game::player_mode::in_aircraft) throw std::runtime_error{"scripted pilot could not board the White Sands aircraft"};
   auto const runway_heading{game.craft().attitude.heading};
   game.press(corncob::game::action::toggle_look);
-  for(unsigned int frame{0}; frame != 16; ++frame) game.advance({
-    .stick{
-      .roll{-512},
-    },
-    .view{
-      .left{true},
-    },
-  });
+  for(unsigned int frame{0}; frame != 16; ++frame) {
+    game.advance({
+      .stick{
+        .roll{-512},
+      },
+      .view{
+        .left{true},
+      },
+    });
+  }
   if(!game.looking_around() || game.craft().attitude.heading != runway_heading || std::abs(static_cast<int>(corncob::maths::word(game.camera().attitude.heading - runway_heading))) < 15'000) throw std::runtime_error{"keypad look altered the aircraft instead of the camera"};
   game.press(corncob::game::action::toggle_look);
   game.advance({});
@@ -66,8 +68,10 @@ int main(int const argc, char const *const argv[]) {
       },
       .throttle_up{i < 10},
     });
-    if(i % 100 == 0) std::cout << "Flight frame " << i << ": z=" << game.craft().position.z << " v=" << game.craft().body_velocity.x
-      << " pitch=" << std::bit_cast<int16_t>(game.craft().attitude.pitch) << " throttle=" << game.craft().throttle << std::endl;
+    if(i % 100 == 0) {
+      std::cout << "Flight frame " << i << ": z=" << game.craft().position.z << " v=" << game.craft().body_velocity.x
+        << " pitch=" << std::bit_cast<int16_t>(game.craft().attitude.pitch) << " throttle=" << game.craft().throttle << std::endl;
+    }
   }
   if(game.player() != corncob::game::player_mode::in_aircraft || game.craft().position.z < 5000) throw std::runtime_error{"scripted takeoff did not achieve sustained flight"};
   std::cout << "Final mode " << std::to_underlying(game.player()) << ": " << game.message() << std::endl;
@@ -91,16 +95,18 @@ int main(int const argc, char const *const argv[]) {
     }
   }
   auto const before_stick_view{game.craft().attitude.roll};
-  for(unsigned int frame{0}; frame != 12; ++frame) game.advance({
-    .stick{
-      .roll{256},
-    },
-    .joystick_controlled{true},
-    .view{
-      .left{true},
-      .modifier{true},
-    },
-  });
+  for(unsigned int frame{0}; frame != 12; ++frame) {
+    game.advance({
+      .stick{
+        .roll{256},
+      },
+      .joystick_controlled{true},
+      .view{
+        .left{true},
+        .modifier{true},
+      },
+    });
+  }
   if(game.craft().attitude.roll == before_stick_view || !game.looking_around()) throw std::runtime_error{"looking sideways suppressed physical joystick flight controls"};
   game.advance({});
   auto const airborne{game.craft().position};

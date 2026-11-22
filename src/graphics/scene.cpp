@@ -122,14 +122,20 @@ void scene_renderer::background(view_parameters const &view, maths::rotation con
   double const horizontal{-rotation.rows[1].z * view.focal_y};
   auto fill{[&](int y, int left, int right, uint8_t colour){
     auto first{indexed.pixels.begin() + static_cast<ptrdiff_t>(y) * indexed.width + left};
-    if(!indexed.monochrome) std::fill_n(first, right - left, colour);
-    else for(int x{left}; x < right; ++x) indexed.pixels[static_cast<size_t>(y) * indexed.width + static_cast<unsigned int>(x)] = render::hercules_colour(colour, x);
+    if(!indexed.monochrome) {
+      std::fill_n(first, right - left, colour);
+    } else {
+      for(int x{left}; x < right; ++x) indexed.pixels[static_cast<size_t>(y) * indexed.width + static_cast<unsigned int>(x)] = render::hercules_colour(colour, x);
+    }
   }};
   for(int y{view.bounds.top}; y < view.bounds.bottom; ++y) {
     double const height{rotation.rows[0].z * view.focal_x * view.focal_y * direction
       - rotation.rows[2].z * (y - view.centre_y) * view.focal_x
       + horizontal * (view.bounds.left - view.centre_x)};
-    if(horizontal == 0) { fill(y, view.bounds.left, view.bounds.right, height >= 0 ? 11 : 2); continue; }
+    if(horizontal == 0) {
+      fill(y, view.bounds.left, view.bounds.right, height >= 0 ? 11 : 2);
+      continue;
+    }
     double const crossing{view.bounds.left - height / horizontal};
     int const boundary{static_cast<int>(std::clamp(horizontal > 0 ? std::ceil(crossing) : std::floor(crossing) + 1.0, static_cast<double>(view.bounds.left), static_cast<double>(view.bounds.right)))};
     fill(y, view.bounds.left, boundary, horizontal > 0 ? 2 : 11);
@@ -153,10 +159,14 @@ void scene_renderer::draw_ground_and_stars(world::theatre const &theatre, camera
       auto point{transformed};
       if(view.rear) point.x = -point.x;
       if(point.x < 1.0) continue;
-      double const x{view.centre_x - point.y * view.focal_x / point.x}, y{view.centre_y - point.z * view.focal_y / point.x};
+      double const x{view.centre_x - point.y * view.focal_x / point.x};
+      double const y{view.centre_y - point.z * view.focal_y / point.x};
       if(x < view.bounds.left || x >= view.bounds.right || y < view.bounds.top || y >= view.bounds.bottom) continue;
-      if(star) raster{indexed, view.bounds, random}.point({static_cast<int>(x), static_cast<int>(y)}, 15);
-      else depth_raster{indexed, depth, view, random}.point(transformed, dark ? 14 : 0, ground_footprint);
+      if(star) {
+        raster{indexed, view.bounds, random}.point({static_cast<int>(x), static_cast<int>(y)}, 15);
+      } else {
+        depth_raster{indexed, depth, view, random}.point(transformed, dark ? 14 : 0, ground_footprint);
+      }
     }
   }};
   for(auto const &point : detail.points()) draw_point(point, false);
@@ -170,7 +180,7 @@ void scene_renderer::draw_model(resources::model_address const address, unsigned
   for(auto const &command : geometry.commands(address, octant)) {
     std::visit([&](auto const &shape){
       using shape_type = std::remove_cvref_t<decltype(shape)>;
-      auto vertex{[&](maths::fixed_vector const &point){ return rotate(matrix, view_point{point}) + origin; }};
+      auto vertex{[&](maths::fixed_vector const &point){return rotate(matrix, view_point{point}) + origin;}};
       for(auto const &view : views) {
         depth_raster draw{indexed, depth, view, random};
         if constexpr(std::is_same_v<shape_type, resources::polygon>) {
@@ -257,8 +267,8 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
   double const scale{available >= 1.0 ? std::floor(available) : available};
   double const panel_top{size.height - 350.0 * scale};
   double const panel_left{(size.width - 640.0 * scale) * 0.5};
-  auto scaled_x{[&](double const x){ return static_cast<int>(std::lround(panel_left + x * scale)); }};
-  auto scaled_y{[&](double const y){ return static_cast<int>(std::lround(panel_top + y * scale)); }};
+  auto scaled_x{[&](double const x){return static_cast<int>(std::lround(panel_left + x * scale));}};
+  auto scaled_y{[&](double const y){return static_cast<int>(std::lround(panel_top + y * scale));}};
   int const cockpit_top{scaled_y(200)};
   view_storage[0].bounds = {0, 0, static_cast<int>(size.width), observer.cockpit ? cockpit_top : static_cast<int>(size.height)};
   double const focal{size.width * 0.5 / std::tan(settings.horizontal_fov * 3.141592653589793 / 360.0)};
@@ -315,11 +325,13 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
     }
     if(auto item{visibility(subject, geometry.definition(subject.type), observer.position, appearance)}) visible.push_back(*item);
   }
-  if(!observer.map_mode) std::ranges::stable_sort(visible, [](visible_object const &lhs, visible_object const &rhs){
-    // Paint ground surfaces first; depth testing resolves solid intersections, while authored overlay order survives.
-    if(lhs.ground_first != rhs.ground_first) return lhs.ground_first;
-    return lhs.distance > rhs.distance;
-  });
+  if(!observer.map_mode) {
+    std::ranges::stable_sort(visible, [](visible_object const &lhs, visible_object const &rhs){
+      // Paint ground surfaces first; depth testing resolves solid intersections, while authored overlay order survives.
+      if(lhs.ground_first != rhs.ground_first) return lhs.ground_first;
+      return lhs.distance > rhs.distance;
+    });
+  }
   if(observer.map_mode) {
     // survey markers blink independently of the stopped actor timers
     geometry.set_map_colours(timer);
@@ -383,7 +395,8 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
       auto const aim{rotate(rotation, view_point{*observer.aim_point} - view_point{observer.position})};
       visible = aim.x > 1.0;
       if(visible) {
-        double const x{view.centre_x - aim.y * view.focal_x / aim.x}, y{view.centre_y - aim.z * view.focal_y / aim.x};
+        double const x{view.centre_x - aim.y * view.focal_x / aim.x};
+        double const y{view.centre_y - aim.z * view.focal_y / aim.x};
         visible = x >= view.bounds.left && x < view.bounds.right && y >= view.bounds.top && y < view.bounds.bottom;
         if(visible) centre = {static_cast<int>(x), static_cast<int>(y)};
       }
@@ -418,28 +431,36 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
     }
   }
   if(observer.cockpit) {
-    for(unsigned int y{0}; y != indexed.height; ++y) for(unsigned int x{0}; x != indexed.width; ++x) {
-      bool in_view{false};
-      for(auto const &view : views) if(static_cast<int>(x) >= view.bounds.left && static_cast<int>(x) < view.bounds.right
-        && static_cast<int>(y) >= view.bounds.top && static_cast<int>(y) < view.bounds.bottom) in_view = true;
-      if(in_view) continue;
-      int const px{static_cast<int>(std::floor((x - panel_left) / scale))};
-      int const py{static_cast<int>(std::floor((y - panel_top) / scale))};
-      uint8_t const colour{px >= 0 && px < 640 && py >= 200 && py < 350 ? panel.pixels[static_cast<unsigned int>(py) * 640 + static_cast<unsigned int>(px)] : uint8_t{0}};
-      indexed.pixels[y * indexed.width + x] = indexed.monochrome ? static_cast<uint8_t>(colour == 0 ? 0 : 15) : colour;
+    for(unsigned int y{0}; y != indexed.height; ++y) {
+      for(unsigned int x{0}; x != indexed.width; ++x) {
+        bool in_view{false};
+        for(auto const &view : views) {
+          if(static_cast<int>(x) >= view.bounds.left && static_cast<int>(x) < view.bounds.right
+            && static_cast<int>(y) >= view.bounds.top && static_cast<int>(y) < view.bounds.bottom) in_view = true;
+        }
+        if(in_view) continue;
+        int const px{static_cast<int>(std::floor((x - panel_left) / scale))};
+        int const py{static_cast<int>(std::floor((y - panel_top) / scale))};
+        uint8_t const colour{px >= 0 && px < 640 && py >= 200 && py < 350 ? panel.pixels[static_cast<unsigned int>(py) * 640 + static_cast<unsigned int>(px)] : uint8_t{0}};
+        indexed.pixels[y * indexed.width + x] = indexed.monochrome ? static_cast<uint8_t>(colour == 0 ? 0 : 15) : colour;
+      }
     }
   }
   if(observer.palette_phase != vec3<uint16_t>{0, 0, 0}) {
-    for(auto &colour : palette) for(unsigned int axis{0}; axis != 3; ++axis) {
-      auto &channel{axis == 0 ? colour.red : axis == 1 ? colour.green : colour.blue};
-      uint8_t const phase{static_cast<uint8_t>((channel >> 2) + (observer.palette_phase[axis] >> 8))};
-      uint8_t const value{static_cast<uint8_t>((phase & 64u) != 0 ? 63u - (phase & 63u) : phase & 63u)};
-      channel = static_cast<uint8_t>((value << 2) | (value >> 4));
+    for(auto &colour : palette) {
+      for(unsigned int axis{0}; axis != 3; ++axis) {
+        auto &channel{axis == 0 ? colour.red : axis == 1 ? colour.green : colour.blue};
+        uint8_t const phase{static_cast<uint8_t>((channel >> 2) + (observer.palette_phase[axis] >> 8))};
+        uint8_t const value{static_cast<uint8_t>((phase & 64u) != 0 ? 63u - (phase & 63u) : phase & 63u)};
+        channel = static_cast<uint8_t>((value << 2) | (value >> 4));
+      }
     }
   }
   if(observer.palette_phase == vec3<uint16_t>{0, 0, 0}) render::fade_palette(palette, observer.palette_brightness);
-  for(unsigned int i{0}; i != output.pixels.size(); ++i) output.pixels[i] = indexed.monochrome
-    ? (indexed.pixels[i] != 0 ? render::rgba_pixel{255, 255, 255} : render::rgba_pixel{0, 0, 0}) : palette[indexed.pixels[i] & 15u];
+  for(unsigned int i{0}; i != output.pixels.size(); ++i) {
+    output.pixels[i] = indexed.monochrome
+      ? (indexed.pixels[i] != 0 ? render::rgba_pixel{255, 255, 255} : render::rgba_pixel{0, 0, 0}) : palette[indexed.pixels[i] & 15u];
+  }
   return statistics;
 }
 
