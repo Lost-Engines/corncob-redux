@@ -3,8 +3,8 @@
 #include <optional>
 #include <span>
 #include <vector>
-#include "graphics/raster.h"
 #include "vectorstorm/vector/vector3.h"
+#include "graphics/raster.h"
 
 namespace corncob::graphics {
 
@@ -16,7 +16,7 @@ struct perspective_view {
   double centre_x;
   double centre_y;
   bool rear;
-  double pixel_scale{1.0}; // Screen size of one pixel in the original graphics mode.
+  double pixel_scale{1.0};                                                     // Screen size of one pixel in the original graphics mode.
 };
 
 // Reciprocal depth keeps precision at the horizon without imposing a far plane.

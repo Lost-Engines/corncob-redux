@@ -121,9 +121,9 @@ void scene_renderer::background(view_parameters const &view, maths::rotation con
   // The mirror reverses depth, but its horizontal axis matches the forward view.
   double const horizontal{-rotation.rows[1].z * view.focal_y};
   auto fill{[&](int y, int left, int right, uint8_t colour){
-    auto first{indexed.pixels.begin() + static_cast<std::ptrdiff_t>(y) * indexed.width + left};
+    auto first{indexed.pixels.begin() + static_cast<ptrdiff_t>(y) * indexed.width + left};
     if(!indexed.monochrome) std::fill_n(first, right - left, colour);
-    else for(int x{left}; x < right; ++x) indexed.pixels[static_cast<std::size_t>(y) * indexed.width + static_cast<unsigned int>(x)] = render::hercules_colour(colour, x);
+    else for(int x{left}; x < right; ++x) indexed.pixels[static_cast<size_t>(y) * indexed.width + static_cast<unsigned int>(x)] = render::hercules_colour(colour, x);
   }};
   for(int y{view.bounds.top}; y < view.bounds.bottom; ++y) {
     double const height{rotation.rows[0].z * view.focal_x * view.focal_y * direction
@@ -182,7 +182,7 @@ void scene_renderer::draw_model(resources::model_address const address, unsigned
         } else if constexpr(std::is_same_v<shape_type, resources::wireframe>) {
           for(auto const &line : shape.lines) {
             auto const surface_depth{line.surface_anchor ? std::optional{vertex(*line.surface_anchor).x} : std::nullopt};
-            for(std::size_t i{1}; i < line.vertices.size(); ++i) {
+            for(size_t i{1}; i < line.vertices.size(); ++i) {
               draw.line(vertex(line.vertices[i - 1]), vertex(line.vertices[i]), geometry.colour(line.colour), surface_depth);
               ++statistics.lines;
             }
@@ -215,8 +215,7 @@ scene_renderer::scene_renderer(resources::geometry_bank &geometry, resources::co
   /// Keep immutable world resources outside the renderer and own only frame-local display state
 }
 
-void scene_renderer::initialise(maths::world_position const &observer, random_source &random) {
-  (void)random;
+void scene_renderer::initialise(maths::world_position const &observer, random_source &/*random*/) {
   detail.density(settings.ground_points);
   detail.range(settings.ground_range);
   detail.update(observer, visual_random);
@@ -231,9 +230,8 @@ std::array<render::rgba_pixel, 16> const &scene_renderer::colours() const noexce
   return palette;
 }
 render_statistics scene_renderer::render(world::theatre const &theatre, camera const &observer, unsigned int const frame,
-                                        uint16_t const timer, random_source &simulation_random, render::framebuffer &output, instrument_telemetry const *const telemetry) {
+                                        uint16_t const timer, random_source &/*simulation_random*/, render::framebuffer &output, instrument_telemetry const *const telemetry) {
   /// Keep authored indexed artwork separate from the configurable 3D rendering surface.
-  (void)simulation_random;
   auto &random{visual_random};
   auto const size{settings.resolution};
   indexed.width = output.width = size.width;
@@ -312,8 +310,9 @@ render_statistics scene_renderer::render(world::theatre const &theatre, camera c
   if(observer.subject) {
     auto const &subject{*observer.subject};
     auto appearance{geometry.appearance(subject)};
-    if(subject.type == world::object_type::ground_crew)
+    if(subject.type == world::object_type::ground_crew) {
       appearance = {resources::geometry_bank::player_model, resources::geometry_bank::player_model, resources::geometry_bank::player_model};
+    }
     if(auto item{visibility(subject, geometry.definition(subject.type), observer.position, appearance)}) visible.push_back(*item);
   }
   if(!observer.map_mode) std::ranges::stable_sort(visible, [](visible_object const &lhs, visible_object const &rhs){

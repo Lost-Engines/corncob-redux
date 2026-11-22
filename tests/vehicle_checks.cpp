@@ -42,12 +42,14 @@ int main(int const argc, char const *const argv[]) {
     std::array<uint16_t, 8> const actual{object.attitude.heading, object.attitude.pitch, object.attitude.roll,
       object.flags, static_cast<uint16_t>(object.velocity.x), static_cast<uint16_t>(object.velocity.y), static_cast<uint16_t>(object.velocity.z), object.timer};
     std::array<unsigned int, 8> constexpr fields{12, 14, 16, 24, 46, 48, 50, 52};
-    for(unsigned int field{0}; field != fields.size(); ++field) if(actual[field] != data.word(expected + fields[field]))
+    for(unsigned int field{0}; field != fields.size(); ++field) if(actual[field] != data.word(expected + fields[field])) {
       throw std::runtime_error{"native vehicle case " + std::to_string(i) + " field " + std::to_string(fields[field]) + ": got " + std::to_string(actual[field]) + ", expected " + std::to_string(data.word(expected + fields[field]))};
+    }
     if(object.position.z != data.signed_dword(expected + 8)) throw std::runtime_error{"native vehicle height mismatch " + std::to_string(i)};
     if(weapons.random_stream().seed() != data.dword(expected + 74)) throw std::runtime_error{"native vehicle random continuation " + std::to_string(i)};
-    if(effects.capture_pending != (data.byte(expected + 78) != 0) || effects.rescued != (data.byte(expected + 79) != 0))
+    if(effects.capture_pending != (data.byte(expected + 78) != 0) || effects.rescued != (data.byte(expected + 79) != 0)) {
       throw std::runtime_error{"native vehicle capture/rescue state " + std::to_string(i)};
+    }
   }
   std::cout << "512 original vehicle updates, capture/rescue state and random continuation match" << std::endl;
   return EXIT_SUCCESS;

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <optional>
+#include "maths/random.h"
 #include "flight/aircraft.h"
 #include "game/statistics.h"
 #include "game/vehicle.h"
-#include "maths/random.h"
 #include "resources/geometry_bank.h"
 #include "world/world.h"
 

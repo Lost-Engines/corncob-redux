@@ -5,8 +5,8 @@
 #include <ctime>
 #include <format>
 #include <string>
-#include "game/pilots.h"
 #include "maths/integer.h"
+#include "game/pilots.h"
 
 namespace corncob::game {
 

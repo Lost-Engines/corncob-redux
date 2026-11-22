@@ -100,8 +100,9 @@ int main() {
   require(!combat.plant_charge({0, 0, 720}), "carried charge duplicated");
   combat.arm_charges();
   bool armed{false};
-  for(auto const &object : world.objects) if(object.type == world::object_type::bomb && object.has(world::object_flag::special))
+  for(auto const &object : world.objects) if(object.type == world::object_type::bomb && object.has(world::object_flag::special)) {
     armed = (object.flags & 4u) == 0 && object.collision_extents.x == 6000;
+  }
   require(armed, "D failed to release and arm the planted charge");
   for(unsigned int n{0}; n != 20; ++n) require(combat.shoot({position, attitude, rotation, 0, true, false, false}, false, {}), "pistol supply depleted early");
   require(!combat.shoot({position, attitude, rotation, 0, true, false, false}, false, {}), "pistol supplied more than twenty rounds");

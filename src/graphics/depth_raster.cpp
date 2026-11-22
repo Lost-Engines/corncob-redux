@@ -45,8 +45,9 @@ void depth_raster::detail_point(projected_point const &point, colour_index const
   int const size{static_cast<int>(std::lround(detail_width(point.depth, footprint_scale)))};
   // Square footprints preserve the original pixel artwork without filtering the palette.
   int const left{static_cast<int>(std::floor(point.x)) - size / 2}, top{static_cast<int>(std::floor(point.y)) - size / 2};
-  for(int y{std::max(top, view.bounds.top)}; y < std::min(top + size, view.bounds.bottom); ++y)
+  for(int y{std::max(top, view.bounds.top)}; y < std::min(top + size, view.bounds.bottom); ++y) {
     for(int x{std::max(left, view.bounds.left)}; x < std::min(left + size, view.bounds.right); ++x) pixel(x, y, point.depth, colour);
+  }
 }
 void depth_raster::point(view_point const &position, colour_index const colour, double const footprint_scale) {
   auto const centre{orient(position)};
@@ -58,7 +59,7 @@ void depth_raster::point(view_point const &position, colour_index const colour, 
 }
 void depth_raster::pixel(int const x, int const y, double const reciprocal_depth, colour_index colour) {
   if(x < view.bounds.left || x >= view.bounds.right || y < view.bounds.top || y >= view.bounds.bottom) return;
-  auto const index{static_cast<std::size_t>(y) * target.width + static_cast<unsigned int>(x)};
+  auto const index{static_cast<size_t>(y) * target.width + static_cast<unsigned int>(x)};
   // Later coplanar artwork wins: runway paint, windows and faces keep their authored order.
   if(reciprocal_depth * 1.00001 < depth[index]) return;
   if(colour > 15 && (random.next() & 1u) == 0) return;
@@ -98,7 +99,7 @@ void depth_raster::polygon(std::span<view_point const> const vertices, colour_in
   for(auto const &point : vertices) clipped.push_back(orient(point));
   for(unsigned int i{0}; i != 5 && !clipped.empty(); ++i) {
     std::vector<view_point> next;
-    for(std::size_t n{0}; n < clipped.size(); ++n) {
+    for(size_t n{0}; n < clipped.size(); ++n) {
       auto const &a{clipped[n]}, &b{clipped[(n + 1) % clipped.size()]};
       double const da{plane(a, i)}, db{plane(b, i)};
       if(da >= 0) next.push_back(a);
@@ -107,13 +108,13 @@ void depth_raster::polygon(std::span<view_point const> const vertices, colour_in
     clipped = std::move(next);
   }
   if(clipped.size() < 3) return;
-  auto vertex{[&](view_point const &point) {
+  auto vertex{[&](view_point const &point){
     auto result{project(point)};
     if(surface_depth) result.depth = 1.0 / anchor_depth;
     return result;
   }};
   auto const a{vertex(clipped.front())};
-  for(std::size_t i{1}; i + 1 < clipped.size(); ++i) triangle(a, vertex(clipped[i]), vertex(clipped[i + 1]), colour);
+  for(size_t i{1}; i + 1 < clipped.size(); ++i) triangle(a, vertex(clipped[i]), vertex(clipped[i + 1]), colour);
 }
 void depth_raster::line(view_point a, view_point b, colour_index const colour, std::optional<double> const surface_depth) {
   // attached artwork keeps its projection but shares the parent billboard's depth
@@ -172,8 +173,9 @@ void depth_raster::line(view_point a, view_point b, colour_index const colour, s
       double const depth{first.depth + (last.depth - first.depth) * along};
       double const width{detail_width(depth)}, x{major + 0.5 - first.x - dx * along}, y{minor + 0.5 - first.y - dy * along};
       double const squared_distance{x * x + y * y}, squared_radius{width * width * 0.25};
-      if(squared_distance < squared_radius || (squared_distance == squared_radius && y < 0.0))
+      if(squared_distance < squared_radius || (squared_distance == squared_radius && y < 0.0)) {
         pixel(steep ? minor : major, steep ? major : minor, depth, colour);
+      }
     }
   }
 }

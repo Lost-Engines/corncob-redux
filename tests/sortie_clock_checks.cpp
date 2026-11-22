@@ -2,8 +2,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include "game/sortie_clock.h"
 #include "game/session.h"
+#include "game/sortie_clock.h"
 #include "resources/assets.h"
 #include "tests/reference_reader.h"
 

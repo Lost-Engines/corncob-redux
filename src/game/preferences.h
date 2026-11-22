@@ -36,7 +36,7 @@ struct preferences {
   bool window_resolution{true};
   bool fullscreen{false};
   double music_volume{100.0}, effects_volume{100.0};
-  double mouse_sensitivity{24.0}; // Angle units per physical mouse pixel; full turn = 65536.
+  double mouse_sensitivity{24.0};                                              // Angle units per physical mouse pixel; full turn = 65536.
   bool invert_mouse{false};
   std::vector<control_binding> bindings{default_bindings()};
   static preferences load(std::filesystem::path const &path);

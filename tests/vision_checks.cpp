@@ -29,9 +29,10 @@ int main(int const argc, char const *const argv[]) {
     if(closing) actual.close_capture(step);
     int32_t const expected_average{input.signed_dword()};
     uint16_t const expected_brightness{input.word()};
-    if(actual.average_vertical_force != expected_average || actual.brightness != expected_brightness)
+    if(actual.average_vertical_force != expected_average || actual.brightness != expected_brightness) {
       throw std::runtime_error{"native visual-state case " + std::to_string(i) + ": average " + std::to_string(actual.average_vertical_force)
         + "/" + std::to_string(expected_average) + ", intensity " + std::to_string(actual.brightness) + "/" + std::to_string(expected_brightness)};
+    }
   }
   auto expand{[](uint8_t const value){return static_cast<uint8_t>((value << 2) | (value >> 4));}};
   for(unsigned int i{0}; i != palettes; ++i) {

@@ -26,8 +26,9 @@ int main(int const argc, char const *const argv[]) {
     maths::world_position const position{data.signed_dword(offset), data.signed_dword(offset + 4), data.signed_dword(offset + 8)};
     maths::world_position const observer{data.signed_dword(offset + 12), data.signed_dword(offset + 16), data.signed_dword(offset + 20)};
     auto const distance{game::interaction_range(position, observer)};
-    if(distance.has_value() != (data.byte(offset + 24) != 0) || (distance && *distance != data.word(offset + 25)))
+    if(distance.has_value() != (data.byte(offset + 24) != 0) || (distance && *distance != data.word(offset + 25))) {
       throw std::runtime_error{"native interaction range " + std::to_string(i)};
+    }
   }
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   for(unsigned int i{0}; i != handlers; ++i) {
@@ -47,11 +48,13 @@ int main(int const argc, char const *const argv[]) {
     auto const expected{corncob::tests::read_actor(data, offset)};
     corncob::tests::compare_actor(object, expected, i, "scenery");
     auto const models{geometry.appearance(object)};
-    if(models.near != data.word(offset + 40) || models.middle != data.word(offset + 42) || models.far != data.word(offset + 44))
+    if(models.near != data.word(offset + 40) || models.middle != data.word(offset + 42) || models.far != data.word(offset + 44)) {
       throw std::runtime_error{"native scenery models " + std::to_string(i)};
+    }
     offset += 74;
-    if((event == game::scenery_event::tower) != (data.byte(offset) != 0) || weapons.stats().objectives_completed != data.word(offset + 1))
+    if((event == game::scenery_event::tower) != (data.byte(offset) != 0) || weapons.stats().objectives_completed != data.word(offset + 1)) {
       throw std::runtime_error{"native scenery event " + std::to_string(i)};
+    }
     offset += 3;
   }
   if(offset != bytes.size()) throw std::runtime_error{"scenery fixture length mismatch"};

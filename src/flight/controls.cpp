@@ -47,7 +47,7 @@ bool pitch_locked(aircraft_state const &aircraft, angular_response &response) {
 
 void advance_autopilot(aircraft_state const &aircraft, angular_response &response) {
   /// Beginner assistance calls PITCHLOCK independently; an engaged autopilot then makes its own original call
-  if(response.beginner_flight && !aircraft.stalled) (void)pitch_locked(aircraft, response);
+  if(response.beginner_flight && !aircraft.stalled) static_cast<void>(pitch_locked(aircraft, response));
   auto &pilot{response.autopilot};
   if(!pilot.engaged || !pitch_locked(aircraft, response)) return;
   int16_t const change{static_cast<int16_t>(std::clamp<int>(maths::word(aircraft.body_velocity.z - pilot.previous_vertical_airflow), -150, 150))};

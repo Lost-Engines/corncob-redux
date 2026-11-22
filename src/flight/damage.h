@@ -1,8 +1,8 @@
 #pragma once
 
+#include "maths/random.h"
 #include "flight/aircraft.h"
 #include "flight/controls.h"
-#include "maths/random.h"
 
 namespace corncob::flight {
 

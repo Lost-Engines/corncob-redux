@@ -30,8 +30,9 @@ int main() {
     direct.emplace_back(stb_vorbis_open_memory(assets[i].data(), static_cast<int>(assets[i].size()), &error, nullptr), stb_vorbis_close);
     if(!direct.back()) throw std::runtime_error{"embedded music is not valid Vorbis"};
     auto const info{stb_vorbis_get_info(direct.back().get())};
-    if(info.sample_rate != 48'000 || info.channels != 1 || stb_vorbis_stream_length_in_samples(direct.back().get()) != native_boundary_ms[i] * 48)
+    if(info.sample_rate != 48'000 || info.channels != 1 || stb_vorbis_stream_length_in_samples(direct.back().get()) != native_boundary_ms[i] * 48) {
       throw std::runtime_error{"music format or complete native score boundary differs"};
+    }
   }
   audio::music player;
   std::array<float, 1024> actual, expected;
@@ -62,8 +63,9 @@ int main() {
         } else filled += static_cast<unsigned int>(count);
       }
       for(unsigned int sample{0}; sample != frames * 2; ++sample) {
-        if(!std::isfinite(block[sample]) || block[sample] != std::clamp(expected[sample], -1.0f, 1.0f))
+        if(!std::isfinite(block[sample]) || block[sample] != std::clamp(expected[sample], -1.0f, 1.0f)) {
           throw std::runtime_error{"music callback lost samples or used the wrong track at a score boundary"};
+        }
         peak = std::max(peak, std::abs(block[sample]));
       }
       remaining -= frames;

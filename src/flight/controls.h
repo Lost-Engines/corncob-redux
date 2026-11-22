@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "flight/aircraft.h"
 #include "maths/random.h"
+#include "flight/aircraft.h"
 
 namespace corncob::flight {
 

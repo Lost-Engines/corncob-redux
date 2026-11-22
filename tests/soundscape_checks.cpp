@@ -55,8 +55,9 @@ int main(int const argc, char const *const argv[]) {
       + ": got " + std::to_string(actual.size()) + ", expected " + std::to_string(count)};
     for(unsigned int reg{0}; reg != count; ++reg) {
       auto const address{input.byte()}, value{input.byte()};
-      if(actual[reg].address != address || actual[reg].value != value)
+      if(actual[reg].address != address || actual[reg].value != value) {
         throw std::runtime_error{"native proximity register in frame " + std::to_string(i) + ", write " + std::to_string(reg)};
+      }
     }
     registers += count;
     sound.render(drain);

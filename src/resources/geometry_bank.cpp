@@ -189,7 +189,7 @@ geometry_bank::geometry_bank(std::span<uint8_t const> const source, bool const s
   load_model(experimental_model);
   // the crew's eyes and mouth paint onto a camera-facing head disc in every pose
   auto &head{std::get<disc_cloud>(primitives.at(primitive_ids.at((6u << 16) | 0x6e19u)))};
-  for(std::size_t i{1}; i < head.discs.size(); ++i) head.discs[i].surface_anchor.emplace(head.discs.front().position);
+  for(size_t i{1}; i < head.discs.size(); ++i) head.discs[i].surface_anchor.emplace(head.discs.front().position);
   auto &face{std::get<wireframe>(primitives.at(primitive_ids.at((2u << 16) | 0x6ea3u)))};
   face.lines.front().surface_anchor.emplace(head.discs.front().position);
   // the injured pose's blood backdrop belongs behind the head, including its billboard edges
@@ -406,8 +406,9 @@ void geometry_bank::prepare_colours(world::placed_object const &object, unsigned
   if(slalom_models) {
     colour_reference constexpr wing_colour_address{0x44ce};
     if(object.type == world::object_type::saucer_site) colours[wing_colour_address] = 0;
-    else if(object.type == world::object_type::aircraft || object.type == world::object_type::internal_aircraft)
+    else if(object.type == world::object_type::aircraft || object.type == world::object_type::internal_aircraft) {
       colours[wing_colour_address] = (object.flags & 0x1000u) != 0 ? 6 : 1;
+    }
   }
   uint64_t const type_bit{uint64_t{1} << std::to_underlying(object.type)};
   for(auto const &rule : colour_rules) {

@@ -4,9 +4,9 @@
 #include <iostream>
 #include <stdexcept>
 #include <string_view>
+#include "maths/random.h"
 #include "game/session.h"
 #include "graphics/scene.h"
-#include "maths/random.h"
 #include "resources/assets.h"
 
 int main(int const argc, char const *const argv[]) {
@@ -19,8 +19,9 @@ int main(int const argc, char const *const argv[]) {
   resources::geometry_bank geometry{resources::engine_data_asset()};
   auto const cockpit{resources::decode_cockpit_mask(resources::cockpit_asset())};
   graphics::scene_renderer renderer{geometry, cockpit};
-  if(argc > 2 || (argc == 2 && std::string_view{argv[1]} != "--draw-every-frame" && std::string_view{argv[1]} != "--elapsed"))
+  if(argc > 2 || (argc == 2 && std::string_view{argv[1]} != "--draw-every-frame" && std::string_view{argv[1]} != "--elapsed")) {
     throw std::invalid_argument{"optional --draw-every-frame or --elapsed expected"};
+  }
   bool const elapsed_time{argc == 2 && std::string_view{argv[1]} == "--elapsed"};
   bool const full_frames{argc == 2 && !elapsed_time};
   corncob::render::framebuffer output;
@@ -30,8 +31,9 @@ int main(int const argc, char const *const argv[]) {
   for(auto const source : worlds) for(unsigned int start{0}; start != 8; ++start) {
     auto theatre{world::decode_theatre(source)};
     std::vector<maths::world_position> locations;
-    for(auto const &object : theatre.objects) if(object.type == world::object_type::generator_orb || object.type == world::object_type::objective_saucer)
+    for(auto const &object : theatre.objects) if(object.type == world::object_type::generator_orb || object.type == world::object_type::objective_saucer) {
       locations.emplace_back(object.position);
+    }
     auto const plane{std::ranges::find_if(theatre.objects, [](auto const &object){return object.type == world::object_type::aircraft;})};
     if(plane == theatre.objects.end() || locations.empty()) throw std::runtime_error{"endurance theatre lacks an aircraft or objective"};
     theatre.start = maths::world_position{plane->position};
@@ -76,8 +78,8 @@ int main(int const argc, char const *const argv[]) {
         },
       };
       if(elapsed_time) {
-        std::array<double,4> constexpr durations{1.0/144,1.0/60,1.0/30,0.021};
-        flight.advance_time(input,durations[tick%durations.size()]);
+        std::array<double,4> constexpr durations{1.0 / 144,1.0 / 60,1.0 / 30,0.021};
+        flight.advance_time(input,durations[tick % durations.size()]);
       } else if(full_frames) flight.advance(input, std::function_ref<void()>{draw_one});
       else flight.advance(input);
       if(flight.take_tower()) flight.resume_from_tower();
@@ -90,8 +92,8 @@ int main(int const argc, char const *const argv[]) {
     }
     auto const retained{flight.snapshot()};
     auto const encoded{world::encode_theatre(retained)};
-    (void)world::decode_theatre(encoded);
-    (void)game::sortie_statistics::decode(flight.results().encode());
+    static_cast<void>(world::decode_theatre(encoded));
+    static_cast<void>(game::sortie_statistics::decode(flight.results().encode()));
   }
   if(updates < 25'000 || frames < 200) throw std::runtime_error{"endurance runs ended before providing sustained coverage"};
   std::cout << updates << " simulation updates and " << frames << " rendered frames across 32 original-theatre starts" << std::endl;

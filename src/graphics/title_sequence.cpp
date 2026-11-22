@@ -1,7 +1,7 @@
 #include "title_sequence.h"
 #include <algorithm>
-#include "graphics/interface.h"
 #include "maths/fixed.h"
+#include "graphics/interface.h"
 
 namespace corncob::graphics {
 
@@ -53,7 +53,7 @@ title_frame title_motion::advance() {
     .stage{stage},
   };
   ++frame;
-  auto random{[this](){random_seed = random_seed * 0x015a4e35u + 1; return static_cast<int>((random_seed >> 16) & 0x7fffu);}};
+  auto random{[this]{random_seed = random_seed * 0x015a4e35u + 1; return static_cast<int>((random_seed >> 16) & 0x7fffu);}};
   auto sprite{[&](title_sprite_kind const kind, int const x, int const y){result.sprites[result.sprite_count++] = {
     .kind{kind},
     .position{x, y},
@@ -89,8 +89,7 @@ title_frame title_motion::advance() {
       aircraft_y = maths::word(aircraft_y - 4);
       if(aircraft_y < -121 - 4 * 90) {
         aircraft_y = 210 + 4 * 90;
-        if(first_pass) { fade = 255; first_pass = false; }
-        else if(passes < 2) ++passes;
+        if(first_pass) { fade = 255; first_pass = false; } else if(passes < 2) ++passes;
         else fade = 255;
       }
       if(aircraft_y > -50 && aircraft_y < 160 && terrain_scroll % 2 == 0) {
@@ -174,9 +173,11 @@ title_sequence::title_sequence(resources::collection const &assets, bool const e
   auto const font{assets.file("font8.bin")};
   for(unsigned char const ch : text) {
     if(ch == '\n') { x = 0; y += 8; continue; }
-    for(int row{0}; row != 8; ++row) for(int bit{0}; bit != 8; ++bit)
-      if(y + row < static_cast<int>(credit_height) && x + bit < static_cast<int>(width) && (font[ch * 8u + static_cast<unsigned int>(row)] & (128u >> bit)))
+    for(int row{0}; row != 8; ++row) for(int bit{0}; bit != 8; ++bit) {
+      if(y + row < static_cast<int>(credit_height) && x + bit < static_cast<int>(width) && (font[ch * 8u + static_cast<unsigned int>(row)] & (128u >> bit))) {
         credits[static_cast<unsigned int>(y + row) * width + static_cast<unsigned int>(x + bit)] = 7;
+    }
+      }
     x += 8;
   }
 }
@@ -219,8 +220,9 @@ void title_sequence::draw_frame(title_frame const &frame) {
       logo(top_logo, 8, 10);
       logo(bottom_logo, 72, 64);
     }
-    for(unsigned int row{0}; row != 55; ++row)
+    for(unsigned int row{0}; row != 55; ++row) {
       std::copy_n(credits.begin() + ((static_cast<unsigned int>(frame.credits_row) + row) % credit_height) * width, width, pixels.begin() + (row + 144) * width);
+    }
     auto const intensity{expand(static_cast<uint8_t>(frame.credit_intensity))};
     palette[7] = {
       .red{intensity},

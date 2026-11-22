@@ -24,7 +24,7 @@ int main() {
   world::theatre ruined;
   ruined.objects.push_back({.position{4'000'000,4'000'000,40'000}, .attitude{}, .type{world::object_type::destroyed_generator_orb}, .flags{static_cast<uint16_t>(geometry.definition(world::object_type::destroyed_generator_orb).flags | 0x200u)}, .timer{32000}});
   game::combat ruins{geometry, ruined}; game::actors falling{geometry,ruined,ruins};
-  for(unsigned int frame{0}; frame < 202; ++frame) falling.advance({origin,origin,velocity,false,frame*40}, {5,5});
+  for(unsigned int frame{0}; frame < 202; ++frame) falling.advance({origin,origin,velocity,false,frame * 40}, {5,5});
   if(ruined.objects[0].position.z != 3100) throw std::runtime_error{"distant destroyed orb did not settle"};
   std::cout << "Local orb objectives and distant continuous animation passed\n";
 }

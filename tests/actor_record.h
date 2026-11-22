@@ -2,8 +2,8 @@
 
 #include <stdexcept>
 #include <string>
-#include "world/world.h"
 #include "resources/binary_reader.h"
+#include "world/world.h"
 
 namespace corncob::tests {
 

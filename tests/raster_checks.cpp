@@ -71,8 +71,9 @@ auto main(int const argc, char const *const argv[])->int {
     int const expected_x1{clips.signed_word()}, expected_y1{clips.signed_word()}, expected_x2{clips.signed_word()}, expected_y2{clips.signed_word()};
     corncob::graphics::screen_point start{x1, y1}, end{x2, y2};
     if(corncob::graphics::clip_wire_line(start, end, viewport) != accepted
-      || start != corncob::graphics::screen_point{expected_x1, expected_y1} || end != corncob::graphics::screen_point{expected_x2, expected_y2})
+      || start != corncob::graphics::screen_point{expected_x1, expected_y1} || end != corncob::graphics::screen_point{expected_x2, expected_y2}) {
       throw std::runtime_error{"native wire clipping differs in case " + std::to_string(i)};
+    }
   }
   std::cout << "Native disc, polygon and line pixels match, including viewport clipping and degenerate shapes" << std::endl;
   return EXIT_SUCCESS;

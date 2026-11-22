@@ -1,8 +1,8 @@
 #pragma once
 
-#include "flight/controls.h"
-#include "maths/fixed.h"
 #include "vectorstorm/vector/vector2.h"
+#include "maths/fixed.h"
+#include "flight/controls.h"
 
 namespace corncob::game {
 

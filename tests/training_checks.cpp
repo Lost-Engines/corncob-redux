@@ -3,10 +3,10 @@
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
+#include "game/session.h"
 #include "resources/assets.h"
 #include "resources/binary_reader.h"
 #include "world/training.h"
-#include "game/session.h"
 
 int main(int const argc, char const *const argv[]) {
   /// Compare complete generated native placements across counts, fixed/random qualities and PRNG seeds
@@ -38,12 +38,14 @@ int main(int const argc, char const *const argv[]) {
     offset += 20;
     for(auto const &object : world.objects) {
       for(unsigned int axis{0}; axis != 3; ++axis) {
-        if(object.position[axis] != data.signed_dword(offset + axis * 4) || object.velocity[axis] != data.signed_word(offset + 46 + axis * 2))
+        if(object.position[axis] != data.signed_dword(offset + axis * 4) || object.velocity[axis] != data.signed_word(offset + 46 + axis * 2)) {
           throw std::runtime_error{"training position/velocity differs in case " + std::to_string(trial) + " object " + std::to_string(objects)};
+        }
       }
       if(object.attitude.heading != data.word(offset + 12) || object.attitude.pitch != data.word(offset + 14) || object.attitude.roll != data.word(offset + 16)
-         || object.flags != data.word(offset + 24) || object.timer != data.word(offset + 52) || std::to_underlying(object.type) != data.word(offset + 72))
+         || object.flags != data.word(offset + 24) || object.timer != data.word(offset + 52) || std::to_underlying(object.type) != data.word(offset + 72)) {
         throw std::runtime_error{"training pose/type/flags/timer differs in case " + std::to_string(trial) + " type " + std::to_string(std::to_underlying(object.type))};
+      }
       offset += 74;
       ++objects;
     }

@@ -2,11 +2,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
-#include "game/session.h"
 #include "game/frame_clock.h"
-#include "tests/reference_reader.h"
+#include "game/session.h"
 #include "graphics/scene.h"
 #include "resources/assets.h"
+#include "tests/reference_reader.h"
 
 int main(int const argc, char const *const argv[]) {
   if(argc != 2) throw std::invalid_argument{"native frame-clock fixture required"};
@@ -54,8 +54,9 @@ int main(int const argc, char const *const argv[]) {
     if(first.random_stream().seed() != second.random_stream().seed() || first.pilot().position != second.pilot().position
       || first.results().encode() != second.results().encode() || !std::ranges::equal(first_frame.pixels, second_frame.pixels, [](auto const &a, auto const &b){
         return a.red == b.red && a.green == b.green && a.blue == b.blue && a.alpha == b.alpha;
-      }))
+      })) {
       throw std::runtime_error{"extra window refreshes changed gameplay or a rendered simulation frame"};
+    }
   }
   game::session pedestrian{first_geometry, world::theatre{}};
   pedestrian.advance({
@@ -68,8 +69,9 @@ int main(int const argc, char const *const argv[]) {
   auto const seed{first.random_stream().seed()};
   first.press(game::action::pause);
   first.advance({}, std::function_ref<void()>{draw_first});
-  for(unsigned int refresh{0}; refresh != 4; ++refresh)
+  for(unsigned int refresh{0}; refresh != 4; ++refresh) {
     first_renderer.preview(first.world(), first.camera(), first.frame_number(), static_cast<uint16_t>(first.timer()), first.random_stream(), preview);
+  }
   if(draws != 61 || first.random_stream().seed() != seed) throw std::runtime_error{"pause advanced the frame pipeline or shared randomness"};
   first.press(game::action::pause);
   first.press(game::action::toggle_map);

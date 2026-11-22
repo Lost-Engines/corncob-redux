@@ -40,7 +40,7 @@ sortie_statistics sortie_statistics::decode(std::span<uint8_t const> const sourc
   if(source.size() != native_bytes) throw std::invalid_argument{"invalid native sortie statistics length"};
   resources::binary_reader const input{source};
   unsigned int offset{0};
-  auto word{[&](){auto const value{input.word(offset)}; offset += 2; return value;}};
+  auto word{[&]{auto const value{input.word(offset)}; offset += 2; return value;}};
   sortie_statistics result;
   result.status = word();
   result.contacting_type = word();

@@ -2,10 +2,10 @@
 
 #include <array>
 #include <vector>
+#include "maths/random.h"
 #include "game/combat.h"
 #include "game/parked_aircraft.h"
 #include "game/vehicle.h"
-#include "maths/random.h"
 
 namespace corncob::game {
 

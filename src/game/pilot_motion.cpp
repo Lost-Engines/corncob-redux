@@ -11,8 +11,9 @@ maths::world_position walking_displacement(maths::angle const heading, maths::fi
   for(unsigned int axis{0}; axis < 2; ++axis) adjusted[axis] = maths::word(static_cast<int32_t>(stride[axis]) * step.elapsed / step.normal);
   auto const motion{maths::transform(maths::make_inverse_rotation({.heading{heading}}), adjusted)};
   maths::world_position result{0, 0, 0};
-  for(unsigned int axis{0}; axis < 2; ++axis)
+  for(unsigned int axis{0}; axis < 2; ++axis) {
     result[axis] = maths::rounded_divide(maths::scale(motion[axis] >> 4, step.elapsed), step.normal);
+  }
   return result;
 }
 void damp_fall_velocity(maths::fixed_vector &velocity, int16_t const horizontal_damping, int16_t const terminal_velocity, flight::time_step const step) {

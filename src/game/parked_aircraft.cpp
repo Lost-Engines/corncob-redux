@@ -1,7 +1,7 @@
 #include "parked_aircraft.h"
 #include <cstdlib>
-#include "game/scenery.h"
 #include "maths/integer.h"
+#include "game/scenery.h"
 
 namespace corncob::game {
 

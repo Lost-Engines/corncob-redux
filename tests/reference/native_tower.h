@@ -2,7 +2,6 @@
 
 #include <array>
 #include <cstdint>
-
 #include "graphics/raster.h"
 
 namespace corncob::tests {

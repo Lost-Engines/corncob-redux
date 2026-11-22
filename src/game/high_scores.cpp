@@ -1,8 +1,8 @@
 #include "high_scores.h"
 #include <algorithm>
 #include <stdexcept>
-#include "resources/binary_reader.h"
 #include "maths/integer.h"
+#include "resources/binary_reader.h"
 
 namespace corncob::game {
 
@@ -41,8 +41,9 @@ int compare_statistics(sortie_statistics const &a, int32_t const a_points, sorti
   /// Equal native point totals are resolved by signed objective, ground-kill and air-kill words, in that order
   if(a_points != b_points) return a_points > b_points ? 1 : -1;
   for(auto const &pair : {std::pair{maths::word(a.objectives_completed), maths::word(b.objectives_completed)},
-                        std::pair{ground_kills(a), ground_kills(b)}, std::pair{air_kills(a), air_kills(b)}})
+                        std::pair{ground_kills(a), ground_kills(b)}, std::pair{air_kills(a), air_kills(b)}}) {
     if(pair.first != pair.second) return pair.first > pair.second ? 1 : -1;
+  }
   return 0;
 }
 int compare_rate(career_score const &a, career_score const &b) {
@@ -158,8 +159,9 @@ void score_tables::rename(std::string_view const previous, std::string_view cons
     field[length] = 0;
   }};
   for(auto &entry : missions) if(entry.retired == 0 && score_text(entry.name) == previous) replace(entry.name);
-  for(auto *table : {&careers, &fastest}) for(auto &entry : *table)
+  for(auto *table : {&careers, &fastest}) for(auto &entry : *table) {
     if(entry.retired == 0 && score_text(entry.name) == previous) replace(entry.name);
+  }
 }
 void score_tables::clear(unsigned int const list) {
   /// Each of the original three score lists can be reset independently

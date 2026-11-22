@@ -1,7 +1,7 @@
 #pragma once
 
-#include "flight/landing.h"
 #include "maths/continuous.h"
+#include "flight/landing.h"
 
 namespace corncob::flight {
 

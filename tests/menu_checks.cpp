@@ -5,8 +5,8 @@
 #include <map>
 #include <memory>
 #include <stdexcept>
-#include "game/front_end.h"
 #include "platform/storage.h"
+#include "game/front_end.h"
 #include "resources/assets.h"
 
 int main(int const argc, char const *const argv[]) {
@@ -74,8 +74,9 @@ int main(int const argc, char const *const argv[]) {
   auto const saved{career.theatres()};
   auto const native_header{corncob::platform::read_binary(std::filesystem::path{argv[1]}.parent_path() / "menu_theatre_header.bin")};
   auto const created_file{corncob::platform::read_binary(scratch / "THT" / (std::to_string(saved.front().number) + ".THT"))};
-  if(native_header.size() != 48 || !std::ranges::equal(std::span{created_file}.first(48), native_header))
+  if(native_header.size() != 48 || !std::ranges::equal(std::span{created_file}.first(48), native_header)) {
     throw std::runtime_error{"opening a theater changed its original native header"};
+  }
   front.character('a'); front.command(cancel); front.character('v'); front.command(accept); check("theatre-records");
 
   /// Clearing a populated list preserves both other tables, including their persisted native bytes
@@ -90,8 +91,9 @@ int main(int const argc, char const *const argv[]) {
   career.clear_scores(0);
   auto const scores_after{career.high_scores().encode()};
   if(!std::ranges::all_of(std::span{scores_after}.first(1800), [](uint8_t const byte){return byte == 0;})
-      || !std::ranges::equal(std::span{scores_after}.subspan(1800), std::span{scores_before}.subspan(1800)))
+      || !std::ranges::equal(std::span{scores_after}.subspan(1800), std::span{scores_before}.subspan(1800))) {
     throw std::runtime_error{"clearing one score list changed another list"};
+  }
 
   /// Duplicate definitions retain independent file identities, and deleting one preserves the active world
   auto const pristine{corncob::world::decode_theatre(corncob::resources::morning_asset())};

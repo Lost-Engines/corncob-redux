@@ -1,10 +1,10 @@
 #include "music.h"
-#include "gain.h"
 #include <algorithm>
 #include <array>
 #include <atomic>
 #include <limits>
 #include <stdexcept>
+#include "gain.h"
 #include "resources/assets.h"
 
 extern "C" {
@@ -40,8 +40,9 @@ struct music::implementation {
       tracks[i].reset(stb_vorbis_open_memory(files[i].data(), static_cast<int>(files[i].size()), &error, nullptr));
       if(!tracks[i]) throw std::invalid_argument{"cannot decode embedded music: " + std::to_string(error)};
       auto const info{stb_vorbis_get_info(tracks[i].get())};
-      if(info.sample_rate != 48'000 || info.channels != 1 || stb_vorbis_stream_length_in_samples(tracks[i].get()) == 0)
+      if(info.sample_rate != 48'000 || info.channels != 1 || stb_vorbis_stream_length_in_samples(tracks[i].get()) == 0) {
         throw std::invalid_argument{"embedded music must be nonempty 48 kHz mono Vorbis"};
+      }
     }
   }
 };
@@ -50,7 +51,9 @@ music::music() : state{std::make_unique<implementation>()} {
   /// Lossless original-driver masters are encoded offline; the game only streams their compact Vorbis copies
 }
 music::~music() = default;
-void music::volume(float const percent) noexcept { state->gain.set(percent); }
+void music::volume(float const percent) noexcept {
+  state->gain.set(percent);
+}
 void music::select(music_cue const cue) noexcept {
   /// Only the requested programme crosses threads; the callback exclusively owns decoder cursors
   state->requested.store(cue, std::memory_order_relaxed);
@@ -82,7 +85,7 @@ void music::mix(std::span<float> const samples) noexcept {
     for(unsigned int sample{0}; sample != static_cast<unsigned int>(frames) * 2; sample += 2) {
       float const gain{state->gain.next(target_gain)};
       for(unsigned int channel{0}; channel < 2; ++channel) {
-        samples[offset] = std::clamp(samples[offset] + decoded[sample+channel]*gain, -1.0f, 1.0f);
+        samples[offset] = std::clamp(samples[offset] + decoded[sample + channel] * gain, -1.0f, 1.0f);
         ++offset;
       }
     }

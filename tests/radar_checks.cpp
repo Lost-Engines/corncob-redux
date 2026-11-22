@@ -4,8 +4,8 @@
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
-#include "graphics/radar.h"
 #include "graphics/instruments.h"
+#include "graphics/radar.h"
 #include "resources/binary_reader.h"
 
 int main(int const argc, char const *const argv[]) {

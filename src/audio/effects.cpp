@@ -1,5 +1,4 @@
 #include "effects.h"
-#include "gain.h"
 #include <algorithm>
 #include <array>
 #include <charconv>
@@ -7,8 +6,9 @@
 #include <sstream>
 #include <stdexcept>
 #include <opl3.h>
-#include "maths/random.h"
 #include "maths/fixed.h"
+#include "maths/random.h"
+#include "gain.h"
 #include "game/session.h"
 
 namespace corncob::audio {
@@ -154,7 +154,9 @@ effects::effects(resources::collection const &resources) : state{std::make_uniqu
   reset();
 }
 effects::~effects() = default;
-void effects::volume(float const percent) noexcept { state->gain.set(percent); }
+void effects::volume(float const percent) noexcept {
+  state->gain.set(percent);
+}
 void effects::reset(resources::collection const &resources) {
   /// Patch definitions belong to the simulation thread; the PCM thread consumes only queued register writes.
   state->load_patches(resources);

@@ -27,8 +27,9 @@ int main(int const argc, char const *const argv[]) {
     corncob::maths::world_position const observer{0, 0, 0};
     corncob::maths::fixed_vector const velocity{0, 0, 0};
     actors.advance({observer, observer, velocity, false, 0}, {});
-    if(!object.shard_colour || *object.shard_colour != data.word(offset + 80) || weapons.random_stream().seed() != data.dword(offset + 82))
+    if(!object.shard_colour || *object.shard_colour != data.word(offset + 80) || weapons.random_stream().seed() != data.dword(offset + 82)) {
       throw std::runtime_error{"native shard colour/random case " + std::to_string(i)};
+    }
     geometry.prepare_colours(object, 0, 0, 0, false);
     if(geometry.colour(0x71cf) != *object.shard_colour) throw std::runtime_error{"shard colour was not applied to its primitives"};
   }

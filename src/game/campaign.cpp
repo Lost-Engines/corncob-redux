@@ -4,9 +4,9 @@
 #include <chrono>
 #include <stdexcept>
 #include <utility>
+#include "maths/integer.h"
 #include "platform/storage.h"
 #include "resources/binary_reader.h"
-#include "maths/integer.h"
 #include "world/theatre_catalog.h"
 
 namespace corncob::game {
@@ -120,8 +120,9 @@ void campaign_store::synchronise_identities() {
   /// A common roster of names links independent careers; no medals, deaths or progress leak across editions.
   for(auto &source : profiles) for(auto const &pilot : source.roster.pilots) {
     for(auto &target : profiles) {
-      if(std::ranges::none_of(target.roster.pilots, [&](auto const &entry){return entry.name() == pilot.name();}))
+      if(std::ranges::none_of(target.roster.pilots, [&](auto const &entry){return entry.name() == pilot.name();})) {
         target.roster.pilots.emplace_back(pilot.name());
+      }
     }
   }
 }
@@ -179,8 +180,9 @@ bool campaign_store::can_fly() const {
 }
 unsigned int campaign_store::create_pilot(std::string_view const name, bool const activate_created) {
   /// Pilot creation validates the bounded native name before changing saved state
-  if(std::ranges::any_of(state().roster.pilots, [name](pilot_record const &pilot){return pilot.name() == name;}))
+  if(std::ranges::any_of(state().roster.pilots, [name](pilot_record const &pilot){return pilot.name() == name;})) {
     throw std::invalid_argument{"a pilot with that name already exists"};
+  }
   state().roster.pilots.emplace_back(name);
   synchronise_identities();
   unsigned int const index{static_cast<unsigned int>(state().roster.pilots.size() - 1)};

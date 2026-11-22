@@ -36,10 +36,12 @@ int main(int const argc, char const *const argv[]) {
     for(auto &byte : expected) byte = input.byte();
     corncob::game::pilot_record actual{before};
     actual.review_career(theatres, losses, now, edition);
-    for(unsigned int field{0}; field != expected.size(); ++field)
+    for(unsigned int field{0}; field != expected.size(); ++field) {
       if(actual.native_data()[field] != expected[field]) throw std::runtime_error{"native review case " + std::to_string(i) + " byte " + std::to_string(field)};
-    for(auto const &theatre : theatres)
+    }
+    for(auto const &theatre : theatres) {
       if(theatre.completion_recorded != (input.word() != 0)) throw std::runtime_error{"native theatre completion record " + std::to_string(i)};
+    }
   }
   std::cout << cases << " complete original promotion, medal and court-martial decisions match" << std::endl;
   return EXIT_SUCCESS;

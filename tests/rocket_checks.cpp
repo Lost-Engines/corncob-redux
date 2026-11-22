@@ -28,8 +28,9 @@ int main(int const argc, char const *const argv[]) {
       .previous_tick{old_tick},
     };
     bool const ready{charge.advance(aircraft, tick, elapsed, actual_elapsed)};
-    if(aircraft.rocket_ticks != expected_stock || charge.previous_tick != expected_tick || charge.colour != expected_colour || ready != (expected_colour == 10))
+    if(aircraft.rocket_ticks != expected_stock || charge.previous_tick != expected_tick || charge.colour != expected_colour || ready != (expected_colour == 10)) {
       throw std::runtime_error{"native rocket update " + std::to_string(i)};
+    }
   }
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   corncob::world::training_setup setup;

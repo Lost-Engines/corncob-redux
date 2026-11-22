@@ -27,7 +27,7 @@ std::span<theatre_definition const> theatres(theatre_group const group) noexcept
   std::unreachable();
 }
 std::span<theatre_definition const> campaign_theatres(campaign_id const campaign) noexcept {
-  static auto constexpr expansion{[] {
+  static auto constexpr expansion{[]{
     std::array<theatre_definition, other_worlds_catalog.size() + practice_catalog.size()> result{};
     unsigned int index{0};
     for(auto const &definition : other_worlds_catalog) result[index++] = definition;

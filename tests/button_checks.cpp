@@ -16,8 +16,9 @@ int main(int const argc, char const *const argv[]) {
     auto const button{static_cast<corncob::graphics::cockpit_button>(input.byte())};
     auto const source{input.byte()}, destination{input.byte()};
     uint64_t const low{input.dword()}, high{input.dword()};
-    for(unsigned int y{0}; y != 350; ++y)
+    for(unsigned int y{0}; y != 350; ++y) {
       for(unsigned int x{0}; x != 640; ++x) target.pixels[y * 640 + x] = static_cast<uint8_t>((x * 5 + y * 7) & 15u);
+    }
     corncob::graphics::recolour_button(target, button, source, destination);
     uint64_t hash{14'695'981'039'346'656'037ull};
     for(auto const pixel : target.pixels) hash = (hash ^ pixel) * 1'099'511'628'211ull;

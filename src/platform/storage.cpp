@@ -45,14 +45,16 @@ void write_binary(std::filesystem::path const &path, std::span<uint8_t const> co
   temporary += ".tmp";
   {
     std::ofstream output{temporary, std::ios::binary | std::ios::trunc};
-    if(!output || !output.write(reinterpret_cast<char const*>(bytes.data()), static_cast<std::streamsize>(bytes.size())))
+    if(!output || !output.write(reinterpret_cast<char const*>(bytes.data()), static_cast<std::streamsize>(bytes.size()))) {
       throw std::runtime_error{"cannot write save file: " + temporary.string()};
+    }
     output.close();
     if(!output) throw std::runtime_error{"cannot finish writing save file: " + temporary.string()};
   }
 #ifdef _WIN32
-  if(!MoveFileExW(temporary.c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+  if(!MoveFileExW(temporary.c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
     throw std::runtime_error{"cannot replace save file: " + path.string()};
+  }
 #else
   std::filesystem::rename(temporary, path);
 #endif // _WIN32

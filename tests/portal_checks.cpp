@@ -2,8 +2,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include "game/portal.h"
 #include "game/actors.h"
+#include "game/portal.h"
 #include "game/session.h"
 #include "resources/assets.h"
 #include "tests/actor_record.h"
@@ -24,8 +24,9 @@ int main(int const argc, char const *const argv[]) {
     int32_t const expected_x{input.signed_dword()}, expected_y{input.signed_dword()}, expected_z{input.signed_dword()};
     auto const expected_seed{input.dword()};
     corncob::game::transfer_portal(position, start, flag == 0 ? corncob::game::portal_transfer::none : flag == 255 ? corncob::game::portal_transfer::random : corncob::game::portal_transfer::home, random);
-    if(position != corncob::maths::world_position{expected_x, expected_y, expected_z} || random.seed() != expected_seed)
+    if(position != corncob::maths::world_position{expected_x, expected_y, expected_z} || random.seed() != expected_seed) {
       throw std::runtime_error{"native portal destination or random continuation " + std::to_string(i)};
+    }
   }
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
   for(unsigned int i{0}; i != handlers; ++i) {
@@ -47,8 +48,9 @@ int main(int const argc, char const *const argv[]) {
     actors.advance({observer, observer, velocity, false, 0}, {});
     auto const &actual{world.objects[index]};
     corncob::tests::compare_actor(actual, expected, i, "portal");
-    if(actual.portal_colour != colour || weapons.random_stream().seed() != expected_seed)
+    if(actual.portal_colour != colour || weapons.random_stream().seed() != expected_seed) {
       throw std::runtime_error{"native portal timer/colour/random update " + std::to_string(i)};
+    }
     geometry.prepare_colours(actual, 0, 0, 0, false);
     if(geometry.colour(0x2dd3) != colour) throw std::runtime_error{"portal colour did not reach its model primitives"};
   }
@@ -73,11 +75,13 @@ int main(int const argc, char const *const argv[]) {
     .heading{0},
   });
   transfer.advance({});
-  if(transfer.statistics().objectives_completed != 1 || transfer.craft().position.z > 200'000)
+  if(transfer.statistics().objectives_completed != 1 || transfer.craft().position.z > 200'000) {
     throw std::runtime_error{"portal contact did not credit its objective before the deferred transfer"};
+  }
   transfer.advance({});
-  if(std::abs(transfer.craft().position.z - 229'376) > 5000 || transfer.statistics().objectives_completed != 1)
+  if(std::abs(transfer.craft().position.z - 229'376) > 5000 || transfer.statistics().objectives_completed != 1) {
     throw std::runtime_error{"portal arrival failed or repeated its completion credit"};
+  }
   corncob::game::session repaired{geometry, portal_world(6)};
   repaired.set_invincible(true);
   repaired.relocate({
@@ -86,8 +90,9 @@ int main(int const argc, char const *const argv[]) {
     .heading{0},
   });
   repaired.advance({});
-  if(!repaired.aircraft_damage().invincible || repaired.craft().position.z > 200'000)
+  if(!repaired.aircraft_damage().invincible || repaired.craft().position.z > 200'000) {
     throw std::runtime_error{"repair portal changed invulnerability or unexpectedly teleported the aircraft"};
+  }
   auto damaged_world{portal_world(2)};
   auto const &definition{geometry.definition(corncob::world::object_type::portal)};
   damaged_world.objects.push_back({
@@ -107,8 +112,9 @@ int main(int const argc, char const *const argv[]) {
   auto const worst{damage_then_repair.aircraft_damage().worst};
   if(worst == 0) throw std::runtime_error{"damaging portal failed to damage the aircraft"};
   damage_then_repair.advance({});
-  if(damage_then_repair.aircraft_damage().total != 0 || damage_then_repair.aircraft_damage().worst != worst)
+  if(damage_then_repair.aircraft_damage().total != 0 || damage_then_repair.aircraft_damage().worst != worst) {
     throw std::runtime_error{"repair portal failed to repair current damage while preserving the sortie's historical worst"};
+  }
   std::cout << cases << " original portal destinations, 256 complete portal updates and connected transfer/repair cases match" << std::endl;
   return EXIT_SUCCESS;
 }
