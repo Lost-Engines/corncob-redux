@@ -26,11 +26,16 @@ model_animation model_animation::at(unsigned int const frame) noexcept {
 int16_t model_animation::value(model_pulse const pulse) const noexcept {
   /// Typed bindings distinguish signed vertex magnitudes from the two positive disc diameters
   switch(pulse) {
-  case model_pulse::wide_wall: return wide_wall;
-  case model_pulse::small_wall: return small_wall;
-  case model_pulse::square_wall: return square_wall;
-  case model_pulse::upper_saucer: return maths::word(upper_saucer);
-  case model_pulse::lower_saucer: return maths::word(lower_saucer);
+  case model_pulse::wide_wall:
+    return wide_wall;
+  case model_pulse::small_wall:
+    return small_wall;
+  case model_pulse::square_wall:
+    return square_wall;
+  case model_pulse::upper_saucer:
+    return maths::word(upper_saucer);
+  case model_pulse::lower_saucer:
+    return maths::word(lower_saucer);
   }
   return 0;
 }

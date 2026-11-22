@@ -26,7 +26,11 @@ private:
   std::vector<float> &depth;
   perspective_view view;
   random_source &random;
-  struct projected_point { double x, y, depth; };
+  struct projected_point {
+    double x;
+    double y;
+    double depth;
+  };
   view_point orient(view_point const &source) const;
   double plane(view_point const &point, unsigned int index) const;
   projected_point project(view_point const &point) const;

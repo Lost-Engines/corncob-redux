@@ -112,7 +112,13 @@ private:
   unsigned int starting_airfield{4};
   campaign_store &campaign;
   std::array<uint8_t, 4096> menu_font;
-  enum class roster_action { activate, records, rename, resurrect, remove };
+  enum class roster_action {
+    activate,
+    records,
+    rename,
+    resurrect,
+    remove
+  };
   roster_action pilot_action{roster_action::activate};
   unsigned int pilot_index{0};
   unsigned int score_list{0};

@@ -30,7 +30,8 @@ int main(int const argc, char const *const argv[]) {
   /// Decode every original composition and traverse title, briefing, help, confirmation and outcome chains without a window
   namespace game = corncob::game;
   corncob::resources::collection assets{corncob::resources::front_end_asset()};
-  auto const stories{assets.story()}, outcomes{assets.outcomes()};
+  auto const stories{assets.story()};
+  auto const outcomes{assets.outcomes()};
   if(stories.size() != 2 || outcomes.size() != 15) throw std::runtime_error{"original presentation count changed"};
   corncob::render::framebuffer frame;
   if(argc < 2 || argc > 3) throw std::invalid_argument{"interface_checks requires its dedicated scratch directory and optional capture directory"};
@@ -82,8 +83,8 @@ int main(int const argc, char const *const argv[]) {
   for(unsigned int offset{0}; offset != medals.size(); offset += 17) {
     for(unsigned int row{0}; row != 16; ++row) {
       if(menu_font[medals[offset + 16] * 16u + row] != medals[offset + row]) throw std::runtime_error{"medal glyph differs from its original font record"};
-  }
     }
+  }
   front.command(game::interface_command::cancel);
   front.command(game::interface_command::cancel);
   front.character('t');
@@ -97,12 +98,14 @@ int main(int const argc, char const *const argv[]) {
   front.character('n');
   save_capture("training-counts");
   front.character('a');
-  front.character('2'); front.character('6');
+  front.character('2');
+  front.character('6');
   front.command(game::interface_command::accept);
   if(front.current_page() != game::interface_page::training_value) throw std::runtime_error{"training accepted more than 25 sites"};
   front.command(game::interface_command::backspace);
   front.command(game::interface_command::backspace);
-  front.character('2'); front.character('5');
+  front.character('2');
+  front.character('5');
   front.command(game::interface_command::accept);
   if(career.training_settings().aaa.count != 25 || career.training_settings().kla.quality != 7) throw std::runtime_error{"nested training editors lost their settings"};
   front.command(game::interface_command::cancel);
@@ -121,14 +124,16 @@ int main(int const argc, char const *const argv[]) {
     save_capture(c == 's' ? "high-scores" : c == 'c' ? "top-careers" : "fast-careers");
     front.command(game::interface_command::cancel);
   }
-  front.character('d'); front.character('s');
+  front.character('d');
+  front.character('s');
   front.command(game::interface_command::cancel);
   if(front.current_page() != game::interface_page::score_delete) throw std::runtime_error{"score deletion did not cancel"};
   front.command(game::interface_command::cancel);
   front.command(game::interface_command::cancel);
   front.character('v');
   save_capture("documentation");
-  front.character('1'); front.character('7');
+  front.character('1');
+  front.character('7');
   front.command(game::interface_command::accept);
   front.command(game::interface_command::end);
   front.command(game::interface_command::cancel);
@@ -142,12 +147,16 @@ int main(int const argc, char const *const argv[]) {
   save_capture("new-theatre");
   front.command(game::interface_command::accept);
   if(!career.active_theatre() || career.theatres().size() != 1 || !career.load_world("morning")) throw std::runtime_error{"opening a theater did not create its saved world"};
-  front.character('o'); front.command(game::interface_command::down); front.command(game::interface_command::accept);
+  front.character('o');
+  front.command(game::interface_command::down);
+  front.command(game::interface_command::accept);
   if(career.theatres().size() != 2 || career.active_theatre() != 1) throw std::runtime_error{"opening another theater lost the first"};
-  front.character('a'); front.command(game::interface_command::accept);
+  front.character('a');
+  front.command(game::interface_command::accept);
   if(career.active_theatre() != 0) throw std::runtime_error{"theater activation lost its saved-world index"};
   save_capture("combat");
-  front.character('v'); front.command(game::interface_command::accept);
+  front.character('v');
+  front.command(game::interface_command::accept);
   save_capture("theatre-records");
   front.command(game::interface_command::cancel);
   front.character('f');
@@ -185,11 +194,15 @@ int main(int const argc, char const *const argv[]) {
     backdrop.width = size.width;
     backdrop.height = size.height;
     backdrop.pixels.resize(size.width * size.height);
-    for(unsigned int y{0}; y != size.height; ++y) for(unsigned int x{0}; x != size.width; ++x) backdrop.pixels[y * size.width + x] = {
-      .red{static_cast<uint8_t>(x)},
-      .green{static_cast<uint8_t>(y)},
-      .blue{static_cast<uint8_t>(x + y)},
-    };
+    for(unsigned int y{0}; y != size.height; ++y) {
+      for(unsigned int x{0}; x != size.width; ++x) {
+        backdrop.pixels[y * size.width + x] = {
+          .red{static_cast<uint8_t>(x)},
+          .green{static_cast<uint8_t>(y)},
+          .blue{static_cast<uint8_t>(x + y)},
+        };
+      }
+    }
     auto const viewport{corncob::render::fit_viewport(1280, 960, static_cast<int>(size.width), static_cast<int>(size.height))};
     for(unsigned int notice{0}; notice != static_cast<unsigned int>(std::to_underlying(corncob::resources::radio_notice::count)); ++notice) {
       auto const type{static_cast<corncob::resources::radio_notice>(notice)};
@@ -202,13 +215,17 @@ int main(int const argc, char const *const argv[]) {
       auto const displayed{corncob::render::fit_viewport(1280, 960, static_cast<int>(frame.width), static_cast<int>(frame.height))};
       if(displayed.width != viewport.width || displayed.height != viewport.height) throw std::runtime_error{"radio message changed the displayed enlargement"};
       unsigned int text_pixels{0};
-      for(unsigned int y{0}; y != size.height; ++y) for(unsigned int x{0}; x != size.width; ++x) {
-        int const message_x{static_cast<int>(x * 640 / size.width)}, message_y{static_cast<int>(y * 350 / size.height)};
-        auto const &actual{frame.pixels[y * size.width + x]}, &expected{backdrop.pixels[y * size.width + x]};
-        if(message_x >= box.left && message_x < box.left + box.width && message_y >= box.top && message_y < box.top + box.height) {
-          if(actual.red == 170 && actual.green == 170 && actual.blue == 170) ++text_pixels;
-        } else if(actual.red != expected.red || actual.green != expected.green || actual.blue != expected.blue) {
-          throw std::runtime_error{"radio overlay moved or resampled the surrounding scene"};
+      for(unsigned int y{0}; y != size.height; ++y) {
+        for(unsigned int x{0}; x != size.width; ++x) {
+          int const message_x{static_cast<int>(x * 640 / size.width)};
+          int const message_y{static_cast<int>(y * 350 / size.height)};
+          auto const &actual{frame.pixels[y * size.width + x]};
+          auto const &expected{backdrop.pixels[y * size.width + x]};
+          if(message_x >= box.left && message_x < box.left + box.width && message_y >= box.top && message_y < box.top + box.height) {
+            if(actual.red == 170 && actual.green == 170 && actual.blue == 170) ++text_pixels;
+          } else if(actual.red != expected.red || actual.green != expected.green || actual.blue != expected.blue) {
+            throw std::runtime_error{"radio overlay moved or resampled the surrounding scene"};
+          }
         }
       }
       if(text_pixels < 20) throw std::runtime_error{"adapted radio text disappeared"};
@@ -236,7 +253,10 @@ int main(int const argc, char const *const argv[]) {
   setup.render(frame);
   if(argc == 3) capture(frame, std::filesystem::path{argv[2]} / "control-setup.ppm");
   setup.command(game::interface_command::cancel);
-  setup.character('c'); setup.character('m'); setup.character('p'); setup.character('c');
+  setup.character('c');
+  setup.character('m');
+  setup.character('p');
+  setup.character('c');
   if(setup.flight_controls().beginner_flight || !career.combat_invincible() || career.inflight_comments()) throw std::runtime_error{"combat menu toggles did not change their independent settings"};
   setup.command(game::interface_command::cancel);
   setup.character('m');
@@ -246,13 +266,17 @@ int main(int const argc, char const *const argv[]) {
   auto &restored{*restored_storage};
   if(restored.music() != corncob::audio::music_cue::silent || restored.flight_controls().joystick_device != -2
       || restored.flight_controls().beginner_flight || !reopened.combat_invincible() || reopened.inflight_comments()) throw std::runtime_error{"original menu preferences were lost on restart"};
-  restored.character('d'); restored.character('l'); restored.command(game::interface_command::accept);
+  restored.character('d');
+  restored.character('l');
+  restored.command(game::interface_command::accept);
   restored.render(frame);
   if(argc == 3) capture(frame, std::filesystem::path{argv[2]} / "delete-pilot.ppm");
   if(restored.current_page() != game::interface_page::pilot_delete) throw std::runtime_error{"pilot deletion confirmation was not reachable"};
   restored.command(game::interface_command::cancel);
   if(reopened.pilots().size() != 1) throw std::runtime_error{"cancelled pilot deletion removed the pilot"};
-  restored.character('l'); restored.command(game::interface_command::accept); restored.command(game::interface_command::accept);
+  restored.character('l');
+  restored.command(game::interface_command::accept);
+  restored.command(game::interface_command::accept);
   if(!reopened.pilots().empty()) throw std::runtime_error{"confirmed pilot deletion did not remove the pilot"};
   restored.command(game::interface_command::cancel);
   restored.character('x');

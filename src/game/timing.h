@@ -21,9 +21,16 @@ class frame_clock {
   std::optional<double> previous;
 public:
   double advance(double timestamp, bool running = true, bool accelerated = false) noexcept {
-    if(!std::isfinite(timestamp)) { reset(); return 0; }
-    if(!running) { reset(); return 0; }
-    auto const last{previous}; previous = timestamp;
+    if(!std::isfinite(timestamp)) {
+      reset();
+      return 0;
+    }
+    if(!running) {
+      reset();
+      return 0;
+    }
+    auto const last{previous};
+    previous = timestamp;
     if(!last || timestamp < *last) return 0;
     return std::min(timestamp - *last, maximum_frame_time) * (accelerated ? fast_forward_multiplier : 1);
   }

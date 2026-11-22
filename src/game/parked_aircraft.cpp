@@ -21,13 +21,17 @@ parking_reset tower_parking_reset(maths::world_position const &tower, maths::wor
 bool advance_parked_aircraft(world::placed_object &object, maths::world_position const &base, maths::world_position const &observer,
                              aircraft_parking &parking, bool const on_foot, bool const exiting) noexcept {
   /// OBJ5DATIM repairs eligible home landings, arranges unclaimed planes and requests the original boarding handoff
-  uint16_t constexpr permanently_crashed{0x100}, experimental{0x2000}, landing_bits{6};
-  int32_t constexpr parking_spacing{7200}, departure_offset{8000};
+  uint16_t constexpr permanently_crashed{0x100};
+  uint16_t constexpr experimental{0x2000};
+  uint16_t constexpr landing_bits{6};
+  int32_t constexpr parking_spacing{7200};
+  int32_t constexpr departure_offset{8000};
   if((object.flags & permanently_crashed) != 0) object.pose = world::model_pose::damaged;
   object.timer = 32'000;
   if(!exiting) {
-    if(parking.resetting) object.aircraft_parking_flags = 0;
-    else if((object.aircraft_parking_flags & aircraft_parking::keep_pose) == 0 && (object.flags & (permanently_crashed | experimental)) == 0
+    if(parking.resetting) {
+      object.aircraft_parking_flags = 0;
+    } else if((object.aircraft_parking_flags & aircraft_parking::keep_pose) == 0 && (object.flags & (permanently_crashed | experimental)) == 0
       && ((object.flags & landing_bits) == 0 || (object.flags & landing_bits) == landing_bits)) {
       object.flags &= static_cast<uint16_t>(~(permanently_crashed | landing_bits));
       object.position.z = base.z;

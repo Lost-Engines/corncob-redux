@@ -55,7 +55,7 @@ pilot_record::pilot_record(std::span<uint8_t const> const source) {
 std::string pilot_record::name() const {
   /// A record reserves twenty-two bytes although the original name prompt permits twenty characters
   auto const end{std::find(data.begin(), data.begin() + 22, 0)};
-  return {reinterpret_cast<char const*>(data.data()), static_cast<size_t>(end - data.begin())};
+  return {reinterpret_cast<char const *>(data.data()), static_cast<size_t>(end - data.begin())};
 }
 void pilot_record::rename(std::string_view const name) {
   /// Keep DOS-compatible names bounded and terminated inside their original field
@@ -75,13 +75,18 @@ void pilot_record::select(bool const value) {
 }
 std::span<uint8_t const> pilot_record::theatres() const {
   /// The native record stores twenty numbered-theatre references after its count and active-index bytes
-  unsigned int constexpr maximum_theatres{20}, count_offset{0x23c}, first_theatre_offset{0x23e};
+  unsigned int constexpr maximum_theatres{20};
+  unsigned int constexpr count_offset{0x23c};
+  unsigned int constexpr first_theatre_offset{0x23e};
   if(data[count_offset] > maximum_theatres) throw std::invalid_argument{"pilot has too many saved-theatre references"};
   return std::span{data}.subspan(first_theatre_offset, data[count_offset]);
 }
 void pilot_record::add_theatre(uint8_t const number) {
   /// Save the original file number and make its zero-based list position active
-  unsigned int constexpr maximum_theatres{20}, count_offset{0x23c}, active_offset{0x23d}, first_theatre_offset{0x23e};
+  unsigned int constexpr maximum_theatres{20};
+  unsigned int constexpr count_offset{0x23c};
+  unsigned int constexpr active_offset{0x23d};
+  unsigned int constexpr first_theatre_offset{0x23e};
   if(number == 0) throw std::invalid_argument{"saved-theatre number must be nonzero"};
   auto const entries{theatres()};
   auto const existing{std::ranges::find(entries, number)};
@@ -147,8 +152,8 @@ void pilot_record::training_settings(world::training_setup const &settings) {
   for(auto const &defence : {settings.kla, settings.vehicles, settings.aaa}) {
     if(defence.count > world::training_defence::maximum_menu_count || defence.quality < -1 || defence.quality > 7) {
       throw std::invalid_argument{"training settings exceed the original menu limits"};
-  }
     }
+  }
   data[0x234] = static_cast<uint8_t>(settings.kla.count);
   data[0x235] = static_cast<uint8_t>(settings.aaa.count);
   data[0x236] = static_cast<uint8_t>(settings.vehicles.count);
@@ -276,9 +281,11 @@ void pilot_record::review_career(std::span<theatre_progress> const theatres, uin
     dword(619, maths::dword(static_cast<int64_t>(std::max(suspended_until(), now)) + sentence));
     return;
   }
-  bool all_completed{true}, newly_completed{false};
+  bool all_completed{true};
+  bool newly_completed{false};
   auto const definitions{world::campaign_theatres(campaign)};
-  unsigned int required{0}, accomplished{0};
+  unsigned int required{0};
+  unsigned int accomplished{0};
   for(auto const &definition : definitions) {
     bool completed{false};
     int16_t highest_completed{-1};
@@ -313,15 +320,19 @@ void pilot_record::review_career(std::span<theatre_progress> const theatres, uin
     if(theatre_aircraft_lost == 0) award(medal::distinguished_flying_cross);
   }
   if(all_completed && (word(flags_offset) & 2u) == 0) {
-    if(campaign == world::campaign_id::other_worlds) data[std::to_underlying(medal::combat_master)] = 1;
-    else if(awards(medal::combat_master) == 0) award(medal::combat_master);
+    if(campaign == world::campaign_id::other_worlds) {
+      data[std::to_underlying(medal::combat_master)] = 1;
+    } else if(awards(medal::combat_master) == 0) award(medal::combat_master);
   }
   int32_t const score{last_sortie_score()};
   if(maths::word(result.maximum_damage) >= 27 && result.has(sortie_status::home) && result.aircraft_lost == 0 && !result.has(sortie_status::crashed_away)) award(medal::purple_heart);
-  if(score > 100'000) award(medal::stellar_cluster);
-  else if(score > 50'000) award(medal::gold_star);
-  else if(score > 20'000) award(medal::silver_star);
-  else if(score > 10'000) award(medal::bronze_star);
+  if(score > 100'000) {
+    award(medal::stellar_cluster);
+  } else if(score > 50'000) {
+    award(medal::gold_star);
+  } else if(score > 20'000) {
+    award(medal::silver_star);
+  } else if(score > 10'000) award(medal::bronze_star);
   if(maths::word(result.objectives_completed) >= 5) award(medal::distinguished_service_cross);
   if(maths::word(sorties()) >= (awards(medal::service_award) + 1) * 10 && !result.has(sortie_status::killed)) award(medal::service_award);
 }
@@ -364,7 +375,8 @@ pilot_roster pilot_roster::decode(std::span<uint8_t const> const source) {
   std::vector<uint8_t> plain{source.begin() + 4, source.end()};
   mask(plain, result.seed);
   resources::binary_reader const decoded{plain};
-  unsigned int header_length{0}, count{0};
+  unsigned int header_length{0};
+  unsigned int count{0};
   for(unsigned int const length : {24u, 23u}) {
     if(plain.size() >= length + 1) {
       unsigned int const records{decoded.word(length - 2)};

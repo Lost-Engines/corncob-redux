@@ -23,17 +23,29 @@ int32_t signed_square(int16_t const value) noexcept {
 void advance_forces(aircraft_state &aircraft, atmosphere const &environment, time_step const step) {
   /// Translate 3.42's force pass, preserving every intermediate word/dword scale and rounding point
   int16_t constexpr force_scale{16};
-  int16_t constexpr engine_coefficient{450}, reserve_engine_coefficient{350};
-  int16_t constexpr full_throttle{200}, idle_throttle{20};
+  int16_t constexpr engine_coefficient{450};
+  int16_t constexpr reserve_engine_coefficient{350};
+  int16_t constexpr full_throttle{200};
+  int16_t constexpr idle_throttle{20};
   int16_t constexpr minimum_thrust_airflow{300};
-  int16_t constexpr drag_breakpoint{1390}, normal_drag{13'734}, fast_drag{1368}, fast_side_drag{136};
-  int16_t constexpr normal_lift{2016}, stalled_lift{28'224};
-  int16_t constexpr stall_half_angle{2912}, flap_stall_half_angle{3882};
-  int constexpr maximum_side_velocity{9500}, maximum_vertical_velocity{9600}, sideslip_snap{200};
+  int16_t constexpr drag_breakpoint{1390};
+  int16_t constexpr normal_drag{13'734};
+  int16_t constexpr fast_drag{1368};
+  int16_t constexpr fast_side_drag{136};
+  int16_t constexpr normal_lift{2016};
+  int16_t constexpr stalled_lift{28'224};
+  int16_t constexpr stall_half_angle{2912};
+  int16_t constexpr flap_stall_half_angle{3882};
+  int constexpr maximum_side_velocity{9500};
+  int constexpr maximum_vertical_velocity{9600};
+  int constexpr sideslip_snap{200};
   unsigned int constexpr airflow_scale_bits{4};
   int constexpr roll_count_threshold{13'000};
-  unsigned int constexpr power_phase_range{20'383}, power_phase_bias{4000}, quarter_turn{16'384};
-  int16_t constexpr rocket_drain{5}, rocket_engine_multiplier{3};
+  unsigned int constexpr power_phase_range{20'383};
+  unsigned int constexpr power_phase_bias{4000};
+  unsigned int constexpr quarter_turn{16'384};
+  int16_t constexpr rocket_drain{5};
+  int16_t constexpr rocket_engine_multiplier{3};
   assert(environment.height != 0 && environment.power_transition != 0);
   assert(step.normal > 0 && step.elapsed > 0);
   aircraft.body_velocity = maths::transform(aircraft.world_to_body, aircraft.velocity);
@@ -120,7 +132,8 @@ void advance_forces(aircraft_state &aircraft, atmosphere const &environment, tim
 
 void advance_position(aircraft_state &aircraft, time_step const step) {
   /// MOVEME integrates velocity plus half acceleration; the experimental aircraft advances four times farther
-  unsigned int constexpr normal_position_shift{4}, experimental_position_shift{2};
+  unsigned int constexpr normal_position_shift{4};
+  unsigned int constexpr experimental_position_shift{2};
   unsigned int const shift{aircraft.variant == aircraft_variant::experimental ? experimental_position_shift : normal_position_shift};
   for(unsigned int axis{0}; axis != 3; ++axis) {
     int16_t const velocity{maths::word((aircraft.acceleration[axis] >> 1) + aircraft.velocity[axis])};

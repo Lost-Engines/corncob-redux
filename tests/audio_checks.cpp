@@ -29,7 +29,8 @@ int main(int const argc, char const *const argv[]) {
     sound.update(frame);
     auto const writes{sound.pending_registers()};
     for(unsigned int n{0}; n != 2; ++n) {
-      auto const address{input.byte()}, expected{input.byte()};
+      auto const address{input.byte()};
+      auto const expected{input.byte()};
       auto const found{std::find_if(writes.rbegin(), writes.rend(), [address](auto const &entry){return entry.address == address;})};
       if(found == writes.rend() || found->value != expected) throw std::runtime_error{"engine OPL register mismatch in case " + std::to_string(i)};
     }

@@ -12,11 +12,13 @@ int main(int const argc, char const *const argv[]) {
   auto const count{input.dword()};
   for(unsigned int i{0}; i != count; ++i) {
     bool const fast{input.byte() != 0};
-    corncob::world::placed_object a, b;
+    corncob::world::placed_object a;
+    corncob::world::placed_object b;
     for(unsigned int axis{0}; axis != 3; ++axis) a.position[axis] = input.signed_dword();
     for(unsigned int axis{0}; axis != 3; ++axis) b.position[axis] = input.signed_dword();
     for(unsigned int axis{0}; axis != 3; ++axis) a.velocity[axis] = input.signed_word();
-    auto const ar{input.signed_word()}, br{input.signed_word()};
+    auto const ar{input.signed_word()};
+    auto const br{input.signed_word()};
     a.collision_extents = corncob::maths::fixed_vector{ar, ar, ar};
     b.collision_extents = corncob::maths::fixed_vector{br, br, br};
     a.flags = b.flags = 9;
@@ -25,8 +27,10 @@ int main(int const argc, char const *const argv[]) {
     b.collision_group = 1;
     bool const expected{input.byte() != 0};
     bool const actual{corncob::game::objects_overlap(a, b)};
-    if(actual != expected) throw std::runtime_error{"native collision differs in case " + std::to_string(i)
-      + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+    if(actual != expected) {
+      throw std::runtime_error{"native collision differs in case " + std::to_string(i)
+        + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+    }
   }
   std::cout << count << " native ordinary and fast projectile contacts match" << std::endl;
   return EXIT_SUCCESS;

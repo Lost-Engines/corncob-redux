@@ -24,7 +24,7 @@ int main(int const argc, char const *const argv[]) try {
   std::ifstream file{argv[1], std::ios::binary};
   std::vector<uint8_t> const bytes{std::istreambuf_iterator<char>{file}, {}};
   auto const word{[&](unsigned int const offset){return bytes.at(offset) | bytes.at(offset + 1) << 8;}};
-  if(bytes.size() < 26 || std::string_view{reinterpret_cast<char const*>(bytes.data()), 8} != "DBRAWOPL"
+  if(bytes.size() < 26 || std::string_view{reinterpret_cast<char const *>(bytes.data()), 8} != "DBRAWOPL"
     || word(8) != 2 || word(10) != 0 || bytes[20] != 0 || bytes[21] != 0 || bytes[22] != 0
     || bytes[25] > 127 || bytes.size() < 26u + bytes[25] || ((bytes.size() - 26 - bytes[25]) & 1u) != 0) {
     throw std::invalid_argument{"expected an uncompressed DOSBox DRO v2 OPL2 capture"};
@@ -44,12 +44,16 @@ int main(int const argc, char const *const argv[]) try {
       ++rendered;
     }
   }};
-  unsigned int milliseconds{0}, writes{0};
+  unsigned int milliseconds{0};
+  unsigned int writes{0};
   for(unsigned int offset{26u + bytes[25]}; offset < bytes.size(); offset += 2) {
-    uint8_t const command{bytes[offset]}, value{bytes[offset + 1]};
-    if(command == bytes[23]) milliseconds += value + 1;
-    else if(command == bytes[24]) milliseconds += (value + 1) * 256;
-    else {
+    uint8_t const command{bytes[offset]};
+    uint8_t const value{bytes[offset + 1]};
+    if(command == bytes[23]) {
+      milliseconds += value + 1;
+    } else if(command == bytes[24]) {
+      milliseconds += (value + 1) * 256;
+    } else {
       if(milliseconds >= end_ms) break;
       render_until(static_cast<uint64_t>(milliseconds) * sample_rate / 1000);
       if((command & 127u) >= bytes[25]) throw std::invalid_argument{"invalid DRO register-table index"};

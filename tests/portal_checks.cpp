@@ -13,15 +13,22 @@ int main(int const argc, char const *const argv[]) {
   /// Verify original portal precision and PRNG call order rather than only checking a broad destination region
   if(argc != 2) throw std::invalid_argument{"portal fixture required"};
   corncob::tests::reference_reader input{argv[1], "CORNPRT2"};
-  unsigned int const cases{input.dword()}, handlers{input.dword()};
+  unsigned int const cases{input.dword()};
+  unsigned int const handlers{input.dword()};
   for(unsigned int i{0}; i != cases; ++i) {
     auto const flag{input.byte()};
-    int32_t const start_x{input.signed_dword()}, start_y{input.signed_dword()}, start_z{input.signed_dword()};
+    int32_t const start_x{input.signed_dword()};
+    int32_t const start_y{input.signed_dword()};
+    int32_t const start_z{input.signed_dword()};
     corncob::maths::world_position const start{start_x, start_y, start_z};
-    int32_t const x{input.signed_dword()}, y{input.signed_dword()}, z{input.signed_dword()};
+    int32_t const x{input.signed_dword()};
+    int32_t const y{input.signed_dword()};
+    int32_t const z{input.signed_dword()};
     corncob::maths::world_position position{x, y, z};
     corncob::maths::random_source random{input.dword()};
-    int32_t const expected_x{input.signed_dword()}, expected_y{input.signed_dword()}, expected_z{input.signed_dword()};
+    int32_t const expected_x{input.signed_dword()};
+    int32_t const expected_y{input.signed_dword()};
+    int32_t const expected_z{input.signed_dword()};
     auto const expected_seed{input.dword()};
     corncob::game::transfer_portal(position, start, flag == 0 ? corncob::game::portal_transfer::none : flag == 255 ? corncob::game::portal_transfer::random : corncob::game::portal_transfer::home, random);
     if(position != corncob::maths::world_position{expected_x, expected_y, expected_z} || random.seed() != expected_seed) {

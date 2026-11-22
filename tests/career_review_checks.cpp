@@ -15,7 +15,8 @@ int main(int const argc, char const *const argv[]) {
   auto const edition{argc == 3 ? corncob::world::campaign_id::other_worlds : corncob::world::campaign_id::earth};
   auto const definitions{corncob::world::campaign_theatres(edition)};
   for(unsigned int i{0}; i != cases; ++i) {
-    std::array<uint8_t, 623> before, expected;
+    std::array<uint8_t, 623> before;
+    std::array<uint8_t, 623> expected;
     for(auto &byte : before) byte = input.byte();
     auto const now{input.signed_dword()};
     auto const losses{input.word()};
@@ -23,7 +24,8 @@ int main(int const argc, char const *const argv[]) {
     std::vector<corncob::game::theatre_progress> theatres;
     for(unsigned int n{0}; n != count; ++n) {
       auto const definition{input.byte()};
-      auto const remaining{input.signed_word()}, completed{input.signed_word()};
+      auto const remaining{input.signed_word()};
+      auto const completed{input.signed_word()};
       bool const credited{input.byte() != 0};
       theatres.push_back({
         .definition{std::string{definitions[definition].name}},

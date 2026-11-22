@@ -17,10 +17,10 @@ private:
 public:
   framebuffer_presenter(GLFWwindow &window, render::display_aspect aspect);
   ~framebuffer_presenter();
-  framebuffer_presenter(framebuffer_presenter const&) = delete;
-  framebuffer_presenter &operator=(framebuffer_presenter const&) = delete;
-  framebuffer_presenter(framebuffer_presenter&&) = delete;
-  framebuffer_presenter &operator=(framebuffer_presenter&&) = delete;
+  framebuffer_presenter(framebuffer_presenter const &) = delete;
+  framebuffer_presenter &operator=(framebuffer_presenter const &) = delete;
+  framebuffer_presenter(framebuffer_presenter &&) = delete;
+  framebuffer_presenter &operator=(framebuffer_presenter &&) = delete;
   void present(render::framebuffer const &source);
 };
 

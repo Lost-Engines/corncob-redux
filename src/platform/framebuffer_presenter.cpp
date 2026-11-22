@@ -49,7 +49,9 @@ void framebuffer_presenter::present(render::framebuffer const &source) {
     texture_width = source.width;
     texture_height = source.height;
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, static_cast<int>(texture_width), static_cast<int>(texture_height), 0, GL_RGBA, GL_UNSIGNED_BYTE, source.pixels.data());
-  } else glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, static_cast<int>(source.width), static_cast<int>(source.height), GL_RGBA, GL_UNSIGNED_BYTE, source.pixels.data());
+  } else {
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, static_cast<int>(source.width), static_cast<int>(source.height), GL_RGBA, GL_UNSIGNED_BYTE, source.pixels.data());
+  }
   glBegin(GL_TRIANGLE_STRIP);
   glTexCoord2f(0.0f, 0.0f);
   glVertex2f(-1.0f, 1.0f);

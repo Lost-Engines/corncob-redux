@@ -18,7 +18,9 @@ int main(int const argc, char const *const argv[]) {
   unsigned int offset{12};
   for(unsigned int i{0}; i != 512; ++i) {
     auto const result{corncob::graphics::map_relative({data.signed_dword(offset), data.signed_dword(offset + 4), data.signed_dword(offset + 8)})};
-    for(unsigned int axis{0}; axis != 3; ++axis) if(result[axis] != data.signed_dword(offset + 12 + axis * 4)) throw std::runtime_error{"native map projection mismatch at case " + std::to_string(i)};
+    for(unsigned int axis{0}; axis != 3; ++axis) {
+      if(result[axis] != data.signed_dword(offset + 12 + axis * 4)) throw std::runtime_error{"native map projection mismatch at case " + std::to_string(i)};
+    }
     offset += 24;
   }
   namespace game = corncob::game;
@@ -30,15 +32,17 @@ int main(int const argc, char const *const argv[]) {
   flight.press(game::action::toggle_map);
   auto const start{flight.camera()};
   if(!flight.in_map() || !start.map_mode || start.cockpit || start.position.z != 210 * 65'536) throw std::runtime_error{"map did not start above the retained pilot"};
-  for(unsigned int i{0}; i != 20; ++i) flight.advance({
-    .stick{
-      .roll{512},
-      .pitch{-512},
-    },
-    .map{
-      .lower{true},
-    },
-  });
+  for(unsigned int i{0}; i != 20; ++i) {
+    flight.advance({
+      .stick{
+        .roll{512},
+        .pitch{-512},
+      },
+      .map{
+        .lower{true},
+      },
+    });
+  }
   if(flight.pilot().position != position || flight.frame_number() != initial_frame || flight.camera().position.z >= start.position.z || flight.camera().position.x <= start.position.x) throw std::runtime_error{"map navigation advanced or relocated the sortie"};
   flight.advance({.map{.home{true}}});
   if(flight.camera().position.x != position.x || flight.camera().position.y != position.y) throw std::runtime_error{"map Home did not restore the pilot location"};
@@ -51,7 +55,11 @@ int main(int const argc, char const *const argv[]) {
   if(argc == 3) {
     std::ofstream capture{argv[2], std::ios::binary};
     capture << "P6\n640 350\n255\n";
-    for(auto const &pixel : image.pixels) { capture.put(static_cast<char>(pixel.red)); capture.put(static_cast<char>(pixel.green)); capture.put(static_cast<char>(pixel.blue)); }
+    for(auto const &pixel : image.pixels) {
+      capture.put(static_cast<char>(pixel.red));
+      capture.put(static_cast<char>(pixel.green));
+      capture.put(static_cast<char>(pixel.blue));
+    }
   }
   flight.press(game::action::toggle_map);
   if(flight.in_map() || flight.camera().position != position) throw std::runtime_error{"leaving map lost the retained pilot"};

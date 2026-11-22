@@ -15,16 +15,19 @@ particle_animation::particle_animation(std::span<uint8_t const> const source) {
   /// Retain both the authored initial shapes and the separate immutable templates used by the native random animation
   binary_reader const input{source};
   unsigned int index{0};
-  for(unsigned int bank{0}; bank != disc_counts.size(); ++bank) for(unsigned int disc{0}; disc != disc_counts[bank]; ++disc) {
-    unsigned int const live{live_addresses[bank] + 2 + disc * 10}, base{base_addresses[bank] + 2 + disc * 10};
-    current[index] = {
-      .position{input.vector(live)},
-      .diameter{input.word(live + 6)},
-    };
-    bases[index++] = {
-      .position{input.vector(base)},
-      .diameter{input.word(base + 6)},
-    };
+  for(unsigned int bank{0}; bank != disc_counts.size(); ++bank) {
+    for(unsigned int disc{0}; disc != disc_counts[bank]; ++disc) {
+      unsigned int const live{live_addresses[bank] + 2 + disc * 10};
+      unsigned int const base{base_addresses[bank] + 2 + disc * 10};
+      current[index] = {
+        .position{input.vector(live)},
+        .diameter{input.word(live + 6)},
+      };
+      bases[index++] = {
+        .position{input.vector(base)},
+        .diameter{input.word(base + 6)},
+      };
+    }
   }
   headquarters_colour = input.byte(0x31b6);
 }
@@ -42,12 +45,16 @@ void particle_animation::advance(maths::random_source &random) noexcept {
   /// Each native frame draws one shared colour and 140 independent disc-coordinate/diameter offsets for the following frame
   headquarters_colour = static_cast<uint8_t>(random.below(15));
   unsigned int index{0};
-  std::array<uint16_t, 3> constexpr first_ranges{300, 60, 500}, range_steps{30, 7, 62}, biases{0, 120, 1000};
-  for(unsigned int bank{0}; bank != disc_counts.size(); ++bank) for(unsigned int disc{0}; disc != disc_counts[bank]; ++disc) {
-    auto const range{static_cast<uint16_t>(first_ranges[bank] + disc * range_steps[bank])};
-    for(unsigned int axis{0}; axis != 3; ++axis) current[index].position[axis] = maths::word(bases[index].position[axis] + random.below(range) + biases[bank]);
-    current[index].diameter = static_cast<uint16_t>(bases[index].diameter + random.below(range) + biases[bank]);
-    ++index;
+  std::array<uint16_t, 3> constexpr first_ranges{300, 60, 500};
+  std::array<uint16_t, 3> constexpr range_steps{30, 7, 62};
+  std::array<uint16_t, 3> constexpr biases{0, 120, 1000};
+  for(unsigned int bank{0}; bank != disc_counts.size(); ++bank) {
+    for(unsigned int disc{0}; disc != disc_counts[bank]; ++disc) {
+      auto const range{static_cast<uint16_t>(first_ranges[bank] + disc * range_steps[bank])};
+      for(unsigned int axis{0}; axis != 3; ++axis) current[index].position[axis] = maths::word(bases[index].position[axis] + random.below(range) + biases[bank]);
+      current[index].diameter = static_cast<uint16_t>(bases[index].diameter + random.below(range) + biases[bank]);
+      ++index;
+    }
   }
 }
 std::span<particle_disc const> particle_animation::discs() const noexcept {

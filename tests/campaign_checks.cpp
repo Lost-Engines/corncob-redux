@@ -69,7 +69,9 @@ int main(int const argc, char const *const argv[]) {
     require(campaign.high_scores().best_missions().front().points == 1875, "saved high score was lost on restart");
     auto const loaded{campaign.load_world("morning")};
     require(loaded.has_value(), "changed theatre was not saved");
-    require(std::ranges::any_of(loaded->objects, [](auto const &object){return object.type == world::object_type::destroyed_generator_orb && (object.flags & 0x200u) != 0;}), "destroyed objective reverted after loading");
+    require(std::ranges::any_of(loaded->objects, [](auto const &object){
+      return object.type == world::object_type::destroyed_generator_orb && (object.flags & 0x200u) != 0;
+    }), "destroyed objective reverted after loading");
     auto const career_before{std::vector<uint8_t>{campaign.active_pilot()->native_data().begin(), campaign.active_pilot()->native_data().end()}};
     auto const scores_before{campaign.high_scores().encode()};
     for(auto const excluded : {game::sortie_status::invincible, game::sortie_status::aborted}) {
@@ -142,7 +144,11 @@ int main(int const argc, char const *const argv[]) {
     auto const second_score{campaign.active_pilot()->career_score()};
     auto const second_references{std::vector<uint8_t>{campaign.active_pilot()->theatres().begin(), campaign.active_pilot()->theatres().end()}};
     bool duplicate_rejected{false};
-    try { campaign.rename_pilot(1, "Renamed pilot"); } catch(std::invalid_argument const &) { duplicate_rejected = true; }
+    try {
+      campaign.rename_pilot(1, "Renamed pilot");
+    } catch(std::invalid_argument const&) {
+      duplicate_rejected = true;
+    }
     require(duplicate_rejected && campaign.active_pilot()->name() == "Other pilot", "duplicate rename modified a different career");
     campaign.delete_pilot(0);
     require(campaign.pilots().size() == 1 && campaign.active_pilot()->name() == "Other pilot", "deletion shifted active selection onto the wrong pilot");
@@ -160,7 +166,11 @@ int main(int const argc, char const *const argv[]) {
     game::campaign_store campaign{isolated};
     campaign.create_pilot("Award rules");
     bool living_resurrection_rejected{false};
-    try { campaign.resurrect(0); } catch(std::invalid_argument const &) { living_resurrection_rejected = true; }
+    try {
+      campaign.resurrect(0);
+    } catch(std::invalid_argument const&) {
+      living_resurrection_rejected = true;
+    }
     require(living_resurrection_rejected, "resurrection was allowed for a living pilot");
     game::sortie_statistics loss{
       .aircraft_lost{1},
@@ -176,7 +186,7 @@ int main(int const argc, char const *const argv[]) {
     require(campaign.active_pilot()->awards(game::medal::distinguished_flying_cross) == 1, "another theatre's losses disqualified a clean completion");
     auto const saved{corncob::platform::read_binary(isolated / "THT/2.THT")};
     corncob::resources::binary_reader const input{saved};
-    game::pilot_record const theatre_pilot{std::span{saved}.subspan(48,623)};
+    game::pilot_record const theatre_pilot{std::span{saved}.subspan(48, 623)};
     require(theatre_pilot.career().objectives_completed == 4 && theatre_pilot.career().aircraft_lost == 0, "saved theatre copied global career statistics");
     require(input.word(40) == 0 && input.word(46) == 1, "native remaining/completion header words were not saved");
     game::sortie_statistics friendly_loss{
@@ -198,7 +208,11 @@ int main(int const argc, char const *const argv[]) {
     reopened.create_pilot("Replacement");
     require(reopened.can_fly(), "another pilot inherited the suspension");
     bool activation_rejected{false};
-    try { reopened.activate(0); } catch(std::invalid_argument const &) { activation_rejected = true; }
+    try {
+      reopened.activate(0);
+    } catch(std::invalid_argument const&) {
+      activation_rejected = true;
+    }
     require(activation_rejected && reopened.active_pilot()->name() == "Replacement", "suspended pilot activation replaced the current pilot");
   }
   std::filesystem::remove_all(directory);

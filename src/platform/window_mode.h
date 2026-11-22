@@ -6,7 +6,10 @@ namespace corncob::platform {
 
 class window_mode {
   GLFWwindow &window;
-  int x{0}, y{0}, width{640}, height{350};
+  int x{0};
+  int y{0};
+  int width{640};
+  int height{350};
   bool maximized{false};
 public:
   explicit window_mode(GLFWwindow &window);

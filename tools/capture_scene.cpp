@@ -83,10 +83,12 @@ struct capture_access {
     if(index >= g.theatre.objects.size()) {
       throw std::runtime_error{"Object index out of range"};
     }
-    world::placed_object bomb{.position{maths::world_position{g.theatre.objects[index].position}},
+    world::placed_object bomb{
+      .position{maths::world_position{g.theatre.objects[index].position}},
                               .attitude{},
                               .type{world::object_type::bomb},
-                              .flags{0xc9}};
+                              .flags{0xc9}
+    };
     g.weapons.damage(index, bomb, true);
   }
   static world::theatre display(session &g, bool external) {
@@ -122,7 +124,7 @@ vec3<double> triple(std::string text) {
 m::world_position position(std::string const &text) {
   auto const value{triple(text)};
   m::world_position result{};
-  for(unsigned int i = 0; i < 3; ++i) {
+  for(unsigned int i{0}; i < 3; ++i) {
     if(std::abs(value[i]) > 1e6) {
       throw std::runtime_error{"Position exceeds 1000 km"};
     }
@@ -138,21 +140,27 @@ m::angle angle(double degrees) {
 }
 m::angles attitude(std::string const &text) {
   auto const v{triple(text)};
-  return {.heading{angle(v.x)}, .pitch{angle(v.y)}, .roll{angle(v.z)}};
+  return {
+    .heading{angle(v.x)},
+    .pitch{angle(v.y)},
+    .roll{angle(v.z)}
+  };
 }
 m::angles towards(m::world_position const &eye, m::world_position const &target, double bank) {
   auto const delta{vec3<double>{target} - vec3<double>{eye}};
   double const degrees{180 / std::numbers::pi};
-  return {.heading{angle(std::atan2(delta.y, delta.x) * degrees)},
+  return {
+    .heading{angle(std::atan2(delta.y, delta.x) * degrees)},
           .pitch{angle(-std::atan2(delta.z, std::hypot(delta.x, delta.y)) * degrees)},
-          .roll{angle(bank)}};
+          .roll{angle(bank)}
+  };
 }
 void place_object(w::theatre &theatre, std::string const &text, bool copy) {
   auto const first{text.find(':')};
   if(first == std::string::npos) {
     throw std::runtime_error{"Object placement requires INDEX:X,Y,Z[:HEADING,PITCH,ROLL]"};
   }
-  unsigned int index{};
+  unsigned int index{0};
   std::string extra;
   std::istringstream number{text.substr(0, first)};
   if(!(number >> index) || number >> extra || index >= theatre.objects.size()) {
@@ -236,20 +244,20 @@ int main(int argc, char **argv) try {
     for(auto const group : {w::theatre_group::earth, w::theatre_group::other_worlds, w::theatre_group::practice}) {
       for(auto const &t : w::theatres(group)) {
         std::cout << t.name << "  " << t.title << '\n';
-    }
       }
+    }
     return EXIT_SUCCESS;
   }
   if(!args.contains("output")) {
     throw std::runtime_error{"--output is required"};
   }
-  auto finite = [&](char const *key, double low, double high){
+  auto finite{[&](char const *key, double low, double high){
     double v = args[key].as<double>();
     if(!std::isfinite(v) || v < low || v > high) {
       throw std::runtime_error{std::string{"Out of range: "} + key};
     }
     return v;
-  };
+  }};
   double const duration{finite("advance", 0, 600)};
   auto settings{gr::scene_settings{}};
   settings.horizontal_fov = finite("fov", 30, 150);
@@ -275,9 +283,9 @@ int main(int argc, char **argv) try {
     if(args.contains(name)) {
       for(auto const &placement : args[name].as<std::vector<std::string>>()) {
         place_object(theatre, placement, copy);
-  }
-    }
       }
+    }
+  }
   auto start{theatre.start};
   auto pose{attitude(args["attitude"].as<std::string>())};
   if(args.contains("mission")) {
@@ -306,9 +314,11 @@ int main(int argc, char **argv) try {
   if(fire != "none" && fire != "pistol" && fire != "cannon" && fire != "missile" && fire != "both") {
     throw std::runtime_error{"Invalid --fire"};
   }
-  g::input_state const input{.weapons{.gun{fire == "pistol"},
+  g::input_state const input{.weapons{
+    .gun{fire == "pistol"},
                                       .cannon{fire == "cannon" || fire == "both"},
-                                      .missile{fire == "missile" || fire == "both"}}};
+                                      .missile{fire == "missile" || fire == "both"}
+  }};
   std::vector<unsigned int> destroyed;
   if(args.contains("destroy")) {
     auto s = args["destroy"].as<std::string>();
@@ -332,12 +342,12 @@ int main(int argc, char **argv) try {
                                      {"detonate-at", g::action::arm_charges}}) {
     if(args.contains(name)) {
       actions.emplace_back(finite(name, 0, duration), command);
-  }
     }
+  }
   std::ranges::sort(actions, {}, &std::pair<double, g::action>::first);
   unsigned int action_index{0};
   bool hit{false};
-  for(unsigned int frame = 0; frame <= static_cast<unsigned int>(std::ceil(duration * 60)); ++frame) {
+  for(unsigned int frame{0}; frame <= static_cast<unsigned int>(std::ceil(duration * 60)); ++frame) {
     double const time{frame / 60.0};
     if(!hit && time >= damage_time) {
       for(auto const id : destroyed) {
@@ -359,8 +369,8 @@ int main(int argc, char **argv) try {
   if(args.contains("chase")) game.press(g::action::third_person);
   auto display{g::capture_access::display(game, args.contains("external") && !args.contains("chase"))};
   if(args.contains("list-objects")) {
-    for(unsigned int i = 0; i < display.objects.size(); ++i) {
-      auto const &o = display.objects[i];
+    for(unsigned int i{0}; i < display.objects.size(); ++i) {
+      auto const &o{display.objects[i]};
       if(o.has(w::object_flag::present)) {
         std::cout << i << " type=" << std::to_underlying(o.type) << " position=" << o.position.x / 100.0 << ','
                   << o.position.y / 100.0 << ',' << o.position.z / 100.0 << '\n';
@@ -388,14 +398,16 @@ int main(int argc, char **argv) try {
   renderer.configure(settings);
   renderer.initialise(eye.position, game.random_stream());
   corncob::render::framebuffer frame;
-  gr::instrument_telemetry const telemetry{.aircraft{game.craft()},
+  gr::instrument_telemetry const telemetry{
+    .aircraft{game.craft()},
                                            .controls{},
                                            .completed{game.statistics().objectives_completed != 0},
                                            .timer{static_cast<uint16_t>(game.timer())},
                                            .bombs{game.bomb_supply()},
                                            .rocket_colour{game.rocket_indicator_colour()},
                                            .damage{&game.aircraft_damage()},
-                                           .slalom{slalom}};
+                                           .slalom{slalom}
+  };
   auto stats{renderer.render(display, eye, game.frame_number(), static_cast<uint16_t>(game.timer()),
                              game.random_stream(), frame, eye.cockpit ? &telemetry : nullptr)};
   png(args["output"].as<std::string>(), frame);

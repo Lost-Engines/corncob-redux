@@ -14,9 +14,11 @@ int main(int const argc, char const *const argv[]) {
   corncob::tests::reference_reader input{argv[1], "CORNROC1"};
   unsigned int const cases{input.dword()};
   for(unsigned int i{0}; i != cases; ++i) {
-    auto const old_tick{input.word()}, tick{input.word()};
+    auto const old_tick{input.word()};
+    auto const tick{input.word()};
     auto const stock{input.signed_word()};
-    auto const elapsed{input.word()}, actual_elapsed{input.word()};
+    auto const elapsed{input.word()};
+    auto const actual_elapsed{input.word()};
     bool const burning{input.byte() != 0};
     auto const expected_stock{input.signed_word()};
     auto const expected_tick{input.word()};

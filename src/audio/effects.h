@@ -4,7 +4,9 @@
 #include <span>
 #include "resources/collection.h"
 
-namespace corncob::game { class session; }
+namespace corncob::game {
+class session;
+}
 
 namespace corncob::audio {
 

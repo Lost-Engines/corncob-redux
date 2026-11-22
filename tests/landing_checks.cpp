@@ -10,8 +10,10 @@ namespace {
 template<typename value_type>
 void check(value_type const actual, value_type const expected, char const *const field, unsigned int const index) {
   /// Identify the first differing native suspension or contact result
-  if(actual != expected) throw std::runtime_error{std::string{field} + " case " + std::to_string(index)
-    + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+  if(actual != expected) {
+    throw std::runtime_error{std::string{field} + " case " + std::to_string(index)
+      + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+  }
 }
 corncob::maths::angles angles(corncob::tests::reference_reader &input) {
   /// Read an original attitude independent of native structure packing
@@ -28,7 +30,9 @@ int main(int const argc, char const *const argv[]) {
   /// Compare wheel geometry and actual 3.42 suspension with original machine code
   if(argc != 3) throw std::invalid_argument{"landing_checks requires landing and recovery fixture paths"};
   corncob::tests::reference_reader input{argv[1], "CORNLD01"};
-  auto const magnitudes{input.dword()}, wheels{input.dword()}, contacts{input.dword()};
+  auto const magnitudes{input.dword()};
+  auto const wheels{input.dword()};
+  auto const contacts{input.dword()};
   for(unsigned int i{0}; i != magnitudes; ++i) {
     corncob::maths::fixed_vector const value{input.signed_word(), input.signed_word(), input.signed_word()};
     check(corncob::maths::magnitude(value), input.word(), "velocity magnitude", i);

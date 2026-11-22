@@ -64,11 +64,32 @@ std::string binding_name(control_binding const &binding) {
     if(key == keys::keypad_add) return "KP+";
     if(key == keys::keypad_subtract) return "KP-";
     switch(key) {
-    case 262: return "Right"; case 263: return "Left"; case 264: return "Down"; case 265: return "Up";
-    case 340: return "Left Shift"; case 341: return "Left Ctrl"; case 342: return "Left Alt";
-    case 344: return "Right Shift"; case 345: return "Right Ctrl"; case 346: return "Right Alt";
-    case 280: return "Caps Lock"; case 282: return "Num Lock";
-    default: return key >= 290 && key <= 314 ? "F" + std::to_string(key - 289) : "Key " + std::to_string(key);
+    case 262:
+      return "Right";
+    case 263:
+      return "Left";
+    case 264:
+      return "Down";
+    case 265:
+      return "Up";
+    case 340:
+      return "Left Shift";
+    case 341:
+      return "Left Ctrl";
+    case 342:
+      return "Left Alt";
+    case 344:
+      return "Right Shift";
+    case 345:
+      return "Right Ctrl";
+    case 346:
+      return "Right Alt";
+    case 280:
+      return "Caps Lock";
+    case 282:
+      return "Num Lock";
+    default:
+      return key >= 290 && key <= 314 ? "F" + std::to_string(key - 289) : "Key " + std::to_string(key);
     }
   }};
   std::string result{binding.key < 0 ? "" : name(binding.key)};
@@ -81,12 +102,53 @@ preferences preferences::load(std::filesystem::path const &path) {
   std::ifstream input{path};
   std::string line;
   while(std::getline(input, line)) {
-    std::istringstream row{line}; std::string name;
+    std::istringstream row{line};
+    std::string name;
     row >> name;
-    if(name == "resolution") { unsigned int w{}, h{}; if(row >> w >> h && w >= render::resolution_limits::minimum_width && h >= render::resolution_limits::minimum_height && w <= render::resolution_limits::maximum_width && h <= render::resolution_limits::maximum_height) result.scene.resolution = {w, h}; } else if(name == "window_resolution") { int value{}; if(row >> value) result.window_resolution = value != 0; } else if(name == "fullscreen") { int value{}; if(row >> value) result.fullscreen = value != 0; } else if(name == "gunsight_size") { double value{}; if(row >> value && std::isfinite(value)) result.scene.gunsight_size = std::clamp(value, graphics::scene_settings::minimum_gunsight_size, graphics::scene_settings::maximum_gunsight_size); } else if(name == "music_volume" || name == "effects_volume") { double value{}; if(row >> value && std::isfinite(value)) (name == "music_volume" ? result.music_volume : result.effects_volume) = std::clamp(value, 0.0, 100.0); } else if(name == "fov") { double value{}; if(row >> value && std::isfinite(value)) result.scene.horizontal_fov = std::clamp(value, graphics::scene_settings::minimum_fov, graphics::scene_settings::maximum_fov); } else if(name == "draw_distance") { double value{}; if(row >> value && std::isfinite(value) && value >= 0) result.scene.draw_distance = std::min(value, graphics::scene_settings::maximum_draw_distance); } else if(name == "ground_points") { unsigned int value{}; if(row >> value) result.scene.ground_points = std::min(value, graphics::scene_settings::maximum_ground_points); } else if(name == "ground_range") { double value{}; if(row >> value && std::isfinite(value)) result.scene.ground_range = std::clamp(value, graphics::scene_settings::minimum_ground_range, graphics::scene_settings::maximum_ground_range); } else if(name == "mouse_sensitivity") { double value{}; if(row >> value && std::isfinite(value)) result.mouse_sensitivity = std::clamp(value, minimum_mouse_sensitivity, maximum_mouse_sensitivity); } else if(name == "invert_mouse") { int value{}; if(row >> value) result.invert_mouse = value != 0; } else if(name == "bind") {
-      unsigned int index{}; int key{}, alternate{}, mouse{};
+    if(name == "resolution") {
+      unsigned int w{0};
+      unsigned int h{0};
+      if(row >> w >> h && w >= render::resolution_limits::minimum_width && h >= render::resolution_limits::minimum_height && w <= render::resolution_limits::maximum_width && h <= render::resolution_limits::maximum_height) result.scene.resolution = {w, h};
+    } else if(name == "window_resolution") {
+      int value{0};
+      if(row >> value) result.window_resolution = value != 0;
+    } else if(name == "fullscreen") {
+      int value{0};
+      if(row >> value) result.fullscreen = value != 0;
+    } else if(name == "gunsight_size") {
+      double value{0.0};
+      if(row >> value && std::isfinite(value)) result.scene.gunsight_size = std::clamp(value, graphics::scene_settings::minimum_gunsight_size, graphics::scene_settings::maximum_gunsight_size);
+    } else if(name == "music_volume" || name == "effects_volume") {
+      double value{0.0};
+      if(row >> value && std::isfinite(value)) (name == "music_volume" ? result.music_volume : result.effects_volume) = std::clamp(value, 0.0, 100.0);
+    } else if(name == "fov") {
+      double value{0.0};
+      if(row >> value && std::isfinite(value)) result.scene.horizontal_fov = std::clamp(value, graphics::scene_settings::minimum_fov, graphics::scene_settings::maximum_fov);
+    } else if(name == "draw_distance") {
+      double value{0.0};
+      if(row >> value && std::isfinite(value) && value >= 0) result.scene.draw_distance = std::min(value, graphics::scene_settings::maximum_draw_distance);
+    } else if(name == "ground_points") {
+      unsigned int value{0};
+      if(row >> value) result.scene.ground_points = std::min(value, graphics::scene_settings::maximum_ground_points);
+    } else if(name == "ground_range") {
+      double value{0.0};
+      if(row >> value && std::isfinite(value)) result.scene.ground_range = std::clamp(value, graphics::scene_settings::minimum_ground_range, graphics::scene_settings::maximum_ground_range);
+    } else if(name == "mouse_sensitivity") {
+      double value{0.0};
+      if(row >> value && std::isfinite(value)) result.mouse_sensitivity = std::clamp(value, minimum_mouse_sensitivity, maximum_mouse_sensitivity);
+    } else if(name == "invert_mouse") {
+      int value{0};
+      if(row >> value) result.invert_mouse = value != 0;
+    } else if(name == "bind") {
+      unsigned int index{0};
+      int key{0};
+      int alternate{0};
+      int mouse{0};
       if(row >> index >> key >> alternate >> mouse && index < result.bindings.size() && keys::valid(key) && keys::valid(alternate) && mouse >= -1 && mouse <= 7) {
-        auto &binding{result.bindings[index]}; binding.key = key; binding.alternate = alternate; binding.mouse = mouse;
+        auto &binding{result.bindings[index]};
+        binding.key = key;
+        binding.alternate = alternate;
+        binding.mouse = mouse;
       }
     }
   }
@@ -99,10 +161,11 @@ void preferences::save(std::filesystem::path const &path) const {
     << "\nwindow_resolution " << window_resolution << "\nfov " << scene.horizontal_fov << "\ndraw_distance " << scene.draw_distance
     << "\nground_points " << scene.ground_points << "\nground_range " << scene.ground_range << "\nmouse_sensitivity " << mouse_sensitivity << "\ninvert_mouse " << invert_mouse << '\n';
   for(size_t i{0}; i < bindings.size(); ++i) {
-    auto const &b{bindings[i]}; text << "bind " << i << ' ' << b.key << ' ' << b.alternate << ' ' << b.mouse << '\n';
+    auto const &b{bindings[i]};
+    text << "bind " << i << ' ' << b.key << ' ' << b.alternate << ' ' << b.mouse << '\n';
   }
   auto const contents{text.str()};
-  platform::write_binary(path, {reinterpret_cast<uint8_t const*>(contents.data()), contents.size()});
+  platform::write_binary(path, {reinterpret_cast<uint8_t const *>(contents.data()), contents.size()});
 }
 
 } // namespace corncob::game

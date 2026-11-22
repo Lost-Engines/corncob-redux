@@ -11,31 +11,32 @@ void controls_elapsed(aircraft_state &aircraft, angular_response &response, cont
   double const ratio{seconds / game::timing::seconds_per_step};
   // Evaluate the original torque/assistance laws at their reference interval.
   // Integrate their rates over actual elapsed time, including exponential inertia.
-  auto evaluation{aircraft}; auto next{response};
+  auto evaluation{aircraft};
+  auto next{response};
   if(state.previous_step > 0) {
     double const previous_ratio{state.previous_step / game::timing::seconds_per_step};
     // These feedback laws predict a reference interval ahead, rather than one host callback.
     double const airflow_change{maths::word(aircraft.body_velocity.z - response.autopilot.previous_vertical_airflow) / previous_ratio};
     next.autopilot.previous_vertical_airflow = maths::word(static_cast<int32_t>(aircraft.body_velocity.z)
-      - static_cast<int32_t>(std::clamp(airflow_change,-150.0,150.0)));
+      - static_cast<int32_t>(std::clamp(airflow_change, -150.0, 150.0)));
     double const angle_change{maths::word(aircraft.angle_of_attack - aircraft.previous_angle_of_attack) / previous_ratio};
     evaluation.previous_angle_of_attack = maths::word(maths::dword(static_cast<int64_t>(aircraft.angle_of_attack)
-      - static_cast<int64_t>(std::clamp(angle_change,-32768.0,32767.0))));
+      - static_cast<int64_t>(std::clamp(angle_change, -32768.0, 32767.0))));
   }
   advance_controls(evaluation, next, input, environment, {}, nullptr);
-  vec3<double> impulse{0,0,0};
+  vec3<double> impulse{0, 0, 0};
   if(random && response.stability_damage != 0) {
-    int16_t const airflow{std::clamp<int16_t>(aircraft.scaled_body_velocity.x,-300,300)};
+    int16_t const airflow{std::clamp<int16_t>(aircraft.scaled_body_velocity.x, -300, 300)};
     uint16_t const span{static_cast<uint16_t>(std::abs(static_cast<int>(maths::word(static_cast<int32_t>(response.stability_damage) * airflow / 300))) + 2)};
     // Damage jitter is one reference-clock impulse, rather than a force scaled by callback duration.
-    for(unsigned int axis : {1u,2u,0u}) impulse[axis] = maths::word(random->below(span) - span / 2) * 65536.0;
+    for(unsigned int axis : {1u, 2u, 0u}) impulse[axis] = maths::word(random->below(span) - span / 2) * 65536.0;
   }
-  std::array<int32_t*,3> const output{&response.roll, &response.pitch, &response.yaw};
-  std::array<int32_t,3> const target{next.roll, next.pitch, next.yaw};
-  std::array<double,3> constexpr retained{0.8125, 0.9, 0.9};
-  vec3<double> integrated{0,0,0};
+  std::array<int32_t *, 3> const output{&response.roll, &response.pitch, &response.yaw};
+  std::array<int32_t, 3> const target{next.roll, next.pitch, next.yaw};
+  std::array<double, 3> constexpr retained{0.8125, 0.9, 0.9};
+  vec3<double> integrated{0, 0, 0};
   for(unsigned int axis{0}; axis < 3; ++axis) {
-    double const before{std::clamp(*output[axis] + state.response[axis] + impulse[axis],-196608000.0,196608000.0)};
+    double const before{std::clamp(*output[axis] + state.response[axis] + impulse[axis], -196608000.0, 196608000.0)};
     double const forcing{target[axis] - retained[axis] * *output[axis]};
     double const equilibrium{forcing / (1 - retained[axis])};
     double const attenuation{maths::decay(retained[axis], ratio)};
@@ -72,8 +73,11 @@ void forces_elapsed(aircraft_state &aircraft, continuous_state &state, atmospher
   vec3<double> acceleration{aircraft.body_force};
   acceleration /= 65536.0;
   auto next{body + acceleration * ratio};
-  if(aircraft.on_ground) next.y = 0;
-  else next.y = std::clamp(next.y, -9500.0, 9500.0);
+  if(aircraft.on_ground) {
+    next.y = 0;
+  } else {
+    next.y = std::clamp(next.y, -9500.0, 9500.0);
+  }
   next.z = std::clamp(next.z, -9600.0, 9600.0);
   auto const world{rotation.apply(next)};
   state.acceleration = rotation.apply(acceleration);
@@ -89,7 +93,8 @@ void forces_elapsed(aircraft_state &aircraft, continuous_state &state, atmospher
 landing_result landing_elapsed(aircraft_state &aircraft, angular_response &response, landing_state &landing,
                                continuous_state &state, control_input const &input, double const seconds) {
   double const ratio{seconds / game::timing::seconds_per_step};
-  auto evaluated{aircraft}; auto spring{response};
+  auto evaluated{aircraft};
+  auto spring{response};
   auto const result{advance_landing(evaluated, spring, landing, input, {})};
   aircraft.on_ground = evaluated.on_ground;
   if(result == landing_result::airborne || result == landing_result::fatal || result == landing_result::crash_landing) return result;

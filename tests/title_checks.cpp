@@ -38,7 +38,8 @@ int main(int const argc, char const *const argv[]) {
   /// Compare the unchanged native animation loops, then exercise a complete animated presentation cycle
   if(argc < 2 || argc > 3) throw std::invalid_argument{"title fixture required"};
   corncob::tests::reference_reader input{argv[1], "CORNTTL1"};
-  unsigned int const count{input.dword()}, masks{input.dword()};
+  unsigned int const count{input.dword()};
+  unsigned int const masks{input.dword()};
   for(unsigned int i{0}; i != count; ++i) {
     auto actual{read(input)};
     auto const expected{read(input)};
@@ -68,7 +69,8 @@ int main(int const argc, char const *const argv[]) {
   for(unsigned int i{0}; i != masks; ++i) {
     uint8_t const threshold{input.byte()};
     unsigned int const length{input.word()};
-    std::vector<uint8_t> cloud(length), stencil(length);
+    std::vector<uint8_t> cloud(length);
+    std::vector<uint8_t> stencil(length);
     for(auto &value : cloud) value = input.byte();
     for(auto &value : stencil) value = input.byte();
     for(unsigned int j{0}; j != length; ++j) {
@@ -85,7 +87,11 @@ int main(int const argc, char const *const argv[]) {
     if(argc == 3 && (i == 30 || i == 60 || i == 120 || i == 240 || i == 280 || i == 350)) {
       std::ofstream output{std::filesystem::path{argv[2]} / ("title-" + std::to_string(i) + ".ppm"), std::ios::binary};
       output << "P6\n320 200\n255\n";
-      for(auto const &pixel : image.pixels) { output.put(static_cast<char>(pixel.red)); output.put(static_cast<char>(pixel.green)); output.put(static_cast<char>(pixel.blue)); }
+      for(auto const &pixel : image.pixels) {
+        output.put(static_cast<char>(pixel.red));
+        output.put(static_cast<char>(pixel.green));
+        output.put(static_cast<char>(pixel.blue));
+      }
     }
   }
   if(image.width != 320 || image.height != 200) throw std::runtime_error{"animated title changed video resolution"};

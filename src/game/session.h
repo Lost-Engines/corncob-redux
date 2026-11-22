@@ -116,8 +116,11 @@ private:
   person_state person;
   flight::continuous_state continuous;
   maths::motion_fraction person_fraction;
-  vec2<double> tumble_fraction{0,0}, head_fraction{0,0};
-  double elapsed_phase{0}, pit_fraction{0}, capture_fraction{0};
+  vec2<double> tumble_fraction{0, 0};
+  vec2<double> head_fraction{0, 0};
+  double elapsed_phase{0};
+  double pit_fraction{0};
+  double capture_fraction{0};
   timing::frame_clock host_clock;
   vision_state vision;
   std::optional<unsigned int> controlled_aircraft;
@@ -137,7 +140,8 @@ private:
   std::optional<mission_builder> builder;
   std::optional<slalom_course> course;
   std::optional<recorded_flight> recording;
-  unsigned int recorded_index{0}, recorded_ticks{0};
+  unsigned int recorded_index{0};
+  unsigned int recorded_ticks{0};
   bool recording_complete{false};
   bool experimental_clearance{false};
   bool beginner_flight{false};

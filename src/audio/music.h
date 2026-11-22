@@ -15,8 +15,8 @@ public:
   music();
   ~music();
   void volume(float percent) noexcept;
-  music(music const&) = delete;
-  music &operator=(music const&) = delete;
+  music(music const &) = delete;
+  music &operator=(music const &) = delete;
   void select(music_cue cue) noexcept;
   void mix(std::span<float> samples) noexcept;
 };

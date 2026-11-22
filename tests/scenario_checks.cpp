@@ -111,7 +111,9 @@ int main() {
   auto const &effects{practice_actors.advance({exposed, exposed, velocity, false, 0}, {})};
   require(practice_weapons.stats().objectives_completed == 0, "unprimed local census completed an uncleared objective");
   require(effects.attraction.x < 0 && effects.attraction.z > 0 && effects.orb_distortion != 0, "special orb failed to attract and distort the aircraft view");
-  require(std::ranges::count_if(targets.objects, [](auto const &object){return object.has(world::object_flag::present) && object.type == world::object_type::flotsam_2 && object.collision_group == 3;}) == 2,
+  require(std::ranges::count_if(targets.objects, [](auto const &object){
+    return object.has(world::object_flag::present) && object.type == world::object_type::flotsam_2 && object.collision_group == 3;
+  }) == 2,
     "mortar failed to launch its two dangerous fragments");
   practice_weapons.damage(3, bomb);
   require(!targets.objects[3].has(world::object_flag::present) && std::ranges::any_of(targets.objects, [](auto const &object){
@@ -141,7 +143,9 @@ int main() {
   for(unsigned int frame{0}; frame != 2; ++frame) hidden_actors.advance(context, {});
   require(hidden_weapons.stats().objectives_completed == 0, "concealed fuel failed to block a clear-fuel objective");
   hidden_weapons.damage(1, bomb);
-  auto const revealed{std::ranges::find_if(hidden_fuel.objects, [](auto const &object){return object.type == world::object_type::fuel_dump && object.has(world::object_flag::present);})};
+  auto const revealed{std::ranges::find_if(hidden_fuel.objects, [](auto const &object){
+    return object.type == world::object_type::fuel_dump && object.has(world::object_flag::present);
+  })};
   require(revealed != hidden_fuel.objects.end(), "concealed fuel did not reveal its fuel dump");
   hidden_actors.advance(context, {});
   hidden_weapons.damage(static_cast<unsigned int>(revealed - hidden_fuel.objects.begin()), bomb, true);
@@ -190,7 +194,9 @@ int main() {
   game::session rescue{geometry, world::theatre{}};
   rescue.press(game::action::call_rescue);
   rescue.press(game::action::call_rescue);
-  require(std::ranges::count_if(rescue.world().objects, [](auto const &object){return object.type == world::object_type::rescue_van && object.has(world::object_flag::present);}) == 1,
+  require(std::ranges::count_if(rescue.world().objects, [](auto const &object){
+    return object.type == world::object_type::rescue_van && object.has(world::object_flag::present);
+  }) == 1,
     "rescue call failed or created duplicate vans");
   for(unsigned int frame{0}; frame != 200 && !rescue.finished(); ++frame) {
     auto const &person{rescue.pilot()};

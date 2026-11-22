@@ -7,8 +7,21 @@ namespace corncob::graphics {
 
 uint8_t title_letter_colour(uint8_t cloud, uint8_t stencil, uint8_t threshold) noexcept;
 
-enum class title_stage { flyby, lettering };
-enum class title_sprite_kind { saucer_1, saucer_2, saucer_3, saucer_4, flak_1, flak_2, flak_3, aircraft, flash };
+enum class title_stage {
+  flyby,
+  lettering
+};
+enum class title_sprite_kind {
+  saucer_1,
+  saucer_2,
+  saucer_3,
+  saucer_4,
+  flak_1,
+  flak_2,
+  flak_3,
+  aircraft,
+  flash
+};
 struct title_sprite {
   title_sprite_kind kind;
   vec2<int> position{0, 0};

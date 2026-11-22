@@ -60,7 +60,8 @@ void report(graphics::menu_canvas &screen, pilot_record const *const pilot, bool
   screen.colours(preliminary ? 15 : 7, preliminary ? 1 : 8, preliminary ? 14 : 9, 15);
   screen.panel(0, 0, 79, 24, preliminary ? 14 : 9, true, false);
   screen.text((78 - static_cast<int>(title.size())) / 2, 0, " " + std::string{title} + " ", preliminary ? 14 : 2);
-  screen.text(16, 2, "PILOT:", preliminary ? 14 : 2); screen.text(24, 2, pilot_label(pilot), 15);
+  screen.text(16, 2, "PILOT:", preliminary ? 14 : 2);
+  screen.text(24, 2, pilot_label(pilot), 15);
   auto const career{post && pilot ? pilot->last_sortie() : pilot ? pilot->career() : sortie.value_or(sortie_statistics{})};
   unsigned int const tenths{career.elapsed_seconds / 360};
   bool const columns{detailed || sortie.has_value()};
@@ -71,81 +72,92 @@ void report(graphics::menu_canvas &screen, pilot_record const *const pilot, bool
     auto const &result{*sortie};
     auto const factors{calculate_score_factors(result, calculation)};
     screen.text(24, 3, std::format("Flying time = {}:{:02}:{:02}", result.elapsed_seconds / 3600, result.elapsed_seconds / 60 % 60, result.elapsed_seconds % 60), 14);
-    screen.text(15, 4, "STATUS:", 14); screen.text(24, 4, sortie_description(result));
-    screen.text(16, 5, "SCORE:", 14); screen.text(24, 5, std::to_string(calculate_score(result, calculation)));
-    screen.text(35, 5, "BEST:", 14); screen.text(42, 5, std::to_string(pilot->best_sortie_score()));
-    screen.text(53, 5, "TOTAL:", 14); screen.text(61, 5, std::to_string(pilot->career_score()));
+    screen.text(15, 4, "STATUS:", 14);
+    screen.text(24, 4, sortie_description(result));
+    screen.text(16, 5, "SCORE:", 14);
+    screen.text(24, 5, std::to_string(calculate_score(result, calculation)));
+    screen.text(35, 5, "BEST:", 14);
+    screen.text(42, 5, std::to_string(pilot->best_sortie_score()));
+    screen.text(53, 5, "TOTAL:", 14);
+    screen.text(61, 5, std::to_string(pilot->career_score()));
     if(calculate_score(result, calculation) > (previous ? previous->best_sortie_score() : 0)) screen.text(25 + static_cast<int>(std::to_string(calculate_score(result, calculation)).size()), 5, "\x03", 12);
-    screen.text(17, 6, "PMSF:", 14); screen.text(24, 6, std::to_string(factors.present));
-    screen.text(31, 6, "MSF:", 14); screen.text(37, 6, std::to_string(factors.mission));
-    screen.text(44, 6, "MOBF:", 14); screen.text(51, 6, std::to_string(factors.base));
+    screen.text(17, 6, "PMSF:", 14);
+    screen.text(24, 6, std::to_string(factors.present));
+    screen.text(31, 6, "MSF:", 14);
+    screen.text(37, 6, std::to_string(factors.mission));
+    screen.text(44, 6, "MOBF:", 14);
+    screen.text(51, 6, std::to_string(factors.base));
   } else {
     screen.text(24, 3, std::format("{} mission{}{}", pilot ? pilot->sorties() : 0, pilot && pilot->sorties() == 1 ? "" : "s", columns ? std::string{} : ",  " + hours), 2);
     if(columns) screen.text(24, 3 + extra_rows, hours, 2);
     screen.text(15, 4 + extra_rows, "STATUS:", 2);
     screen.text(24, 4 + extra_rows, duty_description(pilot) + (pilot && pilot->condition(report_time()) == pilot_condition::stockade ? " until " + release_date(pilot->suspended_until()) + "." : ""), 15);
-    screen.text(11, 5 + extra_rows, "HIGH SCORE:", 2); screen.text(24, 5 + extra_rows, std::to_string(pilot ? pilot->best_sortie_score() : 0), 15);
-    screen.text(37, 5 + extra_rows, "TOTAL SCORE:", 2); screen.text(51, 5 + extra_rows, std::to_string(pilot ? pilot->career_score() : 0), 15);
+    screen.text(11, 5 + extra_rows, "HIGH SCORE:", 2);
+    screen.text(24, 5 + extra_rows, std::to_string(pilot ? pilot->best_sortie_score() : 0), 15);
+    screen.text(37, 5 + extra_rows, "TOTAL SCORE:", 2);
+    screen.text(51, 5 + extra_rows, std::to_string(pilot ? pilot->career_score() : 0), 15);
   }
-  int const first{9 + extra_rows}, secondary{15 + (global ? 1 : 0)};
+  int const first{9 + extra_rows};
+  int const secondary{15 + (global ? 1 : 0)};
   if(columns) {
     screen.text(33, 7 + extra_rows, preliminary ? "This      Career      Best       Career" : "Last      Career      Best       Career", preliminary ? 12 : 6);
     screen.text(32, 8 + extra_rows, "Mission     High      Mission      Total", preliminary ? 12 : 6);
   } else {
-    screen.text(post ? 33 : 31, 7, post ? "This" : "Career", 6); screen.text(post ? 30 : 32, 8, post ? "Mission" : "Total", 6);
+    screen.text(post ? 33 : 31, 7, post ? "This" : "Career", 6);
+    screen.text(post ? 30 : 32, 8, post ? "Mission" : "Total", 6);
   }
   screen.text(8, 8 + extra_rows, "PRIMARY KILLS:", preliminary ? 14 : 2);
   screen.text(7, secondary - 1, "SECONDARY KILLS:", preliminary ? 14 : 2);
   struct report_row {
     std::string_view label;
     int row;
-    int (*value)(sortie_statistics const &);
+    int (*value)(sortie_statistics const&);
   };
   std::array<report_row, 9> const fields{
     report_row{
       .label{"Mission Objective:"},
       .row{first},
-      .value{[](auto const &s)->int{return maths::word(s.objectives_completed);}},
+      .value{[](auto const &s)->int {return maths::word(s.objectives_completed);}},
     },
     report_row{
       .label{"TRFRU/Fuel Dumps:"},
       .row{first + 1},
-      .value{[](auto const &s)->int{return maths::word(s.resource_kills);}},
+      .value{[](auto const &s)->int {return maths::word(s.resource_kills);}},
     },
     report_row{
       .label{"AAA Batteries:"},
       .row{first + 2},
-      .value{[](auto const &s)->int{return total(s.aaa_kills);}},
+      .value{[](auto const &s)->int {return total(s.aaa_kills);}},
     },
     report_row{
       .label{"Other Sites:"},
       .row{first + 3},
-      .value{[](auto const &s)->int{return maths::word(total(s.site_kills) + total(s.orb_kills));}},
+      .value{[](auto const &s)->int {return maths::word(total(s.site_kills) + total(s.orb_kills));}},
     },
     report_row{
       .label{"Ground Transports:"},
       .row{secondary},
-      .value{[](auto const &s)->int{return total(s.vehicle_kills);}},
+      .value{[](auto const &s)->int {return total(s.vehicle_kills);}},
     },
     report_row{
       .label{"Enemy Missiles:"},
       .row{secondary + 1},
-      .value{[](auto const &s)->int{return total(s.kla_kills);}},
+      .value{[](auto const &s)->int {return total(s.kla_kills);}},
     },
     report_row{
       .label{"Number of Planes Lost:"},
       .row{19},
-      .value{[](auto const &s)->int{return maths::word(s.aircraft_lost);}},
+      .value{[](auto const &s)->int {return maths::word(s.aircraft_lost);}},
     },
     report_row{
       .label{"Friendly Sites Lost:"},
       .row{20},
-      .value{[](auto const &s)->int{return maths::word(s.friendly_destroyed);}},
+      .value{[](auto const &s)->int {return maths::word(s.friendly_destroyed);}},
     },
     report_row{
       .label{"Total Damage:"},
       .row{21},
-      .value{[](auto const &s)->int{return maths::word(s.maximum_damage);}},
+      .value{[](auto const &s)->int {return maths::word(s.maximum_damage);}},
     },
   };
   auto const last{sortie.value_or(pilot ? pilot->last_sortie() : sortie_statistics{})};
@@ -154,8 +166,11 @@ void report(graphics::menu_canvas &screen, pilot_record const *const pilot, bool
   for(auto const &field : fields) {
     int const row{field.row - (preliminary && field.row >= 19 ? 1 : 0)};
     screen.text(29 - static_cast<int>(field.label.size()), row, field.label, preliminary ? 12 : 6);
-    if(columns) screen.text(33, row, std::format("{:>3}        {:>3}        {:>3}           {:>3}", field.value(last), field.value(peaks), field.value(best), field.value(career)));
-    else screen.text(33, row, std::format("{:>4}", field.value(career)));
+    if(columns) {
+      screen.text(33, row, std::format("{:>3}        {:>3}        {:>3}           {:>3}", field.value(last), field.value(peaks), field.value(best), field.value(career)));
+    } else {
+      screen.text(33, row, std::format("{:>4}", field.value(career)));
+    }
     if(preliminary) {
       screen.text(69, row, std::format("{:>3}", field.value(career)), 7);
       if(row >= 18) {
@@ -168,34 +183,43 @@ void report(graphics::menu_canvas &screen, pilot_record const *const pilot, bool
   if(!columns) {
     std::array<unsigned int, 10> constexpr order{7, 8, 9, 4, 6, 3, 2, 1, 0, 5};
     std::array<std::string_view, 10> constexpr abbreviations{"PH", "BS", "SS", "GS", "DSC", "SA", "SC", "CM", "DFC", "TCM"};
-    unsigned int lines{0}, largest{4};
-    if(pilot) for(auto const &award : medal_definitions) {
-      unsigned int const count{pilot->awards(award.kind)};
-      lines += (count + 13) / 14;
-      largest = std::max(largest, std::min(count, 14u));
+    unsigned int lines{0};
+    unsigned int largest{4};
+    if(pilot) {
+      for(auto const &award : medal_definitions) {
+        unsigned int const count{pilot->awards(award.kind)};
+        lines += (count + 13) / 14;
+        largest = std::max(largest, std::min(count, 14u));
+      }
     }
     int const column{56 - static_cast<int>(largest)};
     int row{lines > 12 ? 7 : 8};
     screen.text(column, row++, "DECORATIONS:", 2);
-    if(pilot) for(auto const index : order) {
-      auto const &award{medal_definitions[index]};
-      unsigned int count{pilot->awards(award.kind)};
-      if(count == 0) continue;
-      screen.text(column, row, std::format("{:>3}: ", abbreviations[index]), 6);
-      while(count != 0 && row < 23) {
-        unsigned int const shown{std::min(count, 14u)};
-        std::string glyphs;
-        for(unsigned int i{0}; i != shown; ++i) glyphs.append(award.glyphs.data(), award.glyphs.size());
-        screen.text(column + 5, row++, glyphs, award.colour);
-        count -= shown;
+    if(pilot) {
+      for(auto const index : order) {
+        auto const &award{medal_definitions[index]};
+        unsigned int count{pilot->awards(award.kind)};
+        if(count == 0) continue;
+        screen.text(column, row, std::format("{:>3}: ", abbreviations[index]), 6);
+        while(count != 0 && row < 23) {
+          unsigned int const shown{std::min(count, 14u)};
+          std::string glyphs;
+          for(unsigned int i{0}; i != shown; ++i) glyphs.append(award.glyphs.data(), award.glyphs.size());
+          screen.text(column + 5, row++, glyphs, award.colour);
+          count -= shown;
+        }
       }
     }
   }
-  if(preliminary) screen.text(24, 23, "Type almost any key to continue...", 14);
-  else if(post) screen.text(24, 23, "Type almost any key to continue...", 13);
-  else screen.text(columns && !global ? 16 : 7, 23, columns && !global ? "Type \x18\x19 for next/prev, or ESC, BS, or CR to exit"
-    : global ? "Type \x18\x19 for next/prev, <INS> for medals, or ESC, BS, or CR to exit"
-    : "Type \x18\x19 for next/prev, <INS> for stats, or ESC, BS, or CR to exit", 2);
+  if(preliminary) {
+    screen.text(24, 23, "Type almost any key to continue...", 14);
+  } else if(post) {
+    screen.text(24, 23, "Type almost any key to continue...", 13);
+  } else {
+    screen.text(columns && !global ? 16 : 7, 23, columns && !global ? "Type \x18\x19 for next/prev, or ESC, BS, or CR to exit"
+      : global ? "Type \x18\x19 for next/prev, <INS> for medals, or ESC, BS, or CR to exit"
+      : "Type \x18\x19 for next/prev, <INS> for stats, or ESC, BS, or CR to exit", 2);
+  }
 }
 
 } // anonymous namespace
@@ -218,11 +242,14 @@ void front_end::render_menus(render::framebuffer &target) const {
   screen.frame("Main Menu");
   screen.text(10, 6, "Use arrow keys or type highlighted letter to choose action:", 11);
   options(27, 8, main_choices, selected(interface_page::menu));
-  screen.text(9, 21, "Active pilot:", 14); screen.text(24, 21, pilot_label(pilot));
+  screen.text(9, 21, "Active pilot:", 14);
+  screen.text(24, 21, pilot_label(pilot));
   screen.text(9, 22, "Theater-of-Operations:", 14);
   screen.text(33, 22, active && *active < worlds.size() ? worlds[*active].title : "Training Mission");
-  screen.text(9, 23, "Control:", 14); screen.text(19, 23, controls.joystick_device == -2 ? "Keyboard" : "Joystick");
-  screen.text(53, 23, "Music", 14); screen.text(59, 23, music_on ? "On " : "Off", 11);
+  screen.text(9, 23, "Control:", 14);
+  screen.text(19, 23, controls.joystick_device == -2 ? "Keyboard" : "Joystick");
+  screen.text(53, 23, "Music", 14);
+  screen.text(59, 23, music_on ? "On " : "Off", 11);
   interface_page const view{page == interface_page::menu_information || page == interface_page::notice ? information_return
     : page == interface_page::no_aircraft || page == interface_page::no_objectives ? interface_page::starting_airfield
     : page == interface_page::completed_theatre ? interface_page::theatre_delete
@@ -237,7 +264,8 @@ void front_end::render_menus(render::framebuffer &target) const {
     screen.heading(roster ? "Duty Roster" : "Theater of Operations Menu");
     screen.panel(1, 5, 78, 23);
     for(int row{6}; row < 23; ++row) screen.text(47, row, "\xb3", 6);
-    screen.text(47, 5, "\xc2", 6); screen.text(47, 23, "\xc1", 6);
+    screen.text(47, 5, "\xc2", 6);
+    screen.text(47, 23, "\xc1", 6);
     if(!roster) screen.text(47, 14, std::string{"\xc3"} + std::string(30, '\xc4') + '\xb4', 6);
   }
   if(view == interface_page::campaigns) {
@@ -306,7 +334,9 @@ void front_end::render_menus(render::framebuffer &target) const {
       std::string const instruction{"Select pilot with \x18\x19, <CR> to " + std::string{action}};
       screen.text(24 - static_cast<int>(instruction.size()) / 2, 7, instruction, 4);
       auto const &chosen{pilots[chosen_index]};
-      auto const totals{chosen.career()}, peak{chosen.individual_records()}, best{chosen.best_sortie()};
+      auto const totals{chosen.career()};
+      auto const peak{chosen.individual_records()};
+      auto const best{chosen.best_sortie()};
       std::string const label{"Pilot:  " + pilot_label(&chosen, true)};
       screen.text(24 - static_cast<int>(label.size()) / 2, 9, label);
       auto const condition{chosen.condition(report_time())};
@@ -316,7 +346,9 @@ void front_end::render_menus(render::framebuffer &target) const {
       screen.text(24 - static_cast<int>(missions.size()) / 2, 11, missions);
       screen.text(4, 12, "Mission Objectives = " + std::to_string(totals.objectives_completed));
       screen.text(4, 13, "Total points = " + std::to_string(chosen.career_score()));
-      auto primary{[](sortie_statistics const &s){return maths::word(s.objectives_completed + s.resource_kills + total(s.aaa_kills) + total(s.site_kills) + total(s.orb_kills));}};
+      auto primary{[](sortie_statistics const &s){
+        return maths::word(s.objectives_completed + s.resource_kills + total(s.aaa_kills) + total(s.site_kills) + total(s.orb_kills));
+      }};
       auto other{[](sortie_statistics const &s){return maths::word(total(s.kla_kills) + total(s.vehicle_kills));}};
       screen.text(4, 14, "Primary Kills = " + std::to_string(primary(totals)));
       screen.text(4, 15, "Other Kills = " + std::to_string(other(totals)));
@@ -344,7 +376,8 @@ void front_end::render_menus(render::framebuffer &target) const {
       screen.text(5, 12, " Almost anything else cancels...");
     }
   } else if(combat) {
-    screen.text(4, 6, "Current Pilot:"); screen.text(19, 6, pilot_label(pilot, true), 14);
+    screen.text(4, 6, "Current Pilot:");
+    screen.text(19, 6, pilot_label(pilot, true), 14);
     screen.text(4, 7, "Active Theater :");
     screen.text(7, 8, active && *active < worlds.size() ? worlds[*active].title : "none", 14);
     screen.text(4, 10, "Choose with arrow keys or letter", 15);
@@ -404,9 +437,12 @@ void front_end::render_menus(render::framebuffer &target) const {
       screen.text(4, 14, "Primary Kills = " + std::to_string(totals.objectives_completed + totals.resource_kills + total(totals.aaa_kills) + total(totals.site_kills) + total(totals.orb_kills)));
       screen.text(4, 15, "Other Kills = " + std::to_string(total(totals.kla_kills) + total(totals.vehicle_kills)));
       screen.text(4, 17, "Combined best-single-mission:");
-      auto primary{[](sortie_statistics const &s){return maths::word(s.objectives_completed + s.resource_kills + total(s.aaa_kills) + total(s.site_kills) + total(s.orb_kills));}};
+      auto primary{[](sortie_statistics const &s){
+        return maths::word(s.objectives_completed + s.resource_kills + total(s.aaa_kills) + total(s.site_kills) + total(s.orb_kills));
+      }};
       auto secondary{[](sortie_statistics const &s){return maths::word(total(s.kla_kills) + total(s.vehicle_kills));}};
-      auto const peaks{record.individual_records()}, best{record.best_sortie()};
+      auto const peaks{record.individual_records()};
+      auto const best{record.best_sortie()};
       screen.text(5, 18, std::format("{} primary kills \xc4\xc4 {} other kills", primary(peaks), secondary(peaks)));
       screen.text(4, 19, "Best mission score = " + std::to_string(record.best_sortie_score()) + ":");
       screen.text(5, 20, std::format("{} primary kills \xc4\xc4 {} other kills", primary(best), secondary(best)));
@@ -421,14 +457,20 @@ void front_end::render_menus(render::framebuffer &target) const {
     options(24, 9, training_choices, selected(interface_page::training));
     screen.text(15, 17, "Current choices:", 14);
     screen.text(18, 18, std::string{"Plane:  "} + (training.invincible ? "Invulnerable" : "Standard"));
-    auto strength{[](int const q){return q < 0 ? std::string{"random spread of strength"} : "strength " + std::to_string(q + 1);}};
-    screen.text(18, 19, std::to_string(training.kla.count) + " missile sites:"); screen.text(43, 19, strength(training.kla.quality));
-    screen.text(18, 20, std::to_string(training.aaa.count) + " AAA sites:"); screen.text(43, 20, strength(training.aaa.quality));
-    screen.text(18, 21, std::to_string(training.vehicles.count) + " ground vehicle sites:"); screen.text(43, 21, strength(training.vehicles.quality));
+    auto strength{[](int const q){
+      return q < 0 ? std::string{"random spread of strength"} : "strength " + std::to_string(q + 1);
+    }};
+    screen.text(18, 19, std::to_string(training.kla.count) + " missile sites:");
+    screen.text(43, 19, strength(training.kla.quality));
+    screen.text(18, 20, std::to_string(training.aaa.count) + " AAA sites:");
+    screen.text(43, 20, strength(training.aaa.quality));
+    screen.text(18, 21, std::to_string(training.vehicles.count) + " ground vehicle sites:");
+    screen.text(43, 21, strength(training.vehicles.quality));
     bool const editor{view == interface_page::training_value};
     bool const quality{view == interface_page::training_wickedness || (editor && training_editor == interface_page::training_wickedness)};
     if(view != interface_page::training) {
-      int const left{quality ? 14 : 9}, right{quality ? 65 : 68};
+      int const left{quality ? 14 : 9};
+      int const right{quality ? 65 : 68};
       screen.colours(7, 4, 2);
       screen.heading(quality ? "Modify Wickedness of Enemies" : "Choose Number of Enemies");
       screen.panel(left, 8, right, 19);
@@ -471,11 +513,17 @@ void front_end::render_menus(render::framebuffer &target) const {
       screen.text(5, 9, "Your objective is to destroy the flying saucer and to take out");
       screen.text(5, 10, "as many enemy fuel dumps and ground sites as possible.");
       screen.text(5, 12, "Latest intelligence reports enemy strengths as follows:");
-      auto strength{[](int const q){return q < 0 ? std::string{"random spread of strength"} : "strength " + std::to_string(q + 1);}};
-      screen.text(15, 13, std::to_string(training.kla.count) + " Missile sites:"); screen.text(39, 13, strength(training.kla.quality));
-      screen.text(15, 14, std::to_string(training.aaa.count) + " AAA sites:"); screen.text(39, 14, strength(training.aaa.quality));
-      screen.text(15, 15, std::to_string(training.vehicles.count) + " Ground-Vehicle sites:"); screen.text(39, 15, strength(training.vehicles.quality));
-      screen.text(15, 16, "1 Enemy Saucers:"); screen.text(39, 16, "random spread of strength");
+      auto strength{[](int const q){
+        return q < 0 ? std::string{"random spread of strength"} : "strength " + std::to_string(q + 1);
+      }};
+      screen.text(15, 13, std::to_string(training.kla.count) + " Missile sites:");
+      screen.text(39, 13, strength(training.kla.quality));
+      screen.text(15, 14, std::to_string(training.aaa.count) + " AAA sites:");
+      screen.text(39, 14, strength(training.aaa.quality));
+      screen.text(15, 15, std::to_string(training.vehicles.count) + " Ground-Vehicle sites:");
+      screen.text(39, 15, strength(training.vehicles.quality));
+      screen.text(15, 16, "1 Enemy Saucers:");
+      screen.text(39, 16, "random spread of strength");
       screen.text(3, 19, "Note:  Training missions are much harder than the combat missions.");
       screen.text(21, 21, "Type <CR> to continue, <ESC> to abort", 14);
     } else if(view == interface_page::starting_airfield) {
@@ -491,7 +539,8 @@ void front_end::render_menus(render::framebuffer &target) const {
         screen.text(6, 19, "Escape returns without starting a flight.", 14);
       } else {
         screen.text(6, 7, "Type <CR> to fly, `i' for detailed info, or <ESC> to abort mission.", 14);
-        screen.text(34, 13, "RDU ^international", 15); screen.text(39, 14, "Airport", 15);
+        screen.text(34, 13, "RDU ^international", 15);
+        screen.text(39, 14, "Airport", 15);
         auto const status{prepared_world ? resources::survey_airfield(*prepared_world) : resources::airfield_status{}};
         screen.text(35, 15, std::format("({} planes  {} MO)", status.planes, status.objectives), 15);
       }
@@ -499,11 +548,14 @@ void front_end::render_menus(render::framebuffer &target) const {
     } else {
       screen.colours(7, 6, 7, 15);
       bool highlighted{false};
-      for(unsigned int i{0}; i < scroll; ++i) for(unsigned int n{0}; n < document_lines[i].size(); ++n) {
-        if(document_lines[i][n] == '\\' && n + 1 < document_lines[i].size()) {
-          char const marker{document_lines[i][++n]};
-          if(marker == '(') highlighted = true;
-          else if(marker == ')') highlighted = false;
+      for(unsigned int i{0}; i < scroll; ++i) {
+        for(unsigned int n{0}; n < document_lines[i].size(); ++n) {
+          if(document_lines[i][n] == '\\' && n + 1 < document_lines[i].size()) {
+            char const marker{document_lines[i][++n]};
+            if(marker == '(') {
+              highlighted = true;
+            } else if(marker == ')') highlighted = false;
+          }
         }
       }
       for(unsigned int i{0}; i < 15 && i + scroll < document_lines.size(); ++i) {
@@ -570,18 +622,23 @@ void front_end::render_menus(render::framebuffer &target) const {
     screen.panel(12, 5, 68, 19);
     screen.text(22, 8, "Use arrow keys or type highlighted");
     screen.text(24, 9, "letter to choose action:");
-    if(deleting) options(22, 11, delete_choices, selected(interface_page::score_delete));
-    else options(22, 11, score_choices, selected(interface_page::high_score_menu));
+    if(deleting) {
+      options(22, 11, delete_choices, selected(interface_page::score_delete));
+    } else {
+      options(22, 11, score_choices, selected(interface_page::high_score_menu));
+    }
     if(view == interface_page::score_delete_confirmation) {
       screen.colours(4, 7, 5, 4);
-      screen.heading("Confirm Deletion"); screen.panel(19, 9, 61, 15);
+      screen.heading("Confirm Deletion");
+      screen.panel(19, 9, 61, 15);
       screen.text(21, 11, "Type <ENTER> to delete high score list", 14);
       screen.text(21, 12, " Almost anything else cancels...");
     }
   } else if(view == interface_page::high_scores) {
     std::array<std::string_view, 3> constexpr titles{"High Scores", "Top Careers", "Fastest Careers"};
     screen.colours(1, 3, 6);
-    screen.heading(titles[score_list]); screen.panel(2, 5, 76, 20);
+    screen.heading(titles[score_list]);
+    screen.panel(2, 5, 76, 20);
     screen.text(4, 6, score_list == 0 ? "Name                       Score  Theater-of-Operations      Kills"
       : score_list == 1 ? "Name                 Total Score  Missions Resurrections     Kills"
       : "Name                 Total Score  Missions Resurrections   Points/Misn", 14);
@@ -603,8 +660,11 @@ void front_end::render_menus(render::framebuffer &target) const {
       } else {
         auto const &entry{(score_list == 1 ? tables.best_careers() : tables.fastest_careers())[i]};
         auto text{std::format("  {:>9}  {:<8} {:<8}", entry.points, maths::word(entry.sorties), maths::word(entry.resurrections))};
-        if(score_list == 1) text += std::format("    {:>4} {:>5} {:>5}", maths::word(statistics.objectives_completed), primary, secondary);
-        else text += std::format("   {:>16}", entry.sorties == 0 ? 0 : entry.points / maths::word(entry.sorties));
+        if(score_list == 1) {
+          text += std::format("    {:>4} {:>5} {:>5}", maths::word(statistics.objectives_completed), primary, secondary);
+        } else {
+          text += std::format("   {:>16}", entry.sorties == 0 ? 0 : entry.points / maths::word(entry.sorties));
+        }
         screen.text(25, row, text, 15);
       }
     }
@@ -633,19 +693,26 @@ void front_end::render_menus(render::framebuffer &target) const {
     report(screen, returned_pilot ? &*returned_pilot : nullptr, false, "POST-MISSION CAREER REPORT");
   } else if((view == interface_page::menu && session_running) || view == interface_page::quit_confirmation) {
     if(view == interface_page::quit_confirmation) {
-      std::array<std::string_view, 2> constexpr choices{"Yes", "No - return"}; draw_menu(canvas, "End this sortie?", choices);
+      std::array<std::string_view, 2> constexpr choices{"Yes", "No - return"};
+      draw_menu(canvas, "End this sortie?", choices);
     } else {
-      std::array<std::string_view, 4> constexpr choices{"Resume flight", "Options and controls", "Control bindings", "End current sortie"}; draw_menu(canvas, "Main menu", choices);
+      std::array<std::string_view, 4> constexpr choices{"Resume flight", "Options and controls", "Control bindings", "End current sortie"};
+      draw_menu(canvas, "Main menu", choices);
     }
   }
   if(page == interface_page::documentation || page == interface_page::registration || page == interface_page::menu_information) {
     bool const context{page == interface_page::menu_information};
-    int const left{context ? 2 : 0}, top{context ? 5 : 0}, right{context ? 76 : 79}, bottom{context ? 22 : 24};
+    int const left{context ? 2 : 0};
+    int const top{context ? 5 : 0};
+    int const right{context ? 76 : 79};
+    int const bottom{context ? 22 : 24};
     screen.colours(7, page == interface_page::documentation ? 8 : 4, page == interface_page::documentation ? 9 : 2, 15);
     if(context) {
       std::array<std::string_view, 9> constexpr titles{"", "Main Menu Information", "Duty Roster Menu Information", "Combat Missions Information", "", "Keyboard/Joystick Information", "Training Missions Information", "High Score Menu Information", "Delete a High Score List"};
       screen.heading(titles.at(information_section));
-    } else canvas.clear();
+    } else {
+      canvas.clear();
+    }
     screen.panel(left, top, right, bottom, 16, false, context);
     unsigned int const visible{static_cast<unsigned int>(bottom - top - 2)};
     for(unsigned int i{0}; i != visible && i + scroll < document_lines.size(); ++i) {
@@ -659,13 +726,16 @@ void front_end::render_menus(render::framebuffer &target) const {
     }
     canvas.rectangle((left + 1) * 8, (bottom - 1) * 16, right * 8, bottom * 16, render::rgba_pixel{});
     if(page == interface_page::documentation && document_chapter == 0) {
-      if(numeric_input.empty()) screen.text(4, 23, "Choose a chapter number for more info, <CR> to continue or <ESC> to exit", 15, 0);
-      else {
+      if(numeric_input.empty()) {
+        screen.text(4, 23, "Choose a chapter number for more info, <CR> to continue or <ESC> to exit", 15, 0);
+      } else {
         // MOAG replaces the entire instruction row with its grey chapter-number input field.
         screen.text(1, 23, std::string(78, ' '), 8, 7);
         screen.text(4, 23, "Enter a Chapter number:  " + numeric_input + "_", 8, 7);
       }
-    } else screen.text(context ? 13 : 14, bottom - 1, "Type \x18 \x19 <P-UP> <P-DN> etc..., <CR> or <ESC> to exit", 15, 0);
+    } else {
+      screen.text(context ? 13 : 14, bottom - 1, "Type \x18 \x19 <P-UP> <P-DN> etc..., <CR> or <ESC> to exit", 15, 0);
+    }
   }
   if(page == interface_page::unavailable_pilot || page == interface_page::resurrect_activate) {
     auto const &chosen{campaign.pilots()[pilot_index]};
@@ -688,7 +758,9 @@ void front_end::render_menus(render::framebuffer &target) const {
       if(stockade) {
         screen.text(8, 14, "Release is scheduled for " + release_date(chosen.suspended_until()) + ".");
         screen.text(9, 16, "Type almost any key to continue...");
-      } else screen.text(8, 15, "Do you want to resurrect the pilot?  (Y or N)");
+      } else {
+        screen.text(8, 15, "Do you want to resurrect the pilot?  (Y or N)");
+      }
     }
   }
   if(page == interface_page::completed_theatre) {
@@ -750,7 +822,8 @@ void front_end::render_menus(render::framebuffer &target) const {
   }
   if(page == interface_page::notice) {
     // Wrap long file paths rather than losing the destination at the right edge of the dialog.
-    unsigned int constexpr columns{61}, maximum_rows{19};
+    unsigned int constexpr columns{61};
+    unsigned int constexpr maximum_rows{19};
     std::vector<std::string> lines;
     std::istringstream text{feedback};
     std::string line;
@@ -760,8 +833,10 @@ void front_end::render_menus(render::framebuffer &target) const {
     }
     unsigned int const rows{std::min(static_cast<unsigned int>(lines.size()), maximum_rows)};
     int const height{std::max(8, static_cast<int>(rows) + 4)};
-    int const top{std::min(9, 24 - height)}, bottom{top + height - 1};
-    screen.heading("Information"); screen.panel(8, top, 72, bottom);
+    int const top{std::min(9, 24 - height)};
+    int const bottom{top + height - 1};
+    screen.heading("Information");
+    screen.panel(8, top, 72, bottom);
     for(unsigned int row{0}; row != rows; ++row) screen.text(10, top + 2 + static_cast<int>(row), lines[row]);
     screen.text(10, bottom - 1, "Type almost any key to continue...", 14);
   }

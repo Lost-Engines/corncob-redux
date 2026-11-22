@@ -21,8 +21,10 @@ int main(int const argc, char const *const argv[]) {
     particles.advance(random);
     if(particles.colour() != input.byte()) throw std::runtime_error{"native particle colour " + std::to_string(i)};
     for(auto const &disc : particles.discs()) {
-      for(unsigned int axis{0}; axis != 3; ++axis) if(disc.position[axis] != input.signed_word()) {
-        throw std::runtime_error{"native particle coordinate " + std::to_string(i)};
+      for(unsigned int axis{0}; axis != 3; ++axis) {
+        if(disc.position[axis] != input.signed_word()) {
+          throw std::runtime_error{"native particle coordinate " + std::to_string(i)};
+        }
       }
       if(disc.diameter != input.word()) throw std::runtime_error{"native particle diameter " + std::to_string(i)};
     }

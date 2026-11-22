@@ -8,8 +8,21 @@
 namespace corncob::game {
 
 enum class builder_command {
-  cursor, hide_cursor, create, select, erase, next_type, previous_type,
-  next_quality, previous_quality, special, complete, level, lock_height, remember_height, map,
+  cursor,
+  hide_cursor,
+  create,
+  select,
+  erase,
+  next_type,
+  previous_type,
+  next_quality,
+  previous_quality,
+  special,
+  complete,
+  level,
+  lock_height,
+  remember_height,
+  map,
 };
 
 class mission_builder {
@@ -24,7 +37,8 @@ private:
   std::optional<unsigned int> marker;
   void update_marker();
   bool overhead{false};
-  int32_t speed{512}, height_lock{0};
+  int32_t speed{512};
+  int32_t height_lock{0};
   void change_type(int direction);
 
 public:

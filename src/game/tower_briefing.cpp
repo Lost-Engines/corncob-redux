@@ -94,7 +94,8 @@ void tower_briefing::render(render::framebuffer &target, std::span<uint8_t const
     screen.text(2, 3, "Type almost any key to continue...");
     return;
   }
-  bool selected{false}, highlighted{false};
+  bool selected{false};
+  bool highlighted{false};
   unsigned int const count{static_cast<unsigned int>(text_lines.size())};
   for(unsigned int row{0}; row != visible_lines; ++row) {
     unsigned int const index{first + row};

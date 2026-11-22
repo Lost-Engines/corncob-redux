@@ -12,15 +12,19 @@ int main(int const argc, char const *const argv[]) {
   /// Compare visual state with unchanged DOS routines and every native DAC write, then check the palette reaches the scene renderer
   if(argc != 2) throw std::invalid_argument{"visual feedback fixture required"};
   corncob::tests::reference_reader input{argv[1], "CORNVIS1"};
-  auto const states{input.dword()}, palettes{input.dword()};
+  auto const states{input.dword()};
+  auto const palettes{input.dword()};
   for(unsigned int i{0}; i != states; ++i) {
-    int32_t const force{input.signed_dword()}, average{input.signed_dword()};
-    uint16_t const brightness{input.word()}, frame{input.word()};
+    int32_t const force{input.signed_dword()};
+    int32_t const average{input.signed_dword()};
+    uint16_t const brightness{input.word()};
+    uint16_t const frame{input.word()};
     corncob::flight::time_step const step{
       .elapsed{input.signed_word()},
       .normal{input.signed_word()},
     };
-    bool const on_foot{input.byte() != 0}, closing{input.byte() != 0};
+    bool const on_foot{input.byte() != 0};
+    bool const closing{input.byte() != 0};
     corncob::game::vision_state actual{
       .average_vertical_force{average},
       .brightness{brightness},
@@ -38,14 +42,18 @@ int main(int const argc, char const *const argv[]) {
   for(unsigned int i{0}; i != palettes; ++i) {
     auto const brightness{static_cast<uint8_t>(input.word())};
     std::array<corncob::render::rgba_pixel, 16> colours;
-    for(auto &colour : colours) colour = {
-      .red{expand(input.byte())},
-      .green{expand(input.byte())},
-      .blue{expand(input.byte())},
-    };
+    for(auto &colour : colours) {
+      colour = {
+        .red{expand(input.byte())},
+        .green{expand(input.byte())},
+        .blue{expand(input.byte())},
+      };
+    }
     corncob::render::fade_palette(colours, brightness);
     for(auto const &colour : colours) {
-      auto const red{expand(input.byte())}, green{expand(input.byte())}, blue{expand(input.byte())};
+      auto const red{expand(input.byte())};
+      auto const green{expand(input.byte())};
+      auto const blue{expand(input.byte())};
       if(colour.red != red || colour.green != green || colour.blue != blue) throw std::runtime_error{"native DAC palette case " + std::to_string(i)};
     }
   }

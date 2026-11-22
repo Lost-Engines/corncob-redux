@@ -39,8 +39,10 @@ corncob::maths::rotation read_rotation(std::istream &input) {
 void check_word(int16_t const actual, std::istream &input, char const *const operation, unsigned int const index) {
   /// Report the first discrepancy against execution of the DOS routine
   int16_t const expected{std::bit_cast<int16_t>(read_word(input))};
-  if(actual != expected) throw std::runtime_error{std::string{operation} + " case " + std::to_string(index)
-    + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+  if(actual != expected) {
+    throw std::runtime_error{std::string{operation} + " case " + std::to_string(index)
+      + ": expected " + std::to_string(expected) + ", got " + std::to_string(actual)};
+  }
 }
 void check_rotation(corncob::maths::rotation const &actual, std::istream &input, char const *const operation, unsigned int const index) {
   /// Preserve row order while comparing all nine coefficients

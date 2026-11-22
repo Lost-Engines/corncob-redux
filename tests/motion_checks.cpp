@@ -45,7 +45,8 @@ int main(int const argc, char const *const argv[]) {
   /// Exercise original PRNG-driven motion and all three strict box boundaries against machine code
   if(argc != 2) throw std::invalid_argument{"motion_checks requires a fixture path"};
   corncob::tests::reference_reader input{argv[1], "CORNMO01"};
-  auto const motions{input.dword()}, boxes{input.dword()};
+  auto const motions{input.dword()};
+  auto const boxes{input.dword()};
   for(unsigned int i{0}; i != motions; ++i) {
     auto actual{read_object(input)};
     corncob::flight::time_step const step{

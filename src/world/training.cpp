@@ -13,7 +13,9 @@ theatre generate_training(resources::geometry_bank const &geometry, training_set
   theatre result;
   result.training = true;
   /// MOAG writes the generated training intelligence into airfield four's TOWERS.DAT section
-  auto strength{[](training_defence const &defence){return defence.quality < 0 ? std::string{"random spread of strength"} : "strength " + std::to_string(defence.quality + 1);}};
+  auto strength{[](training_defence const &defence){
+    return defence.quality < 0 ? std::string{"random spread of strength"} : "strength " + std::to_string(defence.quality + 1);
+  }};
   result.briefing = "\r\n\f\r\n\f\r\n\f\r\n\f\r\n\f\r\n";
   result.briefing += "   Your objective is to destroy the flying saucer and to take out\r\n"
     "   as many enemy fuel dumps and ground sites as possible.\r\n\r\n"
@@ -51,14 +53,16 @@ theatre generate_training(resources::geometry_bank const &geometry, training_set
   add(object_type::runway_end_1, -950'273, -8000, 0);
   add(object_type::runway_piece, result.start.x - 12'000, 0, 0, 7);
   for(unsigned int n{0}; n != 15; ++n) {
-    int32_t const x{coordinate()}, y{coordinate()};
+    int32_t const x{coordinate()};
+    int32_t const y{coordinate()};
     add(object_type::fuel_dump, x, y, 1550);
   }
   for(auto const type : {object_type::aaa_site, object_type::vehicle_site, object_type::kla_site}) {
     auto const &defence{type == object_type::aaa_site ? setup.aaa : type == object_type::vehicle_site ? setup.vehicles : setup.kla};
     for(unsigned int n{0}; n != defence.count; ++n) {
       unsigned int const q{quality(defence.quality)};
-      int32_t const x{coordinate()}, y{coordinate()};
+      int32_t const x{coordinate()};
+      int32_t const y{coordinate()};
       auto &object{add(type, x, y, 800, q)};
       object.velocity = maths::fixed_vector{0, 0, 0};
       object.timer = static_cast<uint16_t>(type == object_type::aaa_site ? 24'000 : type == object_type::vehicle_site ? 900 : 400);
@@ -77,12 +81,15 @@ theatre generate_training(resources::geometry_bank const &geometry, training_set
     }
     add(object_type::crater, 196'608, 163'072, 0);
     for(unsigned int n{0}; n != 50; ++n) {
-      int32_t const x{coordinate()}, y{coordinate()};
+      int32_t const x{coordinate()};
+      int32_t const y{coordinate()};
       add(object_type::shell, x, y, 2000);
     }
     add(object_type::saucer, 0, -131'073, 1000);
-    for(unsigned int row{0}; row != 2; ++row) for(unsigned int marker{0}; marker != 6; ++marker) {
-      add(object_type::tet, static_cast<int32_t>(marker) * 131'072, 131'072, 16'384 + static_cast<int32_t>(row) * 32'768);
+    for(unsigned int row{0}; row != 2; ++row) {
+      for(unsigned int marker{0}; marker != 6; ++marker) {
+        add(object_type::tet, static_cast<int32_t>(marker) * 131'072, 131'072, 16'384 + static_cast<int32_t>(row) * 32'768);
+      }
     }
   } else {
     add(object_type::forcefield_y, 0, 131'072, 32'766);

@@ -14,8 +14,10 @@ int main(int const argc, char const *const argv[]) {
   unsigned int const cases{input.dword()};
   for(unsigned int i{0}; i != cases; ++i) {
     corncob::game::sortie_clock clock{input.word()};
-    auto const first{input.dword()}, second{input.dword()};
-    auto const first_seconds{input.word()}, second_seconds{input.word()};
+    auto const first{input.dword()};
+    auto const second{input.dword()};
+    auto const first_seconds{input.word()};
+    auto const second_seconds{input.word()};
     clock.advance(first);
     if(clock.elapsed() != first_seconds) throw std::runtime_error{"native sortie-clock first segment " + std::to_string(i)};
     clock.suspend();

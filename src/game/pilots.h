@@ -170,7 +170,9 @@ public:
 
 class pilot_roster {
 private:
-  static unsigned int constexpr current_header_bytes{24}, legacy_header_bytes{23}, music_flag_offset{21};
+  static unsigned int constexpr current_header_bytes{24};
+  static unsigned int constexpr legacy_header_bytes{23};
+  static unsigned int constexpr music_flag_offset{21};
   std::vector<uint8_t> header = std::vector<uint8_t>(current_header_bytes);
   uint8_t retained_byte{0};
   uint16_t seed{1};

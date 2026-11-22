@@ -34,8 +34,10 @@ auto main(int const argc, char const *const argv[])->int {
   for(auto const &reference : corncob::tests::native_discs) {
     std::ranges::fill(surface.pixels, 0);
     draw.disc({reference.x, reference.y}, reference.diameter, 12);
-    if(checksum(surface) != reference.hash) throw std::runtime_error{"native disc pixels differ at diameter " + std::to_string(reference.diameter)
-      + " and centre " + std::to_string(reference.x) + "," + std::to_string(reference.y)};
+    if(checksum(surface) != reference.hash) {
+      throw std::runtime_error{"native disc pixels differ at diameter " + std::to_string(reference.diameter)
+        + " and centre " + std::to_string(reference.x) + "," + std::to_string(reference.y)};
+    }
   }
   unsigned int polygon_index{0};
   for(auto const &reference : corncob::tests::native_polygons) {
@@ -50,11 +52,18 @@ auto main(int const argc, char const *const argv[])->int {
   unsigned int const line_count{lines.dword()};
   for(unsigned int i{0}; i != line_count; ++i) {
     bool const wire{lines.byte() != 0};
-    int const x1{lines.signed_word()}, y1{lines.signed_word()}, x2{lines.signed_word()}, y2{lines.signed_word()};
-    uint64_t const low{lines.dword()}, high{lines.dword()};
+    int const x1{lines.signed_word()};
+    int const y1{lines.signed_word()};
+    int const x2{lines.signed_word()};
+    int const y2{lines.signed_word()};
+    uint64_t const low{lines.dword()};
+    uint64_t const high{lines.dword()};
     std::ranges::fill(surface.pixels, 0);
-    if(wire) draw.wire({x1, y1}, {x2, y2}, 12);
-    else draw.line({x1, y1}, {x2, y2}, 12);
+    if(wire) {
+      draw.wire({x1, y1}, {x2, y2}, 12);
+    } else {
+      draw.line({x1, y1}, {x2, y2}, 12);
+    }
     if(checksum(surface) != (high << 32 | low)) throw std::runtime_error{"native line pixels differ in case " + std::to_string(i)};
   }
   corncob::tests::reference_reader clips{argv[2], "CORNCLP1"};
@@ -66,10 +75,17 @@ auto main(int const argc, char const *const argv[])->int {
     .bottom{199},
   };
   for(unsigned int i{0}; i != clip_count; ++i) {
-    int const x1{clips.signed_word()}, y1{clips.signed_word()}, x2{clips.signed_word()}, y2{clips.signed_word()};
+    int const x1{clips.signed_word()};
+    int const y1{clips.signed_word()};
+    int const x2{clips.signed_word()};
+    int const y2{clips.signed_word()};
     bool const accepted{clips.byte() != 0};
-    int const expected_x1{clips.signed_word()}, expected_y1{clips.signed_word()}, expected_x2{clips.signed_word()}, expected_y2{clips.signed_word()};
-    corncob::graphics::screen_point start{x1, y1}, end{x2, y2};
+    int const expected_x1{clips.signed_word()};
+    int const expected_y1{clips.signed_word()};
+    int const expected_x2{clips.signed_word()};
+    int const expected_y2{clips.signed_word()};
+    corncob::graphics::screen_point start{x1, y1};
+    corncob::graphics::screen_point end{x2, y2};
     if(corncob::graphics::clip_wire_line(start, end, viewport) != accepted
       || start != corncob::graphics::screen_point{expected_x1, expected_y1} || end != corncob::graphics::screen_point{expected_x2, expected_y2}) {
       throw std::runtime_error{"native wire clipping differs in case " + std::to_string(i)};

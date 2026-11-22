@@ -17,7 +17,8 @@ int main(int const argc, char const *const argv[]) {
   namespace world = corncob::world;
   namespace game = corncob::game;
   corncob::resources::geometry_bank geometry{corncob::resources::engine_data_asset()};
-  unsigned int offset{12}, particles{0};
+  unsigned int offset{12};
+  unsigned int particles{0};
   for(unsigned int i{0}; i != data.dword(8); ++i) {
     auto const initial{corncob::tests::read_actor(data, offset)};
     corncob::maths::world_position const observer{data.signed_dword(offset + 74), data.signed_dword(offset + 78), data.signed_dword(offset + 82)};
@@ -35,7 +36,11 @@ int main(int const argc, char const *const argv[]) {
     unsigned int const count{data.byte(offset + 171)};
     offset += 172;
     unsigned int actual_count{0};
-    if(!full) for(unsigned int slot{1}; slot != 320; ++slot) if(theatre.objects[slot].flags != 0) ++actual_count;
+    if(!full) {
+      for(unsigned int slot{1}; slot != 320; ++slot) {
+        if(theatre.objects[slot].flags != 0) ++actual_count;
+      }
+    }
     if(actual_count != count) throw std::runtime_error{"native mortar particle count " + std::to_string(i)};
     for(unsigned int n{0}; n != count; ++n) {
       corncob::tests::compare_actor(theatre.objects[n + 1], corncob::tests::read_actor(data, offset), i, "particle");

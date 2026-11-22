@@ -6,7 +6,8 @@ namespace corncob::graphics {
 
 screen_point radar_position(uint16_t const distance, maths::angle const bearing) noexcept {
   /// RADARDOT uses the high product word with independently stored horizontal/vertical radar diameters
-  int const horizontal{distance * 120 / 256}, vertical{distance * 76 / 256};
+  int const horizontal{distance * 120 / 256};
+  int const vertical{distance * 76 / 256};
   return {
     561 + ((static_cast<int32_t>(maths::negate(maths::sine(bearing))) * horizontal) >> 16),
     295 + ((static_cast<int32_t>(maths::negate(maths::cosine(bearing))) * vertical) >> 16),

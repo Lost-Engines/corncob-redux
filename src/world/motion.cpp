@@ -16,7 +16,7 @@ bool advance_motion(placed_object &object, bool const rotates, maths::random_sou
       maths::turn(object.attitude.roll, object.motion.spin.z * ratio, object.fraction.angles.z);
     }
     vec3<double> velocity{vec3<double>{object.velocity} + object.fraction.velocity};
-    vec3<double> distance{0,0,0};
+    vec3<double> distance{0, 0, 0};
     for(unsigned int axis{0}; axis < 3; ++axis) {
       auto const dispersion{static_cast<uint16_t>(object.motion.dispersion)};
       if(step.clock_tick && dispersion != 0) velocity[axis] += maths::word(random.below(dispersion) - (dispersion + 1) / 2);
@@ -30,8 +30,10 @@ bool advance_motion(placed_object &object, bool const rotates, maths::random_sou
     }
     maths::move(object.position, distance, object.fraction.position);
     if(object.position.z >= 0 || object.velocity.z == 0) return false;
-    object.position.z = 0; object.fraction.position.z = 0;
-    object.velocity = maths::fixed_vector{0,0,0}; object.fraction.velocity = vec3<double>{0,0,0};
+    object.position.z = 0;
+    object.fraction.position.z = 0;
+    object.velocity = maths::fixed_vector{0, 0, 0};
+    object.fraction.velocity = vec3<double>{0, 0, 0};
     if(rotates) object.motion = {};
     return true;
   }

@@ -40,7 +40,7 @@ auto main(int const argc, char const *const argv[])->int {
   bool rejected{false};
   try {
     corncob::resources::decode_cockpit_mask(std::array<uint8_t, 4>{0, 0, 0, 0});
-  } catch(std::invalid_argument const&) {
+  } catch(std::invalid_argument const &) {
     rejected = true;
   }
   require(rejected, "truncated cockpit IMG was accepted");

@@ -26,7 +26,10 @@ unsigned int nearest_airfield(theatre const &world, maths::world_position const 
     int64_t const dx{(static_cast<int64_t>(position.x) - tower.position.x) / 256};
     int64_t const dy{(static_cast<int64_t>(position.y) - tower.position.y) / 256};
     uint64_t const square{static_cast<uint64_t>(dx * dx + dy * dy)};
-    if(square < distance) { distance = square; result = airfield_for(tower.position); }
+    if(square < distance) {
+      distance = square;
+      result = airfield_for(tower.position);
+    }
   }
   return result;
 }

@@ -14,10 +14,25 @@ namespace {
 bool proximity_register(uint8_t const address) noexcept {
   /// Restrict comparisons to the original proximity block's operator and channel registers
   switch(address) {
-  case 0x28: case 0x2b: case 0x48: case 0x4b: case 0x4c: case 0x68:
-  case 0x6b: case 0x88: case 0x8b: case 0xa3: case 0xa4: case 0xb3:
-  case 0xb4: case 0xc3: case 0xe8: case 0xeb: return true;
-  default: return false;
+  case 0x28:
+  case 0x2b:
+  case 0x48:
+  case 0x4b:
+  case 0x4c:
+  case 0x68:
+  case 0x6b:
+  case 0x88:
+  case 0x8b:
+  case 0xa3:
+  case 0xa4:
+  case 0xb3:
+  case 0xb4:
+  case 0xc3:
+  case 0xe8:
+  case 0xeb:
+    return true;
+  default:
+    return false;
   }
 }
 
@@ -49,12 +64,17 @@ int main(int const argc, char const *const argv[]) {
       .active{true},
     });
     std::vector<corncob::audio::register_write> actual;
-    for(auto const &write : sound.pending_registers()) if(proximity_register(write.address)) actual.push_back(write);
+    for(auto const &write : sound.pending_registers()) {
+      if(proximity_register(write.address)) actual.push_back(write);
+    }
     unsigned int const count{input.word()};
-    if(actual.size() != count) throw std::runtime_error{"native proximity register count in frame " + std::to_string(i)
-      + ": got " + std::to_string(actual.size()) + ", expected " + std::to_string(count)};
+    if(actual.size() != count) {
+      throw std::runtime_error{"native proximity register count in frame " + std::to_string(i)
+        + ": got " + std::to_string(actual.size()) + ", expected " + std::to_string(count)};
+    }
     for(unsigned int reg{0}; reg != count; ++reg) {
-      auto const address{input.byte()}, value{input.byte()};
+      auto const address{input.byte()};
+      auto const value{input.byte()};
       if(actual[reg].address != address || actual[reg].value != value) {
         throw std::runtime_error{"native proximity register in frame " + std::to_string(i) + ", write " + std::to_string(reg)};
       }
